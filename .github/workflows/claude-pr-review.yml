@@ -1,4 +1,4 @@
-name: Claude PR Review
+﻿name: Claude PR Review
 
 on:
   pull_request:
@@ -72,11 +72,10 @@ jobs:
             "messages": [
               {
                 "role": "user",
-                "content": "You are reviewing a pull request for the ProjectMarworyn project.\n\n## Project Context\n\nThis is a .NET 9 console application for population simulation. Please review the code with the project's standards in mind.\n\n### Project Standards (from AGENTS.md):\n```\nAGENTS_CONTEXT_PLACEHOLDER\n```\n\n## Pull Request Details\n**Title:** PR_TITLE_PLACEHOLDER\n**Description:** PR_DESCRIPTION_PLACEHOLDER\n**Author:** PR_AUTHOR_PLACEHOLDER\n\n## Changes\n```diff\nDIFF_CONTENT_PLACEHOLDER\n```\n\n## Review Instructions\n\nPlease provide a thorough code review covering:\n1. **Code Quality**: Does the code follow the project's coding standards?\n2. **Architecture**: Does it fit the established patterns (DI, service extension pattern)?\n3. **Potential Issues**: Any bugs, edge cases, or problems?\n4. **Best Practices**: .NET 9 best practices and patterns\n5. **Performance**: Any performance concerns?\n6. **Testing**: Should unit tests be added or updated?\n7. **Positive Feedback**: What's done well?\n\nFormat your review as:\n- Use markdown\n- Start with a summary (approve/request changes/comment)\n- Use emoji to categorize feedback (?? for critical, ?? for suggestions, ? for positives)\n- Be constructive and specific\n- Provide code examples for suggestions when helpful"
+                "content": "You are reviewing a pull request for the ProjectMarworyn project.\n\n## Project Context\n\nThis is a .NET 9 console application for population simulation. Please review the code with the project's standards in mind.\n\n### Project Standards (from AGENTS.md):\n```\nAGENTS_CONTEXT_PLACEHOLDER\n```\n\n## Pull Request Details\n**Title:** PR_TITLE_PLACEHOLDER\n**Description:** PR_DESCRIPTION_PLACEHOLDER\n**Author:** PR_AUTHOR_PLACEHOLDER\n\n## Changes\n```diff\nDIFF_CONTENT_PLACEHOLDER\n```\n\n## Review Instructions\n\nPlease provide a thorough code review covering:\n1. **Code Quality**: Does the code follow the project's coding standards?\n2. **Architecture**: Does it fit the established patterns (DI, service extension pattern)?\n3. **Potential Issues**: Any bugs, edge cases, or problems?\n4. **Best Practices**: .NET 9 best practices and patterns\n5. **Performance**: Any performance concerns?\n6. **Testing**: Should unit tests be added or updated?\n7. **Positive Feedback**: What's done well?\n\nFormat your review as:\n- Use markdown\n- Start with a summary (approve/request changes/comment)\n- Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)\n- Be constructive and specific\n- Provide code examples for suggestions when helpful"
               }
             ]
           }
-EOF
           
           # Replace placeholders with actual content
           # Escape special characters for JSON
@@ -128,7 +127,7 @@ EOF
             const fs = require('fs');
             const review = fs.readFileSync('claude_review.txt', 'utf8');
             
-            const comment = `## ?? Claude AI Code Review
+            const comment = `## 🤖 Claude AI Code Review
             
             ${review}
             
