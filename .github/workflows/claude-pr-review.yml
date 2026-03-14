@@ -24,120 +24,124 @@ jobs:
       - name: Get PR diff
         id: pr-diff
         run: |
-          # Get the diff for this PR
           git fetch origin ${{ github.base_ref }}
-          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD)
-          
-          # Save diff to file to handle multi-line content
-          echo "$DIFF" > pr_diff.txt
-          
-          # Get file count
-          FILE_COUNT=$(echo "$DIFF" | grep -c "^diff --git" || echo "0")
-          echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
+          git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+          echo "Diff saved to pr_diff.txt"
 
-      - name: Get PR details
-        id: pr-details
+      - name: Get PR details and request Claude review
         uses: actions/github-script@v7
-        with:
-          script: |
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
-            });
-            
-            core.setOutput('title', pr.data.title);
-            core.setOutput('description', pr.data.body || 'No description provided');
-            core.setOutput('author', pr.data.user.login);
-
-      - name: Request Claude review
-        id: claude-review
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          # Read the diff file
-          DIFF_CONTENT=$(cat pr_diff.txt)
-          
-          # Read AGENTS.md if it exists
-          AGENTS_CONTEXT=""
-          if [ -f "AGENTS.md" ]; then
-            AGENTS_CONTEXT=$(cat AGENTS.md)
-          fi
-          
-          # Prepare the prompt for Claude
-          cat > claude_prompt.json <<'EOF'
-          {
-            "model": "claude-3-5-sonnet-20241022",
-            "max_tokens": 4096,
-            "messages": [
-              {
-                "role": "user",
-                "content": "You are reviewing a pull request for the ProjectMarworyn project.\n\n## Project Context\n\nThis is a .NET 9 console application for population simulation. Please review the code with the project's standards in mind.\n\n### Project Standards (from AGENTS.md):\n```\nAGENTS_CONTEXT_PLACEHOLDER\n```\n\n## Pull Request Details\n**Title:** PR_TITLE_PLACEHOLDER\n**Description:** PR_DESCRIPTION_PLACEHOLDER\n**Author:** PR_AUTHOR_PLACEHOLDER\n\n## Changes\n```diff\nDIFF_CONTENT_PLACEHOLDER\n```\n\n## Review Instructions\n\nPlease provide a thorough code review covering:\n1. **Code Quality**: Does the code follow the project's coding standards?\n2. **Architecture**: Does it fit the established patterns (DI, service extension pattern)?\n3. **Potential Issues**: Any bugs, edge cases, or problems?\n4. **Best Practices**: .NET 9 best practices and patterns\n5. **Performance**: Any performance concerns?\n6. **Testing**: Should unit tests be added or updated?\n7. **Positive Feedback**: What's done well?\n\nFormat your review as:\n- Use markdown\n- Start with a summary (approve/request changes/comment)\n- Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)\n- Be constructive and specific\n- Provide code examples for suggestions when helpful"
-              }
-            ]
-          }
-          
-          # Replace placeholders with actual content
-          # Escape special characters for JSON
-          DIFF_ESCAPED=$(echo "$DIFF_CONTENT" | jq -Rs .)
-          AGENTS_ESCAPED=$(echo "$AGENTS_CONTEXT" | jq -Rs .)
-          TITLE_ESCAPED=$(echo "${{ steps.pr-details.outputs.title }}" | jq -Rs .)
-          DESC_ESCAPED=$(echo "${{ steps.pr-details.outputs.description }}" | jq -Rs .)
-          AUTHOR_ESCAPED=$(echo "${{ steps.pr-details.outputs.author }}" | jq -Rs .)
-          
-          # Build the final JSON with proper escaping
-          jq --arg diff "$DIFF_CONTENT" \
-             --arg agents "$AGENTS_CONTEXT" \
-             --arg title "${{ steps.pr-details.outputs.title }}" \
-             --arg desc "${{ steps.pr-details.outputs.description }}" \
-             --arg author "${{ steps.pr-details.outputs.author }}" \
-             '.messages[0].content = (.messages[0].content | 
-               gsub("AGENTS_CONTEXT_PLACEHOLDER"; $agents) | 
-               gsub("PR_TITLE_PLACEHOLDER"; $title) | 
-               gsub("PR_DESCRIPTION_PLACEHOLDER"; $desc) | 
-               gsub("PR_AUTHOR_PLACEHOLDER"; $author) | 
-               gsub("DIFF_CONTENT_PLACEHOLDER"; $diff))' \
-             claude_prompt.json > claude_request.json
-          
-          # Make API request to Claude
-          RESPONSE=$(curl -s https://api.anthropic.com/v1/messages \
-            -H "Content-Type: application/json" \
-            -H "x-api-key: $ANTHROPIC_API_KEY" \
-            -H "anthropic-version: 2023-06-01" \
-            -d @claude_request.json)
-          
-          # Extract the review content
-          REVIEW=$(echo "$RESPONSE" | jq -r '.content[0].text')
-          
-          # Check for errors
-          if [ "$REVIEW" = "null" ] || [ -z "$REVIEW" ]; then
-            echo "Error: Failed to get review from Claude"
-            echo "Response: $RESPONSE"
-            exit 1
-          fi
-          
-          # Save review to file
-          echo "$REVIEW" > claude_review.txt
-          echo "Review generated successfully"
-
-      - name: Post review comment
-        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const review = fs.readFileSync('claude_review.txt', 'utf8');
             
+            // Get PR details
+            const pr = context.payload.pull_request;
+            const title = pr.title;
+            const description = pr.body || 'No description provided';
+            const author = pr.user.login;
+            
+            // Read diff
+            const diff = fs.readFileSync('pr_diff.txt', 'utf8');
+            
+            // Read AGENTS.md if it exists
+            let agentsContext = '';
+            try {
+              agentsContext = fs.readFileSync('AGENTS.md', 'utf8');
+            } catch (e) {
+              console.log('AGENTS.md not found, continuing without it');
+            }
+            
+            // Prepare prompt
+            const prompt = `You are reviewing a pull request for the ProjectMarworyn project.
+
+## Project Context
+
+This is a .NET 9 console application for population simulation. Please review the code with the project's standards in mind.
+
+### Project Standards (from AGENTS.md):
+\`\`\`
+${agentsContext}
+\`\`\`
+
+## Pull Request Details
+**Title:** ${title}
+**Description:** ${description}
+**Author:** ${author}
+
+## Changes
+\`\`\`diff
+${diff}
+\`\`\`
+
+## Review Instructions
+
+Please provide a thorough code review covering:
+1. **Code Quality**: Does the code follow the project's coding standards?
+2. **Architecture**: Does it fit the established patterns (DI, service extension pattern)?
+3. **Potential Issues**: Any bugs, edge cases, or problems?
+4. **Best Practices**: .NET 9 best practices and patterns
+5. **Performance**: Any performance concerns?
+6. **Testing**: Should unit tests be added or updated?
+7. **Positive Feedback**: What's done well?
+
+Format your review as:
+- Use markdown
+- Start with a summary (approve/request changes/comment)
+- Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)
+- Be constructive and specific
+- Provide code examples for suggestions when helpful`;
+            
+            // Call Claude API
+            const apiKey = process.env.ANTHROPIC_API_KEY;
+            if (!apiKey) {
+              throw new Error('ANTHROPIC_API_KEY is not set');
+            }
+            
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01'
+              },
+              body: JSON.stringify({
+                model: 'claude-3-5-sonnet-20241022',
+                max_tokens: 4096,
+                messages: [
+                  {
+                    role: 'user',
+                    content: prompt
+                  }
+                ]
+              })
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+            }
+            
+            const data = await response.json();
+            const review = data.content[0].text;
+            
+            // Save review to file
+            fs.writeFileSync('claude_review.txt', review);
+            console.log('Review generated successfully');
+            
+            // Post comment
             const comment = `## 🤖 Claude AI Code Review
-            
-            ${review}
-            
-            ---
-            *This review was automatically generated by Claude AI. Please use your judgment when considering this feedback.*`;
+
+${review}
+
+---
+*This review was automatically generated by Claude AI. Please use your judgment when considering this feedback.*`;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
+              issue_number: pr.number,
               body: comment
             });
 
