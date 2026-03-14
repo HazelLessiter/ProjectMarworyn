@@ -66,14 +66,15 @@ Claude reviews your code based on:
 ### Change Claude Model
 
 Edit the `model` field in `.github/workflows/claude-pr-review.yml`:
-```yaml
-"model": "claude-3-5-sonnet-20241022"
+```javascript
+model: 'claude-3-5-sonnet-20240620'
 ```
 
 Available models:
-- `claude-3-5-sonnet-20241022` (recommended - balanced performance)
-- `claude-3-opus-20240229` (most capable, slower)
-- `claude-3-haiku-20240307` (fastest, less detailed)
+- `claude-3-5-sonnet-20240620` (recommended - balanced performance)
+- `claude-3-opus-20240229` (most capable, slower, more expensive)
+- `claude-3-haiku-20240307` (fastest, less detailed, cheapest)
+- `claude-3-sonnet-20240229` (older version)
 
 ### Adjust Max Tokens
 
