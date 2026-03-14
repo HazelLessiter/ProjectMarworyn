@@ -26,7 +26,7 @@ namespace ProjectMarworyn
             var pairs = PairNames(generation.Names);
             Console.WriteLine($"Found {pairs.Count} pairs");
 
-            var genderRandomiser = new Random();//TODO: I used to work for a gambling company and .Random() would not pass srutiny from the Gambling Commission - Not random enough
+            var genderRandomiser = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
 
             foreach (var pair in pairs)
             {
