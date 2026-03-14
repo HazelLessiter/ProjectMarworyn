@@ -45,7 +45,7 @@ ProjectMarworyn/
 - **Null Handling:** Nullable reference types are enabled
 - **Async/Await:** Use async
 - **var** Prefer var
-- - **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
+- **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
 
 ### Naming Conventions
 - **Interfaces:** Prefix with `I` (e.g., `IFileManager`)
