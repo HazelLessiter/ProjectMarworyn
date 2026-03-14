@@ -12,28 +12,30 @@ namespace ProjectMarworyn
                 .Count();
 
             Console.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
+            Thread.Sleep(500);//TODO: Make configurable. "slow" = 1000, "medium" = 500, "fast"
         }
 
         public void GenerateChildren(List<Name> names)
         {
             var pairs = PairNames(names);
 
+            var numberOfChildren = new Random()//TODO: I used to work for a gambling company and .Random() would not pass srutiny from the Gambling Commission - Not random enough
+                .Next(0, 3);
+            var genderRandomiser = new Random()
+                .Next(0, 1);
+
             foreach (var pair in pairs)
             {
-                var numberOfChildren = new Random()
-                    .Next(0, 3);
-
                 if (numberOfChildren == 0)
                 {
-                    Console.WriteLine($"Pair {pair.FName} + {pair.MName} had no children");
+                    Console.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
+                    Thread.Sleep(500);
                 }
                 else
                 {
                     var gender = new Gender();
                     for (int i = 0; i < numberOfChildren; i++)
                     {
-                        var genderRandomiser = new Random()
-                            .Next(0, 1);
                         switch (genderRandomiser)
                         {
                             case 0:
@@ -49,24 +51,26 @@ namespace ProjectMarworyn
                         {
                             name = new Name
                             {
-                                Gender = Gender.Female,
+                                FullName = pair.MName.Prefix + pair.FName.Suffix,
                                 Prefix = pair.MName.Prefix,
                                 Suffix = pair.FName.Suffix,
+                                Gender = Gender.Female
                             };
                         }
                         if (gender == Gender.Male)
                         {
                             name = new Name
                             {
-                                Gender = Gender.Male,
+                                FullName = pair.FName.Prefix + pair.MName.Suffix,
                                 Prefix = pair.FName.Prefix,
                                 Suffix = pair.MName.Suffix,
+                                Gender = Gender.Male,
                             };
                         }
 
                         names.Add(name);
-                        Console.WriteLine($"Child {name.Prefix+name.Suffix} was born to {pair.FName.Prefix+pair.FName.Suffix} +" +
-                            $"{pair.MName.Prefix + pair.MName.Suffix}");
+                        Console.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
+                        Thread.Sleep(500);
                     }
                 }
             }
@@ -84,6 +88,11 @@ namespace ProjectMarworyn
 
             foreach (var fName in fNames)
             {
+                if (index >= mNames.Count())
+                {
+                    break;
+                }
+
                 var mName = mNames[index];
 
                 if (mName != null)
@@ -94,7 +103,8 @@ namespace ProjectMarworyn
                         MName = mName
                     });
 
-                    Console.WriteLine($"Pair: {fName} + {mName}");
+                    Console.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
+                    Thread.Sleep(500);
                 }
 
                 index++;

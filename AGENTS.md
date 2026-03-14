@@ -45,6 +45,7 @@ ProjectMarworyn/
 - **Null Handling:** Nullable reference types are enabled
 - **Async/Await:** Use async
 - **var** Prefer var
+- - **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
 
 ### Naming Conventions
 - **Interfaces:** Prefix with `I` (e.g., `IFileManager`)
@@ -170,6 +171,7 @@ ProjectMarworyn/
 - Don't bypass dependency injection
 - Don't create new Random() instances in loops
 - Don't use regions, split large files into smaller ones instead
+- Don't add trailing whitespace to the end of file
 
 ---
 
