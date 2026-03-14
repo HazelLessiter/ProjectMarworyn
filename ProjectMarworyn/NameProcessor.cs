@@ -31,7 +31,7 @@ namespace ProjectMarworyn
             foreach (var pair in pairs)
             {
                 var numberOfChildren = new Random()
-                    .Next(0, 3);
+                    .Next(0, 4);//TODO: Make configurable
 
                 if (numberOfChildren == 0)
                 {

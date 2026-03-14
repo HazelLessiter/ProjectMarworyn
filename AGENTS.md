@@ -119,11 +119,12 @@ ProjectMarworyn/
 ## Known Issues & Technical Debt
 
 ### Current Known Issues
-1. JSON structure doesn't match Name model (needs parser)
-2. Random number generation creates new instances (should be singleton)
-3. Gender randomizer range is incorrect (should be `Next(0, 2)`)
-4. Pairing logic can throw index out of bounds
-5. Static field in Initialiser should be removed
+1. ~~JSON structure doesn't match Name model (needs parser)~~ ✅ FIXED
+2. ~~Random number generation creates new instances (should be singleton)~~ ✅ FIXED - using single Random instance per method
+3. ~~Gender randomizer range is incorrect (should be `Next(0, 2)`)~~ ✅ FIXED
+4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
+5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
+6. Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)
 
 ### Planned Refactoring
 - [Items you plan to address]
