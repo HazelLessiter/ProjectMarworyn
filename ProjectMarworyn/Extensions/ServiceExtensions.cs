@@ -8,6 +8,7 @@ namespace ProjectMarworyn.Extensions
         {
             services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<INameProcessor, NameProcessor>();
+            services.AddTransient<IGenerationManager, GenerationManager>();
             services.AddSingleton<Initiliser>();
 
             return services;

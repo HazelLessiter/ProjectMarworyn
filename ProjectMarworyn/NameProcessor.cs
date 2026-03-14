@@ -15,17 +15,24 @@ namespace ProjectMarworyn
             Thread.Sleep(500);//TODO: Make configurable. "slow" = 1000, "medium" = 500, "fast"
         }
 
-        public void GenerateChildren(List<Name> names)
+        public Generation GenerateChildren(Generation generation)
         {
-            var pairs = PairNames(names);
+            var newGeneration = new Generation()
+            {
+                Iteration = generation.Iteration + 1,
+                Names = new List<Name>()
+            };
 
-            var numberOfChildren = new Random()//TODO: I used to work for a gambling company and .Random() would not pass srutiny from the Gambling Commission - Not random enough
-                .Next(0, 3);
-            var genderRandomiser = new Random()
-                .Next(0, 1);
+            var pairs = PairNames(generation.Names);
+            Console.WriteLine($"Found {pairs.Count} pairs");
+
+            var genderRandomiser = new Random();//TODO: I used to work for a gambling company and .Random() would not pass srutiny from the Gambling Commission - Not random enough
 
             foreach (var pair in pairs)
             {
+                var numberOfChildren = new Random()
+                    .Next(0, 3);
+
                 if (numberOfChildren == 0)
                 {
                     Console.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
@@ -34,9 +41,12 @@ namespace ProjectMarworyn
                 else
                 {
                     var gender = new Gender();
+
                     for (int i = 0; i < numberOfChildren; i++)
                     {
-                        switch (genderRandomiser)
+                        
+                        switch (genderRandomiser
+                            .Next(0, 2))
                         {
                             case 0:
                                 gender = Gender.Female;
@@ -68,12 +78,14 @@ namespace ProjectMarworyn
                             };
                         }
 
-                        names.Add(name);
+                        newGeneration.Names.Add(name);
                         Console.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
                         Thread.Sleep(500);
                     }
                 }
             }
+
+            return newGeneration;
         }
 
         private List<Pair> PairNames(List<Name> names)
