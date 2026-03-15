@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="ProjectMarworyn.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Configuration\" />
   </ItemGroup>
 
