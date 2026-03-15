@@ -22,13 +22,13 @@ namespace ProjectMarworyn
             var names = _fileManager.ReadNameFile();
             var currentGeneration = _generationManager.Initialise(names);
 
-            while(currentGeneration.Names.Count() > 1)
+            while(currentGeneration.Names.Count > 1)
             {
                 _nameProcessor.ListNumberOfNamesByGender(currentGeneration.Names);
                 currentGeneration = _nameProcessor.GenerateChildren(currentGeneration);
                 Console.WriteLine($"New Generation: {currentGeneration.Iteration}");
             }
-            if (currentGeneration.Names.Count() < 2)
+            if (currentGeneration.Names.Count < 2)
             {
                 Console.WriteLine("The population has gone extinct. Less than 2 people remain");
                 Thread.Sleep(500);

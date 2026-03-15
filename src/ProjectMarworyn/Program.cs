@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using ProjectMarworyn.Extensions;
+using ProjectMarworyn.Configuration;
 
 namespace ProjectMarworyn
 {
@@ -9,6 +11,15 @@ namespace ProjectMarworyn
         static void Main(string[] args)
         {
             var builder = Host.CreateApplicationBuilder(args);
+            
+            // Configure appsettings.json
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("Appsettings.json", optional: false, reloadOnChange: true);
+            
+            // Configure options
+            builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("Configuration"));
+            
             builder.Services.AddProjectServices();
 
             var host = builder.Build();

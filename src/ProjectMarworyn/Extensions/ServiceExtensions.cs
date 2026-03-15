@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ProjectMarworyn.Configuration;
 
 namespace ProjectMarworyn.Extensions
 {
@@ -9,6 +10,7 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<INameProcessor, NameProcessor>();
             services.AddTransient<IGenerationManager, GenerationManager>();
+            services.AddTransient<IConsoleService, ConsoleService>();
             services.AddSingleton<Initiliser>();
 
             return services;
