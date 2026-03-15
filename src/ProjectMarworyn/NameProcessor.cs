@@ -46,7 +46,7 @@ namespace ProjectMarworyn
                 }
                 else
                 {
-                    var gender = new Gender();
+                    Gender gender = new Gender();
 
                     for (int i = 0; i < numberOfChildren; i++)
                     {
@@ -60,27 +60,21 @@ namespace ProjectMarworyn
                                 break;
                         }
 
-                        Name name = new Name();
-                        if (gender == Gender.Female)
-                        {
-                            name = new Name
+                        var name = gender == Gender.Female ?
+                            new Name
                             {
                                 FullName = pair.MName.Prefix + pair.FName.Suffix,
                                 Prefix = pair.MName.Prefix,
                                 Suffix = pair.FName.Suffix,
                                 Gender = Gender.Female
-                            };
-                        }
-                        if (gender == Gender.Male)
-                        {
-                            name = new Name
+                            }
+                            : new Name
                             {
                                 FullName = pair.FName.Prefix + pair.MName.Suffix,
                                 Prefix = pair.FName.Prefix,
                                 Suffix = pair.MName.Suffix,
-                                Gender = Gender.Male,
+                                Gender = Gender.Male
                             };
-                        }
 
                         newGeneration.Names.Add(name);
                         _outputService.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
