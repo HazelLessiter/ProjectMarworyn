@@ -8,7 +8,7 @@ namespace ProjectMarworyn.Tests.Mocks
         {
         }
 
-        public void Delay(int milliseconds)
+        public void Delay()
         {
         }
     }

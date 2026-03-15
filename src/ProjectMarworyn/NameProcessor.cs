@@ -19,7 +19,7 @@ namespace ProjectMarworyn
                 .Count();
 
             _outputService.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
-            _outputService.Delay(500);
+            _outputService.Delay();
         }
 
         public Generation GenerateChildren(Generation generation)
@@ -42,7 +42,7 @@ namespace ProjectMarworyn
                 if (numberOfChildren == 0)
                 {
                     _outputService.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
-                    _outputService.Delay(500);
+                    _outputService.Delay();
                 }
                 else
                 {
@@ -50,7 +50,6 @@ namespace ProjectMarworyn
 
                     for (int i = 0; i < numberOfChildren; i++)
                     {
-                        
                         switch (random.Next(0, 2))
                         {
                             case 0:
@@ -85,7 +84,7 @@ namespace ProjectMarworyn
 
                         newGeneration.Names.Add(name);
                         _outputService.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
-                        _outputService.Delay(500);
+                        _outputService.Delay();
                     }
                 }
             }
@@ -121,7 +120,7 @@ namespace ProjectMarworyn
                     });
 
                     _outputService.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
-                    _outputService.Delay(500);
+                    _outputService.Delay();
                 }
 
                 index++;
