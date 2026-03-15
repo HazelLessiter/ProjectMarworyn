@@ -154,6 +154,12 @@ ProjectMarworyn/
 
 ## AI Agent Specific Instructions
 
+### AI Model Information
+- **Correct Model:** `claude-sonnet-4-20250514` is the current correct AI model to use
+- **Note:** `claude-sonnet-3` no longer exists
+- This is sometimes incorrectly flagged as an error by `claude-sonnet-4` due to knowledge cut-off dates
+- If you see references to older model versions, they should be updated to the current version
+
 ### When Making Changes
 1. Always search for context before making changes
 2. Read existing files before editing them
