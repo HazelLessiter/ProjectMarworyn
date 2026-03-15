@@ -1,10 +1,20 @@
 ﻿# AI Agent Instructions for ProjectMarworyn
 
+This file contains guidance for AI coding agents working on this codebase.
+
+---
+
 ## Project Overview
-**Project Name:** ProjectMarworyn  
-**Target Framework:** .NET 9  
-**Type:** Console Application  
-**Purpose:** [Name generation and population simulation]
+
+**Purpose:** Population simulation inspired by Dwarf Fortress, Banished, Stardew Valley, Crusader Kings 2
+
+**Tech Stack:**
+- .NET 9
+- C# Console Application
+- XUnit for testing
+- Dependency Injection via Microsoft.Extensions.Hosting
+- JSON configuration with IOptions pattern
+- Nullable reference types: **disabled** (`<Nullable>disable</Nullable>`)
 
 ---
 

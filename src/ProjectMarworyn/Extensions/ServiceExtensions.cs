@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ProjectMarworyn.Configuration;
 
 namespace ProjectMarworyn.Extensions
 {

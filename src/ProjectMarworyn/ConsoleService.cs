@@ -1,14 +1,15 @@
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using ProjectMarworyn.Configuration;
 
 namespace ProjectMarworyn
 {
     internal class ConsoleService : IConsoleService
     {
-        private readonly int _delay;
+        private readonly Configuration.AppSettings _appSettings;
 
-        public ConsoleService(IConfiguration configuration)
+        public ConsoleService(IOptions<Configuration.AppSettings> appSettings)
         {
-            _delay = configuration.GetValue<int>("Delay");
+            _appSettings = appSettings.Value;
         }
 
         public void WriteLine(string message)
@@ -18,7 +19,7 @@ namespace ProjectMarworyn
 
         public void Delay()
         {
-            Thread.Sleep(_delay);
+            Thread.Sleep(_appSettings.Delay);
         }
     }
 }
