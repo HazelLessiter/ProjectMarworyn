@@ -26,12 +26,11 @@ namespace ProjectMarworyn
             var pairs = PairNames(generation.Names);
             Console.WriteLine($"Found {pairs.Count} pairs");
 
-            var genderRandomiser = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
+            var random = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
 
             foreach (var pair in pairs)
             {
-                var numberOfChildren = new Random()
-                    .Next(0, 4);//TODO: Make configurable
+                var numberOfChildren = random.Next(0, 4);//TODO: Make configurable
 
                 if (numberOfChildren == 0)
                 {
@@ -45,8 +44,7 @@ namespace ProjectMarworyn
                     for (int i = 0; i < numberOfChildren; i++)
                     {
                         
-                        switch (genderRandomiser
-                            .Next(0, 2))
+                        switch (random.Next(0, 2))
                         {
                             case 0:
                                 gender = Gender.Female;

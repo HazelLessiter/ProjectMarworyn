@@ -7,7 +7,7 @@ namespace ProjectMarworyn
     {
         public List<Name> ReadNameFile()
         {
-            var file = File.ReadAllText("C:\\Workspace\\ProjectMarworyn\\ProjectMarworyn\\Configuration\\FileName.Json");
+            var file = File.ReadAllText("C:\\Workspace\\ProjectMarworyn\\src\\ProjectMarworyn\\Configuration\\FileName.Json");//TODO: Fix hardcoded path
 
             var names = JsonConvert.DeserializeObject<List<Name>>(file);
 
