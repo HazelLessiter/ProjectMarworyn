@@ -125,6 +125,7 @@ ProjectMarworyn/
 4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
 5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
 6. Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)
+7. System.Random quality - not cryptographically secure (see TODO comment in GenerateChildren - would not pass Gambling Commission scrutiny)
 
 ### Planned Refactoring
 - [Items you plan to address]
