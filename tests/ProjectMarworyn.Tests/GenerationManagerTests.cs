@@ -128,6 +128,10 @@ namespace ProjectMarworyn.Tests
                     Gender = i % 2 == 0 ? Gender.Female : Gender.Male
                 });
             }
+
+            var result = _generationManager.Initialise(names);
+
+            Assert.Equal(100, result.Names.Count);
         }
     }
 }
