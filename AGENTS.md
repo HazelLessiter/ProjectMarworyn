@@ -1,10 +1,20 @@
 ﻿# AI Agent Instructions for ProjectMarworyn
 
+This file contains guidance for AI coding agents working on this codebase.
+
+---
+
 ## Project Overview
-**Project Name:** ProjectMarworyn  
-**Target Framework:** .NET 9  
-**Type:** Console Application  
-**Purpose:** [Name generation and population simulation]
+
+**Purpose:** Population simulation inspired by Dwarf Fortress, Banished, Stardew Valley, Crusader Kings 2
+
+**Tech Stack:**
+- .NET 9
+- C# Console Application
+- XUnit for testing
+- Dependency Injection via Microsoft.Extensions.Hosting
+- JSON configuration with IOptions pattern
+- Nullable reference types: **disabled** (`<Nullable>disable</Nullable>`)
 
 ---
 
@@ -49,10 +59,16 @@ ProjectMarworyn/
 
 ### Naming Conventions
 - **Interfaces:** Prefix with `I` (e.g., `IFileManager`)
-- **Services:** [Your preference - e.g., suffix with "Service" or "Manager"]
 - **Models:** Plain nouns (e.g., `Name`, `Pair`)
 - **Extension Methods:** Prefix with `Add` for DI registrations
 - **Lists:** Prefer plural
+- **Class Names**: Common sense naming with suffixes like `Manager`, `Service`, `Processor`, `Handler` etc. is acceptable and encouraged
+  - These suffixes help communicate the class's purpose clearly
+  - Examples: `GenerationManager`, `ConsoleService`, `NameProcessor`, `FileManager`
+  - The code's purpose should be immediately clear from the class name
+  - Clarity > avoiding "common" patterns
+- **Methods/Properties**: Should be self-documenting through clear, descriptive names
+- **Variables**: Use meaningful names that describe what the variable contains
 
 ### File Organization
 - One class per file
@@ -125,6 +141,7 @@ ProjectMarworyn/
 4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
 5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
 6. Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)
+7. System.Random quality - not cryptographically secure (see TODO comment in GenerateChildren - would not pass Gambling Commission scrutiny)
 
 ### Planned Refactoring
 - [Items you plan to address]
@@ -167,11 +184,20 @@ ProjectMarworyn/
 4. Use the service extension pattern for DI
 5. Keep separation of concerns (don't mix file I/O with business logic)
 
+### Naming Conventions
+- **Class Names**: Common sense naming with suffixes like `Manager`, `Service`, `Processor`, `Handler` etc. is acceptable and encouraged
+  - These suffixes help communicate the class's purpose clearly
+  - Examples: `GenerationManager`, `ConsoleService`, `NameProcessor`, `FileManager`
+  - The code's purpose should be immediately clear from the class name
+  - Clarity > avoiding "common" patterns
+- **Methods/Properties**: Should be self-documenting through clear, descriptive names
+- **Variables**: Use meaningful names that describe what the variable contains
+
 ### Preferences
 - **Logging:** [ILogger preference]
 - **Error Handling:** [Try-catch strategy, validation approach]
-- **Comments:** [Prefer code to be self commenting. Comments should detail why a choice was made]
-- **Documentation:** [Do NOT use XML comments, summaries or regions. Code should be self commenting, this is an internal code base not a public library]
+- **Comments:** Prefer code to be self commenting. Comments should detail why a choice was made, not what the code does
+- **Documentation:** Do NOT use XML comments, summaries or regions. Code should be self commenting, this is an internal code base not a public library
 
 ### Don't Do This
 - Don't use hardcoded file paths
@@ -179,6 +205,7 @@ ProjectMarworyn/
 - Don't create new Random() instances in loops
 - Don't use regions, split large files into smaller ones instead
 - Don't add trailing whitespace to the end of file
+- Don't over-engineer class names to avoid common suffixes - clarity is more important than uniqueness
 
 ---
 

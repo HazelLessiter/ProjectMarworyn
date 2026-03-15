@@ -4,6 +4,13 @@ namespace ProjectMarworyn
 {
     internal class NameProcessor : INameProcessor
     {
+        private readonly IConsoleService _outputService;
+
+        public NameProcessor(IConsoleService outputService)
+        {
+            _outputService = outputService;
+        }
+
         public void ListNumberOfNamesByGender(List<Name> names)
         {
             var fNames = names.Where(x => x.Gender == Gender.Female)
@@ -11,8 +18,8 @@ namespace ProjectMarworyn
             var mNames = names.Where(x => x.Gender == Gender.Male)
                 .Count();
 
-            Console.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
-            Thread.Sleep(500);//TODO: Make configurable. "slow" = 1000, "medium" = 500, "fast"
+            _outputService.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
+            _outputService.Delay();
         }
 
         public Generation GenerateChildren(Generation generation)
@@ -24,29 +31,26 @@ namespace ProjectMarworyn
             };
 
             var pairs = PairNames(generation.Names);
-            Console.WriteLine($"Found {pairs.Count} pairs");
+            _outputService.WriteLine($"Found {pairs.Count} pairs");
 
-            var genderRandomiser = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
+            var random = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
 
             foreach (var pair in pairs)
             {
-                var numberOfChildren = new Random()
-                    .Next(0, 4);//TODO: Make configurable
+                var numberOfChildren = random.Next(0, 4);
 
                 if (numberOfChildren == 0)
                 {
-                    Console.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
-                    Thread.Sleep(500);
+                    _outputService.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
+                    _outputService.Delay();
                 }
                 else
                 {
-                    var gender = new Gender();
+                    Gender gender = new Gender();
 
                     for (int i = 0; i < numberOfChildren; i++)
                     {
-                        
-                        switch (genderRandomiser
-                            .Next(0, 2))
+                        switch (random.Next(0, 2))
                         {
                             case 0:
                                 gender = Gender.Female;
@@ -56,31 +60,25 @@ namespace ProjectMarworyn
                                 break;
                         }
 
-                        Name name = new Name();
-                        if (gender == Gender.Female)
-                        {
-                            name = new Name
+                        var name = gender == Gender.Female ?
+                            new Name
                             {
                                 FullName = pair.MName.Prefix + pair.FName.Suffix,
                                 Prefix = pair.MName.Prefix,
                                 Suffix = pair.FName.Suffix,
                                 Gender = Gender.Female
-                            };
-                        }
-                        if (gender == Gender.Male)
-                        {
-                            name = new Name
+                            }
+                            : new Name
                             {
                                 FullName = pair.FName.Prefix + pair.MName.Suffix,
                                 Prefix = pair.FName.Prefix,
                                 Suffix = pair.MName.Suffix,
-                                Gender = Gender.Male,
+                                Gender = Gender.Male
                             };
-                        }
 
                         newGeneration.Names.Add(name);
-                        Console.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
-                        Thread.Sleep(500);
+                        _outputService.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
+                        _outputService.Delay();
                     }
                 }
             }
@@ -115,8 +113,8 @@ namespace ProjectMarworyn
                         MName = mName
                     });
 
-                    Console.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
-                    Thread.Sleep(500);
+                    _outputService.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
+                    _outputService.Delay();
                 }
 
                 index++;

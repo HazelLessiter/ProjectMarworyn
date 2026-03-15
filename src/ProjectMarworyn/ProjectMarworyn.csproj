@@ -4,13 +4,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
-    <Folder Include="Configuration\" />
+    <InternalsVisibleTo Include="ProjectMarworyn.Tests" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
@@ -18,5 +16,9 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Update="Appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
