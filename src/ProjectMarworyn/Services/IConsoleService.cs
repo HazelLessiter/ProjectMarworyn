@@ -1,4 +1,4 @@
-namespace ProjectMarworyn
+namespace ProjectMarworyn.Services
 {
     internal interface IConsoleService
     {

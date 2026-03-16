@@ -1,14 +1,17 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class GenerationManagerTests
     {
         private readonly GenerationManager _generationManager;
+        private readonly MockNameProcessor _mockNameProcessor;
 
         public GenerationManagerTests()
         {
-            _generationManager = new GenerationManager();
+            _mockNameProcessor = new MockNameProcessor();
+            _generationManager = new GenerationManager(_mockNameProcessor, new MockOutputService());
         }
 
         [Fact]
@@ -132,6 +135,96 @@ namespace ProjectMarworyn.Tests
             var result = _generationManager.Initialise(names);
 
             Assert.Equal(100, result.Names.Count);
+        }
+
+        [Fact]
+        public void GenerateChildren_WithNoPairs_ReturnsEmptyNames()
+        {
+            var generation = new Generation
+            {
+                Iteration = 0,
+                Names = new List<Name>()
+            };
+
+            var result = _generationManager.GenerateChildren(generation);
+
+            Assert.Empty(result.Names);
+        }
+
+        [Theory]
+        [InlineData(0, 1)]
+        [InlineData(1, 2)]
+        [InlineData(5, 6)]
+        [InlineData(10, 11)]
+        public void GenerateChildren_IncrementsIteration(int startIteration, int expectedIteration)
+        {
+            var generation = new Generation
+            {
+                Iteration = startIteration,
+                Names = new List<Name>()
+            };
+
+            var result = _generationManager.GenerateChildren(generation);
+
+            Assert.Equal(expectedIteration, result.Iteration);
+        }
+
+        [Fact]
+        public void GenerateChildren_WithOnePair_FemaleChildHasMalePrefixAndFemaleSuffix()
+        {
+            _mockNameProcessor.PairsToReturn = new List<Pair>
+            {
+                new Pair
+                {
+                    FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                }
+            };
+            var generation = new Generation { Iteration = 0, Names = new List<Name>() };
+
+            var result = _generationManager.GenerateChildren(generation);
+
+            var femaleChildren = result.Names.Where(n => n.Gender == Gender.Female).ToList();
+            if (femaleChildren.Any())
+            {
+                Assert.Equal("John", femaleChildren.First().Prefix);
+                Assert.Equal("Doe", femaleChildren.First().Suffix);
+                Assert.Equal("JohnDoe", femaleChildren.First().FullName);
+            }
+        }
+
+        [Fact]
+        public void GenerateChildren_WithOnePair_MaleChildHasFemalePrefixAndMaleSuffix()
+        {
+            _mockNameProcessor.PairsToReturn = new List<Pair>
+            {
+                new Pair
+                {
+                    FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                }
+            };
+            var generation = new Generation { Iteration = 0, Names = new List<Name>() };
+
+            var result = _generationManager.GenerateChildren(generation);
+
+            var maleChildren = result.Names.Where(n => n.Gender == Gender.Male).ToList();
+            if (maleChildren.Any())
+            {
+                Assert.Equal("Jane", maleChildren.First().Prefix);
+                Assert.Equal("Smith", maleChildren.First().Suffix);
+                Assert.Equal("JaneSmith", maleChildren.First().FullName);
+            }
+        }
+
+        [Fact]
+        public void GenerateChildren_ReturnsNonNullGeneration()
+        {
+            var generation = new Generation { Iteration = 3, Names = new List<Name>() };
+
+            var result = _generationManager.GenerateChildren(generation);
+
+            Assert.NotNull(result);
         }
     }
 }

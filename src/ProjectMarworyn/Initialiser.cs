@@ -1,20 +1,23 @@
-﻿using ProjectMarworyn.Models;
+﻿using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
 {
-    internal class Initiliser
+    internal class Initialiser
     {
         public IFileManager _fileManager;
         public INameProcessor _nameProcessor;
         public IGenerationManager _generationManager;
+        public IConsoleService _consoleService;
 
-        public Initiliser(IFileManager fileManager,
+        public Initialiser(IFileManager fileManager,
             INameProcessor nameProcessor,
-            IGenerationManager generationManager)
+            IGenerationManager generationManager,
+            IConsoleService consoleService)
         {
             _fileManager = fileManager;
             _nameProcessor = nameProcessor;
             _generationManager = generationManager;
+            _consoleService = consoleService;
         }
 
         public void Start()
@@ -25,13 +28,13 @@ namespace ProjectMarworyn
             while(currentGeneration.Names.Count > 1)
             {
                 _nameProcessor.ListNumberOfNamesByGender(currentGeneration.Names);
-                currentGeneration = _nameProcessor.GenerateChildren(currentGeneration);
-                Console.WriteLine($"New Generation: {currentGeneration.Iteration}");
+                currentGeneration = _generationManager.GenerateChildren(currentGeneration);
+                _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}");
             }
             if (currentGeneration.Names.Count < 2)
             {
-                Console.WriteLine("The population has gone extinct. Less than 2 people remain");
-                Thread.Sleep(500);
+                _consoleService.WriteLine("The population has gone extinct. Less than 2 people remain");
+                _consoleService.Delay();
             }
         }
     }

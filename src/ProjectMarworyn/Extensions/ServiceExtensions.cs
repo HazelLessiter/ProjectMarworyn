@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ProjectMarworyn.Configuration;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn.Extensions
 {
@@ -11,7 +12,8 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<INameProcessor, NameProcessor>();
             services.AddTransient<IGenerationManager, GenerationManager>();
             services.AddTransient<IConsoleService, ConsoleService>();
-            services.AddSingleton<Initiliser>();
+            services.AddTransient<IDiceGenerator, DiceGenerator>();
+            services.AddSingleton<Initialiser>();
 
             return services;
         }

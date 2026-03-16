@@ -7,20 +7,31 @@ namespace ProjectMarworyn
 {
     internal class FileManager : IFileManager
     {
-        private readonly Configuration.AppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
-        public FileManager(IOptions<Configuration.AppSettings> appSettings)
+        public FileManager(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
 
         public List<Name> ReadNameFile()
         {
-            var file = File.ReadAllText(_appSettings.FilePath);
+            try
+            {
+                var file = File.ReadAllText(_appSettings.FilePath);
 
-            var names = JsonConvert.DeserializeObject<List<Name>>(file);
+                var names = JsonConvert.DeserializeObject<List<Name>>(file);
 
-            return names;
+                return names;
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new FileNotFoundException($"Name file not found at path: {_appSettings.FilePath}", ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidDataException($"Invalid JSON format in name file: {_appSettings.FilePath}", ex);
+            }
         }
     }
 }
