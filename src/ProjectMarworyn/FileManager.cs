@@ -18,22 +18,11 @@ namespace ProjectMarworyn
         {
             try
             {
-                using (FileStream fileStream = new FileStream(_appSettings.FilePath.ToString(),
-                    FileMode.Open))
-                {
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                        var file = reader.ReadToEnd();
+                var file = File.ReadAllText(_appSettings.FilePath);
 
-                        if (file == null)
-                        {
-                            return new List<Name>();
-                        }
-                        var names = JsonConvert.DeserializeObject<List<Name>>(file);
+                var names = JsonConvert.DeserializeObject<List<Name>>(file);
 
-                        return names;
-                    }
-                }
+                return names;
             }
             catch(Exception ex)
             {

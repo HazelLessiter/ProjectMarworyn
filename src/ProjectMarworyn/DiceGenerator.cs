@@ -1,6 +1,6 @@
 ﻿namespace ProjectMarworyn
 {
-    internal class DiceGenerator
+    internal class DiceGenerator : IDiceGenerator
     {
         public Random Create()
         {

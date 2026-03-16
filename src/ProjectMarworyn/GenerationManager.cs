@@ -35,8 +35,8 @@ namespace ProjectMarworyn
                 Names = new List<Name>()
             };
 
-            if (generation?.Names == null &&
-                generation.Names.Count < 0)
+            if (generation?.Names == null ||
+                generation.Names.Count <= 0)
             {
                 return newGeneration;
             }
