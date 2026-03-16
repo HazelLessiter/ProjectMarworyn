@@ -140,7 +140,7 @@ ProjectMarworyn/
 3. ~~Gender randomizer range is incorrect (should be `Next(0, 2)`)~~ ✅ FIXED
 4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
 5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
-6. Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)
+6. ~~Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)~~ ✅ FIXED - `DiceGenerator` introduced to inject `Random` into `NameProcessor`, removing deterministic pairing
 7. System.Random quality - not cryptographically secure (see TODO comment in GenerateChildren - would not pass Gambling Commission scrutiny)
 
 ### Planned Refactoring

@@ -24,9 +24,13 @@ namespace ProjectMarworyn
 
                 return names;
             }
-            catch(Exception ex)
+            catch (FileNotFoundException ex)
             {
-                throw new Exception($"Failed to get Name file - {ex}, {ex?.Message}, {ex?.InnerException}, {ex?.StackTrace}");
+                throw new FileNotFoundException($"Name file not found at path: {_appSettings.FilePath}", ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidDataException($"Invalid JSON format in name file: {_appSettings.FilePath}", ex);
             }
         }
     }
