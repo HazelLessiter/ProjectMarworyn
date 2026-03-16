@@ -24,7 +24,7 @@ namespace ProjectMarworyn
 
             var host = builder.Build();
 
-            var initialiser = host.Services.GetRequiredService<Initiliser>();
+            var initialiser = host.Services.GetRequiredService<Initialiser>();
             initialiser.Start();
         }
     }

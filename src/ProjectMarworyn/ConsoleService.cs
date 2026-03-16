@@ -5,9 +5,9 @@ namespace ProjectMarworyn
 {
     internal class ConsoleService : IConsoleService
     {
-        private readonly Configuration.AppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
-        public ConsoleService(IOptions<Configuration.AppSettings> appSettings)
+        public ConsoleService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }

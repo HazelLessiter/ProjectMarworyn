@@ -4,11 +4,11 @@ namespace ProjectMarworyn
 {
     internal class NameProcessor : INameProcessor
     {
-        private readonly IConsoleService _outputService;
+        private readonly IConsoleService _consoleService;
 
-        public NameProcessor(IConsoleService outputService)
+        public NameProcessor(IConsoleService consoleService)
         {
-            _outputService = outputService;
+            _consoleService = consoleService;
         }
 
         public void ListNumberOfNamesByGender(List<Name> names)
@@ -18,75 +18,11 @@ namespace ProjectMarworyn
             var mNames = names.Where(x => x.Gender == Gender.Male)
                 .Count();
 
-            _outputService.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
-            _outputService.Delay();
+            _consoleService.WriteLine($"Number of female names: {fNames}, Number of male names: {mNames}");
+            _consoleService.Delay();
         }
 
-        public Generation GenerateChildren(Generation generation)
-        {
-            var newGeneration = new Generation()
-            {
-                Iteration = generation.Iteration + 1,
-                Names = new List<Name>()
-            };
-
-            var pairs = PairNames(generation.Names);
-            _outputService.WriteLine($"Found {pairs.Count} pairs");
-
-            var random = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
-
-            foreach (var pair in pairs)
-            {
-                var numberOfChildren = random.Next(0, 4);
-
-                if (numberOfChildren == 0)
-                {
-                    _outputService.WriteLine($"Pair {pair.FName.FullName} + {pair.MName.FullName} had no children");
-                    _outputService.Delay();
-                }
-                else
-                {
-                    Gender gender = new Gender();
-
-                    for (int i = 0; i < numberOfChildren; i++)
-                    {
-                        switch (random.Next(0, 2))
-                        {
-                            case 0:
-                                gender = Gender.Female;
-                                break;
-                            case 1:
-                                gender = Gender.Male;
-                                break;
-                        }
-
-                        var name = gender == Gender.Female ?
-                            new Name
-                            {
-                                FullName = pair.MName.Prefix + pair.FName.Suffix,
-                                Prefix = pair.MName.Prefix,
-                                Suffix = pair.FName.Suffix,
-                                Gender = Gender.Female
-                            }
-                            : new Name
-                            {
-                                FullName = pair.FName.Prefix + pair.MName.Suffix,
-                                Prefix = pair.FName.Prefix,
-                                Suffix = pair.MName.Suffix,
-                                Gender = Gender.Male
-                            };
-
-                        newGeneration.Names.Add(name);
-                        _outputService.WriteLine($"Child {name.FullName} was born to {pair.FName.FullName} and {pair.MName.FullName}");
-                        _outputService.Delay();
-                    }
-                }
-            }
-
-            return newGeneration;
-        }
-
-        private List<Pair> PairNames(List<Name> names)
+        public List<Pair> PairNames(List<Name> names)
         {
             var fNames = GetNamesByGender(names,
                 Gender.Female);
@@ -94,16 +30,20 @@ namespace ProjectMarworyn
                 Gender.Male);
 
             var pairs = new List<Pair>();
-            var index = 0;
 
+            var random = new Random();
             foreach (var fName in fNames)
             {
-                if (index >= mNames.Count())
+                var mNameCount = mNames.Count;
+                if (mNameCount <= 0)
                 {
                     break;
                 }
 
-                var mName = mNames[index];
+                var position = random.Next(0,
+                    mNameCount);
+
+                var mName = mNames[position];
 
                 if (mName != null)
                 {
@@ -113,11 +53,11 @@ namespace ProjectMarworyn
                         MName = mName
                     });
 
-                    _outputService.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
-                    _outputService.Delay();
-                }
+                    mNames.RemoveAt(position);
 
-                index++;
+                    _consoleService.WriteLine($"Pair: {fName.FullName} + {mName.FullName}");
+                    _consoleService.Delay();
+                }
             }
 
             return pairs;

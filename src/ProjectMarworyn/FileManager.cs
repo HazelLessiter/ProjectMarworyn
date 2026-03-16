@@ -7,20 +7,38 @@ namespace ProjectMarworyn
 {
     internal class FileManager : IFileManager
     {
-        private readonly Configuration.AppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
-        public FileManager(IOptions<Configuration.AppSettings> appSettings)
+        public FileManager(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
 
         public List<Name> ReadNameFile()
         {
-            var file = File.ReadAllText(_appSettings.FilePath);
+            try
+            {
+                using (FileStream fileStream = new FileStream(_appSettings.FilePath.ToString(),
+                    FileMode.Open))
+                {
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        var file = reader.ReadToEnd();
 
-            var names = JsonConvert.DeserializeObject<List<Name>>(file);
+                        if (file == null)
+                        {
+                            return new List<Name>();
+                        }
+                        var names = JsonConvert.DeserializeObject<List<Name>>(file);
 
-            return names;
+                        return names;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Failed to get Name file - {ex}, {ex?.Message}, {ex?.InnerException}, {ex?.StackTrace}");
+            }
         }
     }
 }

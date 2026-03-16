@@ -11,7 +11,7 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<INameProcessor, NameProcessor>();
             services.AddTransient<IGenerationManager, GenerationManager>();
             services.AddTransient<IConsoleService, ConsoleService>();
-            services.AddSingleton<Initiliser>();
+            services.AddSingleton<Initialiser>();
 
             return services;
         }
