@@ -28,16 +28,32 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void ReadNameFile_FileNotFound_ThrowsExceptionWithFriendlyMessage()
+        public void ReadNameFile_FileNotFound_ThrowsFileNotFoundException()
         {
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
 
             var options = Options.Create(new AppSettings { FilePath = path });
             var fileManager = new FileManager(options);
 
-            var ex = Assert.Throws<Exception>(() => fileManager.ReadNameFile());
+            var ex = Assert.Throws<FileNotFoundException>(() => fileManager.ReadNameFile());
 
-            Assert.Contains("Failed to get Name file", ex.Message);
+            Assert.Contains(path, ex.Message);
+        }
+
+        [Fact]
+        public void ReadNameFile_InvalidJson_ThrowsInvalidDataException()
+        {
+            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            File.WriteAllText(tempFile, "this is not valid json");
+
+            var options = Options.Create(new AppSettings { FilePath = tempFile });
+            var fileManager = new FileManager(options);
+
+            var ex = Assert.Throws<InvalidDataException>(() => fileManager.ReadNameFile());
+
+            Assert.Contains(tempFile, ex.Message);
+
+            File.Delete(tempFile);
         }
     }
 }
