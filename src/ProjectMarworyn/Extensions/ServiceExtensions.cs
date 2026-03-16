@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ProjectMarworyn.Configuration;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn.Extensions
 {

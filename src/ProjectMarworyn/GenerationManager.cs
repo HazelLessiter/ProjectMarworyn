@@ -1,4 +1,5 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
 {
@@ -6,12 +7,15 @@ namespace ProjectMarworyn
     {
         private readonly INameProcessor _nameProcessor;
         private readonly IConsoleService _consoleService;
+        private readonly IDiceGenerator _diceGenerator;
 
         public GenerationManager(INameProcessor nameProcessor,
-            IConsoleService consoleService)
+            IConsoleService consoleService,
+            IDiceGenerator diceGenerator)
         {
             _nameProcessor = nameProcessor;
             _consoleService = consoleService;
+            _diceGenerator = diceGenerator;
         }
 
         public Generation Initialise(List<Name> names)
@@ -40,7 +44,7 @@ namespace ProjectMarworyn
             var pairs = _nameProcessor.PairNames(generation.Names);
             _consoleService.WriteLine($"Found {pairs.Count} pairs");
 
-            var random = new Random();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
+            var random = _diceGenerator.Create();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
 
             foreach (var pair in pairs)
             {

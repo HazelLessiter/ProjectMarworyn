@@ -9,7 +9,8 @@ namespace ProjectMarworyn.Tests
 
         public NameProcessorTests()
         {
-            _nameProcessor = new NameProcessor(new MockOutputService());
+            _nameProcessor = new NameProcessor(new MockOutputService(),
+                new MockDiceGenerator());
         }
 
         [Fact]

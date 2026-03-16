@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using ProjectMarworyn.Configuration;
 
-namespace ProjectMarworyn
+namespace ProjectMarworyn.Services
 {
     internal class ConsoleService : IConsoleService
     {

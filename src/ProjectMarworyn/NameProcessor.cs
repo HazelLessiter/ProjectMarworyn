@@ -1,14 +1,18 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
 {
     internal class NameProcessor : INameProcessor
     {
         private readonly IConsoleService _consoleService;
+        private readonly IDiceGenerator _diceGenerator;
 
-        public NameProcessor(IConsoleService consoleService)
+        public NameProcessor(IConsoleService consoleService,
+            IDiceGenerator diceGenerator)
         {
             _consoleService = consoleService;
+            _diceGenerator = diceGenerator;
         }
 
         public void ListNumberOfNamesByGender(List<Name> names)
@@ -31,7 +35,7 @@ namespace ProjectMarworyn
 
             var pairs = new List<Pair>();
 
-            var random = new Random();
+            var random = _diceGenerator.Create();
             foreach (var fName in fNames)
             {
                 var mNameCount = mNames.Count;

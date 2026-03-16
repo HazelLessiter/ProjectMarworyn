@@ -1,4 +1,6 @@
-﻿namespace ProjectMarworyn
+﻿using ProjectMarworyn.Services;
+
+namespace ProjectMarworyn
 {
     internal class Initialiser
     {

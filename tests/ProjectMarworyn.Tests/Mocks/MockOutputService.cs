@@ -1,3 +1,5 @@
+using ProjectMarworyn.Services;
+
 namespace ProjectMarworyn.Tests.Mocks
 {
     internal class MockOutputService : IConsoleService
