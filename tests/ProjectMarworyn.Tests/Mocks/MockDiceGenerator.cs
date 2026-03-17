@@ -2,9 +2,17 @@ namespace ProjectMarworyn.Tests.Mocks
 {
     internal class MockDiceGenerator : IDiceGenerator
     {
-        public Random Create()
+        private readonly Random _random;
+
+        public MockDiceGenerator(Random? random = null)
         {
-            return new Random();
+            _random = random ??
+                new Random(0);
+        }
+
+        public Random Create(int worldSeed)
+        {
+            return _random;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ProjectMarworyn
         {
             try
             {
-                var file = File.ReadAllText(_appSettings.FilePath);
+                var file = File.ReadAllText(_appSettings.NameFilePath);
 
                 var names = JsonConvert.DeserializeObject<List<Name>>(file);
 
@@ -26,11 +26,35 @@ namespace ProjectMarworyn
             }
             catch (FileNotFoundException ex)
             {
-                throw new FileNotFoundException($"Name file not found at path: {_appSettings.FilePath}", ex);
+                throw new FileNotFoundException($"Name file not found at path: {_appSettings.NameFilePath}",
+                    ex);
             }
             catch (JsonException ex)
             {
-                throw new InvalidDataException($"Invalid JSON format in name file: {_appSettings.FilePath}", ex);
+                throw new InvalidDataException($"Invalid JSON format in Name file: {_appSettings.NameFilePath}",
+                    ex);
+            }
+        }
+
+        public List<SeedWord> ReadSeedWordFile()
+        {
+            try
+            {
+                var file = File.ReadAllText(_appSettings.SeedWordFilePath);
+
+                var seedWords = JsonConvert.DeserializeObject<List<SeedWord>>(file);
+
+                return seedWords;
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new FileNotFoundException($"SeedWord file not found at path: {_appSettings.SeedWordFilePath}",
+                    ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidDataException($"Invalid JSON format in SeedWord file: {_appSettings.SeedWordFilePath}",
+                    ex);
             }
         }
     }

@@ -7,11 +7,15 @@ namespace ProjectMarworyn.Tests
     {
         private readonly GenerationManager _generationManager;
         private readonly MockNameProcessor _mockNameProcessor;
+        private readonly MockDiceGenerator _mockDiceGenerator;
 
         public GenerationManagerTests()
         {
             _mockNameProcessor = new MockNameProcessor();
-            _generationManager = new GenerationManager(_mockNameProcessor, new MockOutputService());
+            _mockDiceGenerator = new MockDiceGenerator();
+            _generationManager = new GenerationManager(_mockNameProcessor,
+                new MockOutputService(),
+                _mockDiceGenerator);
         }
 
         [Fact]
@@ -146,7 +150,7 @@ namespace ProjectMarworyn.Tests
                 Names = new List<Name>()
             };
 
-            var result = _generationManager.GenerateChildren(generation);
+            var result = _generationManager.GenerateChildren(generation, 0);
 
             Assert.Empty(result.Names);
         }
@@ -164,7 +168,7 @@ namespace ProjectMarworyn.Tests
                 Names = new List<Name>()
             };
 
-            var result = _generationManager.GenerateChildren(generation);
+            var result = _generationManager.GenerateChildren(generation, 0);
 
             Assert.Equal(expectedIteration, result.Iteration);
         }
@@ -172,49 +176,73 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GenerateChildren_WithOnePair_FemaleChildHasMalePrefixAndFemaleSuffix()
         {
-            _mockNameProcessor.PairsToReturn = new List<Pair>
+            var mockNameProcessor = new MockNameProcessor
             {
-                new Pair
+                PairsToReturn = new List<Pair>
                 {
-                    FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                    MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                    new Pair
+                    {
+                        FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                        MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                    }
                 }
             };
-            var generation = new Generation { Iteration = 0, Names = new List<Name>() };
+            var generationManager = new GenerationManager(mockNameProcessor,
+                new MockOutputService(),
+                new MockDiceGenerator(new Random(36)));
+            var generation = new Generation
+            {
+                Iteration = 0,
+                Names = new List<Name>
+                {
+                    new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                }
+            };
 
-            var result = _generationManager.GenerateChildren(generation);
+            var result = generationManager.GenerateChildren(generation, 0);
 
             var femaleChildren = result.Names.Where(n => n.Gender == Gender.Female).ToList();
-            if (femaleChildren.Any())
-            {
-                Assert.Equal("John", femaleChildren.First().Prefix);
-                Assert.Equal("Doe", femaleChildren.First().Suffix);
-                Assert.Equal("JohnDoe", femaleChildren.First().FullName);
-            }
+            Assert.True(femaleChildren.Any());
+            Assert.Equal("John", femaleChildren.First().Prefix);
+            Assert.Equal("Doe", femaleChildren.First().Suffix);
+            Assert.Equal("JohnDoe", femaleChildren.First().FullName);
         }
 
         [Fact]
         public void GenerateChildren_WithOnePair_MaleChildHasFemalePrefixAndMaleSuffix()
         {
-            _mockNameProcessor.PairsToReturn = new List<Pair>
+            var mockNameProcessor = new MockNameProcessor
             {
-                new Pair
+                PairsToReturn = new List<Pair>
                 {
-                    FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                    MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                    new Pair
+                    {
+                        FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                        MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                    }
                 }
             };
-            var generation = new Generation { Iteration = 0, Names = new List<Name>() };
+            var generationManager = new GenerationManager(mockNameProcessor,
+                new MockOutputService(),
+                new MockDiceGenerator(new Random(36)));
+            var generation = new Generation
+            {
+                Iteration = 0,
+                Names = new List<Name>
+                {
+                    new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                }
+            };
 
-            var result = _generationManager.GenerateChildren(generation);
+            var result = generationManager.GenerateChildren(generation, 0);
 
             var maleChildren = result.Names.Where(n => n.Gender == Gender.Male).ToList();
-            if (maleChildren.Any())
-            {
-                Assert.Equal("Jane", maleChildren.First().Prefix);
-                Assert.Equal("Smith", maleChildren.First().Suffix);
-                Assert.Equal("JaneSmith", maleChildren.First().FullName);
-            }
+            Assert.True(maleChildren.Any());
+            Assert.Equal("Jane", maleChildren.First().Prefix);
+            Assert.Equal("Smith", maleChildren.First().Suffix);
+            Assert.Equal("JaneSmith", maleChildren.First().FullName);
         }
 
         [Fact]
@@ -222,7 +250,7 @@ namespace ProjectMarworyn.Tests
         {
             var generation = new Generation { Iteration = 3, Names = new List<Name>() };
 
-            var result = _generationManager.GenerateChildren(generation);
+            var result = _generationManager.GenerateChildren(generation, 0);
 
             Assert.NotNull(result);
         }
