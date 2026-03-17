@@ -41,15 +41,21 @@ namespace ProjectMarworyn
 
         public int CreateWorldSeed(List<SeedWord> seedWords)
         {
-            var threeWordSeed = $"{seedWords[0].Word
-                .ToUpper()}-{seedWords[1].Word
-                .ToUpper()}-{seedWords[2].Word
-                .ToUpper()}";
+            var worldSeed = 0;
+            var threeWordSeed = "threeWorldSeed";
 
-            var worldSeed = BitConverter.ToInt32(SHA256
-                    .HashData(Encoding.UTF8
-                    .GetBytes(threeWordSeed)),
-                0);
+            if (seedWords.Count == 3)
+            {
+                threeWordSeed = $"{seedWords[0].Word
+                    .ToUpper()}-{seedWords[1].Word
+                    .ToUpper()}-{seedWords[2].Word
+                    .ToUpper()}";
+
+                worldSeed = BitConverter.ToInt32(SHA256
+                        .HashData(Encoding.UTF8
+                        .GetBytes(threeWordSeed)),
+                    0);
+            }
 
             _consoleService.WriteLine($"World seed created: {threeWordSeed}");
             return worldSeed;

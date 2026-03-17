@@ -66,5 +66,7 @@
   { "FullName": "Brendan", "Prefix": "Bren", "Suffix": "dan", "Gender": 1 },
   { "FullName": "Clyde", "Prefix": "Cly", "Suffix": "de", "Gender": 1 },
   { "FullName": "Samantha", "Prefix": "Sam", "Suffix": "antha", "Gender": 0 },
-  { "FullName": "Suzan", "Prefix": "Suz", "Suffix": "an", "Gender": 0 }
+  { "FullName": "Suzan", "Prefix": "Suz", "Suffix": "an", "Gender": 0 },
+  { "FullName": "Henry", "Prefix": "Hen", "Suffix": "ry", "Gender": 1 },
+  { "FullName": "Merideth", "Prefix": "Meri", "Suffix": "deth", "Gender": 0 }
 ]
