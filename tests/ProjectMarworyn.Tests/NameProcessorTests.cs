@@ -42,7 +42,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>();
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Empty(result);
         }
@@ -56,7 +56,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Single(result);
         }
@@ -70,7 +70,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Equal("JaneDoe", result[0].FName.FullName);
             Assert.Equal("JohnSmith", result[0].MName.FullName);
@@ -87,7 +87,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Male1", Prefix = "M1", Suffix = "MS1", Gender = Gender.Male }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Single(result);
         }
@@ -102,7 +102,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Male2", Prefix = "M2", Suffix = "MS2", Gender = Gender.Male }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Single(result);
         }
@@ -116,7 +116,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Female2", Prefix = "F2", Suffix = "S2", Gender = Gender.Female }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Empty(result);
         }
@@ -130,7 +130,7 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Male2", Prefix = "M2", Suffix = "MS2", Gender = Gender.Male }
             };
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Empty(result);
         }
@@ -147,7 +147,7 @@ namespace ProjectMarworyn.Tests
             for (int i = 0; i < maleCount; i++)
                 names.Add(new Name { FullName = $"Male{i}", Prefix = $"M{i}", Suffix = $"MS{i}", Gender = Gender.Male });
 
-            var result = _nameProcessor.PairNames(names);
+            var result = _nameProcessor.PairNames(names, 0);
 
             Assert.Equal(Math.Min(maleCount, femaleCount), result.Count);
         }

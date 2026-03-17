@@ -10,7 +10,7 @@ namespace ProjectMarworyn.Tests.Mocks
         {
         }
 
-        public List<Pair> PairNames(List<Name> names)
+        public List<Pair> PairNames(List<Name> names, int worldSeed)
         {
             return PairsToReturn;
         }

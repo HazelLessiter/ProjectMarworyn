@@ -2,6 +2,6 @@
 {
     internal interface IDiceGenerator
     {
-        public Random Create();
+        public Random Create(int worldSeed);
     }
 }

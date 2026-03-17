@@ -26,7 +26,8 @@ namespace ProjectMarworyn
             _consoleService.Delay();
         }
 
-        public List<Pair> PairNames(List<Name> names)
+        public List<Pair> PairNames(List<Name> names,
+            int worldSeed)
         {
             var fNames = GetNamesByGender(names,
                 Gender.Female);
@@ -35,7 +36,7 @@ namespace ProjectMarworyn
 
             var pairs = new List<Pair>();
 
-            var random = _diceGenerator.Create();
+            var random = _diceGenerator.Create(worldSeed);
             foreach (var fName in fNames)
             {
                 var mNameCount = mNames.Count;

@@ -27,7 +27,8 @@ namespace ProjectMarworyn
             };
         }
 
-        public Generation GenerateChildren(Generation generation)
+        public Generation GenerateChildren(Generation generation,
+            int worldSeed)
         {
             var newGeneration = new Generation()
             {
@@ -41,10 +42,11 @@ namespace ProjectMarworyn
                 return newGeneration;
             }
 
-            var pairs = _nameProcessor.PairNames(generation.Names);
+            var pairs = _nameProcessor.PairNames(generation.Names,
+                worldSeed);
             _consoleService.WriteLine($"Found {pairs.Count} pairs");
 
-            var random = _diceGenerator.Create();//TODO: I used to work for a gambling company and .Random() would not pass scrutiny from the Gambling Commission - Not random enough
+            var random = _diceGenerator.Create(worldSeed);
 
             foreach (var pair in pairs)
             {
@@ -69,6 +71,8 @@ namespace ProjectMarworyn
                             case 1:
                                 gender = Gender.Male;
                                 break;
+                            default:
+                                throw new InvalidOperationException("Error randomising gender");
                         }
 
                         var name = gender == Gender.Female ?

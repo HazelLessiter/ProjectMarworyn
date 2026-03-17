@@ -13,6 +13,7 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<IGenerationManager, GenerationManager>();
             services.AddTransient<IConsoleService, ConsoleService>();
             services.AddTransient<IDiceGenerator, DiceGenerator>();
+            services.AddTransient<ISeedGenerator, SeedGenerator>();
             services.AddSingleton<Initialiser>();
 
             return services;

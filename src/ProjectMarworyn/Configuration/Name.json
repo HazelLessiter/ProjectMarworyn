@@ -60,5 +60,13 @@
   { "FullName": "Shavonne", "Prefix": "Sha", "Suffix": "vonne", "Gender": 0 },
   { "FullName": "Tracy", "Prefix": "Tra", "Suffix": "cy", "Gender": 0 },
   { "FullName": "Colin", "Prefix": "Co", "Suffix": "lin", "Gender": 1 },
-  { "FullName": "Mark", "Prefix": "Mar", "Suffix": "k", "Gender": 1 }
+  { "FullName": "Mark", "Prefix": "Mar", "Suffix": "k", "Gender": 1 },
+  { "FullName": "Jane", "Prefix": "Ja", "Suffix": "ne", "Gender": 0 },
+  { "FullName": "John", "Prefix": "Joh", "Suffix": "n", "Gender": 1 },
+  { "FullName": "Brendan", "Prefix": "Bren", "Suffix": "dan", "Gender": 1 },
+  { "FullName": "Clyde", "Prefix": "Cly", "Suffix": "de", "Gender": 1 },
+  { "FullName": "Samantha", "Prefix": "Sam", "Suffix": "antha", "Gender": 0 },
+  { "FullName": "Suzan", "Prefix": "Suz", "Suffix": "an", "Gender": 0 },
+  { "FullName": "Henry", "Prefix": "Hen", "Suffix": "ry", "Gender": 1 },
+  { "FullName": "Merideth", "Prefix": "Meri", "Suffix": "deth", "Gender": 0 }
 ]
