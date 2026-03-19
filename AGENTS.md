@@ -9,7 +9,7 @@ This file contains guidance for AI coding agents working on this codebase.
 **Purpose:** Population simulation inspired by Dwarf Fortress, Banished, Stardew Valley, Crusader Kings 2
 
 **Tech Stack:**
-- .NET 9
+- .NET 10
 - C# Console Application
 - XUnit for testing
 - Dependency Injection via Microsoft.Extensions.Hosting
@@ -21,10 +21,10 @@ This file contains guidance for AI coding agents working on this codebase.
 ## Architecture & Patterns
 
 ### Technology Stack
-- .NET 9 Console Application
-- Microsoft.Extensions.DependencyInjection (v9.0.8)
-- Microsoft.Extensions.Hosting (v9.0.8)
-- Newtonsoft.Json (v13.0.3)
+- .NET 10 Console Application
+- Microsoft.Extensions.DependencyInjection (v10.0.5)
+- Microsoft.Extensions.Hosting (v10.0.5)
+- Newtonsoft.Json (v13.0.4)
 
 ### Design Patterns in Use
 - **Dependency Injection:** All services registered via DI container

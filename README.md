@@ -13,7 +13,7 @@ A population simulation console application inspired by games such as Dwarf Fort
 
 | Concern | Technology |
 |---|---|
-| Runtime | .NET 9 |
+| Runtime | .NET 10 |
 | Application type | C# Console Application |
 | Dependency injection | `Microsoft.Extensions.Hosting` / `Microsoft.Extensions.DependencyInjection` |
 | Configuration | `IOptions<AppSettings>` + `Appsettings.json` |
