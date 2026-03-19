@@ -31,5 +31,6 @@
 - Improved exception handling in `FileManager` — `FileNotFoundException` and `JsonException` are now caught and rethrown with descriptive messages.
 
 ### Modified
+- Updated to .NET 10.
 - Unit tests updated to cover new seed and dice generator behaviour.
 - `AGENTS.md` updated with model-naming guidance to avoid false errors.
