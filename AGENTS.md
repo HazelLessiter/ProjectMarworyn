@@ -52,7 +52,7 @@ ProjectMarworyn/
 ### General Guidelines
 - **Namespace:** All classes use `ProjectMarworyn` namespace
 - **Access Modifiers:** Use `internal` for application classes
-- **Null Handling:** Nullable reference types are enabled
+- **Null Handling:** Nullable reference types are disabled
 - **Async/Await:** Use async
 - **var** Prefer var
 - **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
