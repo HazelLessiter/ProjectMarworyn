@@ -1,0 +1,29 @@
+# CODEOWNERS file for ProjectMarworyn
+# This file defines who is responsible for code in this repository
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @HazelLessiter
+
+# Source code
+/src/ @HazelLessiter
+
+# Tests
+/tests/ @HazelLessiter
+
+# Configuration files
+/src/ProjectMarworyn/Configuration/ @HazelLessiter
+Appsettings.json @HazelLessiter
+
+# Documentation
+*.md @HazelLessiter
+AGENTS.md @HazelLessiter
+README.md @HazelLessiter
+CHANGELOG.md @HazelLessiter
+
+# GitHub workflows and configuration
+/.github/ @HazelLessiter
+
+# Project files
+*.csproj @HazelLessiter
+*.sln @HazelLessiter
