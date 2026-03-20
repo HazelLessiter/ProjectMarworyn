@@ -5,6 +5,7 @@
 ## [1.0.0]
 
 ### Added
+- Added CODEOWNERS
 - Added `CHANGELOG.md` added to the repository root.
 - Added `README.md` added to the repository root.
 - World seed generation using three randomly selected words hashed via SHA-256 (`SeedGenerator`, `ISeedGenerator`).
