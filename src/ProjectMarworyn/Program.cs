@@ -20,7 +20,7 @@ namespace ProjectMarworyn
             // Configure options
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("Configuration"));
             
-            builder.Services.AddProjectServices();
+            builder.Services.AddServices();
 
             var host = builder.Build();
 
