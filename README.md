@@ -7,6 +7,7 @@ A population simulation console application inspired by games such as Dwarf Fort
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.
 - **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes.
 - **Generational loop** — each generation pairs females and males, produces 0–3 children per pair, and passes the survivors to the next generation.
+- **Simulation clock** — a universal heartbeat system tracks simulation time independently from real-world time, with each tick advancing the simulation by one day.
 - **Configurable delay** — a millisecond delay between console outputs keeps the simulation readable.
 
 ## Tech Stack
@@ -120,3 +121,22 @@ Three words are chosen at random and combined (e.g. `ACORN-BIRCH-BROOK`) then SH
    - Each pair produces 0–3 children. A child's name is a blend of both parents' names.
    - The new generation's names are passed into the next iteration.
 4. **End** — when fewer than two individuals remain the simulation reports extinction and exits.
+
+## Simulation Clock Architecture
+
+The **Heartbeat** system provides a universal simulation clock that decouples in-world time from real-world time:
+
+- **SimulationClock** (singleton) — holds the current simulation state:
+  - `TickCount` — total number of ticks elapsed
+  - `SimulationTime` — current in-world date/time
+  - `StartTime` / `EndTime` — simulation boundaries
+  - `ElapsedTime` — total in-world time passed
+  - `IsRunning` — clock state
+
+- **Heartbeat** — manages the clock:
+  - `Start()` — begins the simulation at year 0001
+  - `Tick()` — advances time by one day (configurable)
+  - `Stop()` — pauses the simulation
+  - `Reset()` — clears all state back to defaults
+
+This architecture allows future features like birth/death events, aging, and seasonal changes to occur based on the simulation clock instead of generation boundaries.
