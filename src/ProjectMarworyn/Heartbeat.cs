@@ -12,15 +12,13 @@ namespace ProjectMarworyn
         {
             _consoleService = consoleService;
             _simulationClock = simulationClock;
-            _simulationClock.TickCount = 0;
-            _simulationClock.IsRunning = false;
         }
 
         public void Start()
         {
             if (!_simulationClock.IsRunning)
             {
-                _simulationClock.StartTime = DateTime.Parse("0001-01-01");
+                _simulationClock.StartTime = new DateTime(1, 1, 1);
                 _simulationClock.IsRunning = true;
                 _consoleService.WriteLine($"[SimulationClock] Started at {_simulationClock.StartTime:yyyy-MM-dd}");
 
@@ -59,7 +57,7 @@ namespace ProjectMarworyn
             _simulationClock.TickCount = 0;
             _simulationClock.IsRunning = false;
             _consoleService.WriteLine("[SimulationClock] Reset");
-            _simulationClock.StartTime = DateTime.Parse("0001-01-01");
+            _simulationClock.StartTime = new DateTime(1, 1, 1);
             _simulationClock.SimulationTime = _simulationClock.StartTime;
         }
     }
