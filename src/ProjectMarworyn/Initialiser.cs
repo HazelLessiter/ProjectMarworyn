@@ -1,4 +1,5 @@
 ﻿using ProjectMarworyn.Generators;
+using ProjectMarworyn.Models;
 using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
@@ -40,67 +41,153 @@ namespace ProjectMarworyn
 
             _heartbeat.Start();
 
-            while(exit = false)
+            var random = new Random();
+            var pairs = new List<Pair>();
+            var exit = false;
+            var currentGenNum = 0;
+
+            while (!exit)
             {
-                //Consoleservice delay
-                _heartbeat.Tick();
-
-                //Generation
-                //If people count is < 2, exit = true, console service writeline "The population has gone extinct. Less than 2 people remain"
-                //Heartbeat if simulationClock year is divisible by 20, generation +1
-
-                //Age
-                //For each person where isAlive = true, age +1 day
-                //If TimeLived year has incremented from before, age +1
-                //If WillHaveChildren = true and timeFromLastChild < 2, TimeFromLastChild +1
-
-                //Death
-                //If person age 0-9, 0.20% chance of death per tick
-                //If person age 10-19, 0.01% chance of death per tick
-                //If person age 20-29, 0.05% chance of death per tick
-                //If person age 30-39, 0.10% chance of death per tick
-                //If person age 40-49, 0.20% chance of death per tick
-                //If person age 50-59, 0.30% chance of death per tick
-                //If person age 60-69, 0.40% chance of death per tick
-                //If person age 70-79, 0.50% chance of death per tick
-                //If person age 80-89, 1.00% chance of death per tick
-                //If person age 90-99, 2.0% chance of death per tick
-                //If person age 100+, 5.0% chance of death per tick
-                //if death = true
-                //Person isAlive = false
-                //Console.WriteLine($"{person.Name} has died at age {person.Age}");
-
-                //Pair
-                //Foreach female person where age 18+ and not in pair
-                //Take random male person where age 18+ and not in pair
-                //Pair together, add to list of pairs
-                //console service writeline $"{person1.Name} and {person2.Name} are a pair"
-
-                //Generate Children
-                //For each pair
-                //Where person1 and person2 are both alive
-                //Where person1 age is 18-45 and person2 age is 18+
-                //Where person1 WillHaveChildren = true and person2 WillHaveChildren = true
-                //Where person1 TimeFromLastChild is 2 and person2 TimeFromLastChild is 2
-                //0.25% chance of having a child per tick
-                //If child is born
-                //Generate child name based on parents names
-                //Create new person with name, age 0, WillHaveChildren = 14% chance of false, isAlive = true, TimeLived = (1,1,1), TimeFromLastChild = 0
-                //Add child to generation.Names
-                //console service writeline $"{person1.Name} and {person2.Name} have had a child named {child.Name}"
-            }
-            while (currentGeneration.Names.Count > 1)
-            {
-                _nameProcessor.ListNumberOfNamesByGender(currentGeneration.Names);
-                currentGeneration = _generationManager.GenerateChildren(currentGeneration,
-                    worldSeed);
-                _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}");
-            }
-            if (currentGeneration.Names.Count < 2)
-            {
-                _consoleService.WriteLine("The population has gone extinct. Less than 2 people remain");
                 _consoleService.Delay();
+                _heartbeat.Tick();
+                var currentTime = _heartbeat.GetCurrentTime();
+
+                // Generation tracking
+                if (people.Count(p => p.IsAlive) < 2)
+                {
+                    exit = true;
+                    _consoleService.WriteLine("The population has gone extinct. Less than 2 people remain");
+                    break;
+                }
+
+                if (currentTime.Year % 20 == 0 && currentTime.DayOfYear == 1)
+                {
+                    currentGenNum++;
+                    _consoleService.WriteLine($"Generation milestone reached: {currentGenNum}");
+                }
+
+                // Age increment
+                foreach (var person in people.Where(p => p.IsAlive))
+                {
+                    var previousYear = person.TimeLived.Year;
+                    person.TimeLived = person.TimeLived.AddDays(1);
+
+                    if (person.TimeLived.Year > previousYear)
+                    {
+                        person.Age++;
+                    }
+
+                    if (person.TimeFromLastChild < 2)
+                    {
+                        person.TimeFromLastChild++;
+                    }
+                }
+
+                // Death processing
+                foreach (var person in people.Where(p => p.IsAlive))
+                {
+                    var deathChance = person.Age switch
+                    {
+                        >= 0 and <= 9 => 0.20,
+                        >= 10 and <= 19 => 0.01,
+                        >= 20 and <= 29 => 0.05,
+                        >= 30 and <= 39 => 0.10,
+                        >= 40 and <= 49 => 0.20,
+                        >= 50 and <= 59 => 0.30,
+                        >= 60 and <= 69 => 0.40,
+                        >= 70 and <= 79 => 0.50,
+                        >= 80 and <= 89 => 1.00,
+                        >= 90 and <= 99 => 2.00,
+                        _ => 5.00
+                    };
+
+                    if (random.NextDouble() * 100 < deathChance)
+                    {
+                        person.IsAlive = false;
+                        _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}");
+                    }
+                }
+
+                // Pairing
+                var unpairedFemales = people
+                    .Where(p => p.IsAlive && p.Age >= 18 && p.Name.Gender == Gender.Female)
+                    .Where(p => !pairs.Any(pair => pair.Person1 == p || pair.Person2 == p))
+                    .ToList();
+
+                var unpairedMales = people
+                    .Where(p => p.IsAlive && p.Age >= 18 && p.Name.Gender == Gender.Male)
+                    .Where(p => !pairs.Any(pair => pair.Person1 == p || pair.Person2 == p))
+                    .ToList();
+
+                foreach (var female in unpairedFemales)
+                {
+                    if (unpairedMales.Count == 0) break;
+
+                    var male = unpairedMales[random.Next(unpairedMales.Count)];
+                    unpairedMales.Remove(male);
+
+                    var newPair = new Pair { Person1 = female, Person2 = male };
+                    pairs.Add(newPair);
+                    _consoleService.WriteLine($"{female.Name.FullName} and {male.Name.FullName} are a pair");
+                }
+
+                // Generate Children
+                foreach (var pair in pairs.Where(p => p.Person1.IsAlive && p.Person2.IsAlive))
+                {
+                    var person1 = pair.Person1;
+                    var person2 = pair.Person2;
+
+                    if (person1.Age >= 18 && person1.Age <= 45 && person2.Age >= 18 &&
+                        person1.WillHaveChildren && person2.WillHaveChildren &&
+                        person1.TimeFromLastChild >= 2 && person2.TimeFromLastChild >= 2)
+                    {
+                        if (random.NextDouble() * 100 < 0.25)
+                        {
+                            var childGender = random.Next(0, 2) == 0 ? Gender.Male : Gender.Female;
+                            var femaleName = person1.Name.Gender == Gender.Female ? person1.Name : person2.Name;
+                            var maleName = person1.Name.Gender == Gender.Male ? person1.Name : person2.Name;
+
+                            var childName = childGender == Gender.Female ?
+                                new Name
+                                {
+                                    FullName = maleName.Prefix + femaleName.Suffix,
+                                    Prefix = maleName.Prefix,
+                                    Suffix = femaleName.Suffix,
+                                    Gender = Gender.Female
+                                }
+                                : new Name
+                                {
+                                    FullName = femaleName.Prefix + maleName.Suffix,
+                                    Prefix = femaleName.Prefix,
+                                    Suffix = maleName.Suffix,
+                                    Gender = Gender.Male
+                                };
+
+                            var willHaveChildren = random.Next(1, 101) > 14;
+
+                            var child = new Person
+                            {
+                                Id = people.Count,
+                                Name = childName,
+                                Age = 0,
+                                WillHaveChildren = willHaveChildren,
+                                IsAlive = true,
+                                TimeLived = new DateTime(1, 1, 1),
+                                TimeFromLastChild = 0
+                            };
+
+                            people.Add(child);
+                            currentGeneration.Names.Add(childName);
+                            person1.TimeFromLastChild = 0;
+                            person2.TimeFromLastChild = 0;
+
+                            _consoleService.WriteLine($"{person1.Name.FullName} and {person2.Name.FullName} have had a child named {child.Name.FullName}");
+                        }
+                    }
+                }
             }
+
+            _consoleService.Delay();
         }
     }
 }
