@@ -1,5 +1,6 @@
 ﻿using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
+using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
@@ -100,6 +101,12 @@ namespace ProjectMarworyn
             }
 
             return newGeneration;
+        }
+
+        public bool CheckForExtinction(List<Person> people)
+        {
+            return people == null ||
+                people.Count < 2;
         }
     }
 }

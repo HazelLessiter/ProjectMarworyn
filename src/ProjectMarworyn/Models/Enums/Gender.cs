@@ -1,4 +1,4 @@
-﻿namespace ProjectMarworyn.Models
+﻿namespace ProjectMarworyn.Models.Enums
 {
     internal enum Gender
     {

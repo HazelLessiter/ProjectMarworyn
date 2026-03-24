@@ -72,5 +72,7 @@
   { "FullName": "Rupert", "Prefix": "Ru", "Suffix": "pert", "Gender": 1 },
   { "FullName": "Serena", "Prefix": "Sere", "Suffix": "na", "Gender": 0 },
   { "FullName": "Samuel", "Prefix": "Sam", "Suffix": "uel", "Gender": 1 },
-  { "FullName": "Grace", "Prefix": "Gra", "Suffix": "ce", "Gender": 0 }
+  { "FullName": "Grace", "Prefix": "Gra", "Suffix": "ce", "Gender": 0 },
+  { "FullName": "Crow", "Prefix": "Cr", "Suffix": "ow", "Gender": 1},
+  { "FullName": "Raven", "Prefix": "Ra", "Suffix": "ven", "Gender": 0}
 ]

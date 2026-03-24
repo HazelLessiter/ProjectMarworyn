@@ -35,5 +35,20 @@ namespace ProjectMarworyn.Generators
 
             return people;
         }
+
+        public Person GenerateChildren(Name name)
+        {
+            //For each pair
+            //Where person1 and person2 are both alive
+            //Where person1 age is 18-45 and person2 age is 18+
+            //Where person1 WillHaveChildren = true and person2 WillHaveChildren = true
+            //Where person1 TimeFromLastChild is 2 and person2 TimeFromLastChild is 2
+            //0.25% chance of having a child per tick
+            //If child is born
+            //Generate child name based on parents names
+            //Create new person with name, age 0, WillHaveChildren = 14% chance of false, isAlive = true, TimeLived = (1,1,1), TimeFromLastChild = 0
+            //Add child to generation.Names
+            //console service writeline $"{person1.Name} and {person2.Name} have had a child named {child.Name}"
+        }
     }
 }

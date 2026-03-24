@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ProjectMarworyn.Configuration;
 using ProjectMarworyn.Generators;
 using ProjectMarworyn.Services;
 
@@ -11,6 +10,7 @@ namespace ProjectMarworyn.Extensions
         {
             services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<INameProcessor, NameProcessor>();
+            services.AddTransient<IAgeProcessor, AgeProcessor>();
             services.AddTransient<IGenerationManager, GenerationManager>();
             services.AddTransient<IConsoleService, ConsoleService>();
             services.AddTransient<IDiceGenerator, DiceGenerator>();
@@ -18,7 +18,8 @@ namespace ProjectMarworyn.Extensions
             services.AddSingleton<IHeartbeat, Heartbeat>();
             services.AddSingleton<IPersonGenerator, PersonGenerator>();
             services.AddSingleton<IHeartbeat, Heartbeat>();
-            services.AddSingleton<Initialiser>();
+            services.AddSingleton<IDeathEngine, DeathEngine>();
+            services.AddSingleton<SimulationManager>();
             services.AddSingleton<SimulationClock>();
 
             return services;

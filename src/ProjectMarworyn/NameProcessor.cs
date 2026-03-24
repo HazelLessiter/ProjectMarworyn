@@ -1,5 +1,6 @@
 ﻿using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
+using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
@@ -55,8 +56,8 @@ namespace ProjectMarworyn
                 {
                     pairs.Add(new Pair
                     {
-                        FName = fName,
-                        MName = mName
+                        FPerson = fName,
+                        MPerson = mName
                     });
 
                     mNames.RemoveAt(position);

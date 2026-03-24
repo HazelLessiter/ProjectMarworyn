@@ -1,4 +1,5 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
