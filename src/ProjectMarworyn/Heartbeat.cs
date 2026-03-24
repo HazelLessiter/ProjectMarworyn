@@ -60,5 +60,10 @@ namespace ProjectMarworyn
             _simulationClock.StartTime = new DateTime(1, 1, 1);
             _simulationClock.SimulationTime = _simulationClock.StartTime;
         }
+
+        public DateTime GetCurrentTime()
+        {
+            return _simulationClock.SimulationTime;
+        }
     }
 }

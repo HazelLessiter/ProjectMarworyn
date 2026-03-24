@@ -2,7 +2,7 @@
 {
     internal class Pair
     {
-        public Name FName { get; set; }
-        public Name MName { get; set; }
+        public Person Person1 { get; set; }
+        public Person Person2 { get; set; }
     }
 }
