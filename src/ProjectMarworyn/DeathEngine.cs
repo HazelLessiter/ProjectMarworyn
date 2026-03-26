@@ -21,7 +21,7 @@ namespace ProjectMarworyn
             Generation generation,
             int worldSeed)
         {
-            int deathChance = 0;
+            var deathChance = 0.0;
             var deathModifier = DeathModifier.Zero;
             var surivors = new List<Person>();
             var names = new List<Name>();
@@ -49,7 +49,7 @@ namespace ProjectMarworyn
                     _ => DeathModifier.Hundred
                 };
 
-                deathChance = (int)deathModifier / 100;
+                deathChance = (int)deathModifier / 100.0;
 
                 if (random.Next(0, 101) <= deathChance)
                 {
