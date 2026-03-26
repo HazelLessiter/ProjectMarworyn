@@ -23,7 +23,7 @@ namespace ProjectMarworyn
         {
             var deathChance = 0.0;
             var deathModifier = DeathModifier.Zero;
-            var surivors = new List<Person>();
+            var survivors = new List<Person>();
             var names = new List<Name>();
             bool death = false;
             var random = _diceGenerator.Create(worldSeed);
@@ -60,7 +60,7 @@ namespace ProjectMarworyn
                 else
                 {
                     person.IsAlive = true;
-                    surivors.Add(person);
+                    survivors.Add(person);
                     names.Add(person.Name);
                     death = false;
                 }
@@ -72,7 +72,7 @@ namespace ProjectMarworyn
                 Names = names,
             };
 
-            return (surivors, currentGeneration);//Refactor: Would rather not use tuples
+            return (survivors, currentGeneration);//Refactor: Would rather not use tuples
         }
     }
 }
