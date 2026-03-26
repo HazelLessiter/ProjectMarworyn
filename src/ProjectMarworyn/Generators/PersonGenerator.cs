@@ -103,10 +103,10 @@ namespace ProjectMarworyn.Generators
                             FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
                             Prefix = pair.FPerson.Name.Prefix,
                             Suffix = pair.MPerson.Name.Suffix,
-                            Gender = Gender.Female
+                            Gender = Gender.Male
                         };
 
-                    personId =+ 1;
+                    personId++;
                     var person = new Person()
                     {
                         Id = personId,

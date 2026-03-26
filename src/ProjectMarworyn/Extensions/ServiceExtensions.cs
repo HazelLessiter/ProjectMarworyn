@@ -17,6 +17,7 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<ISeedGenerator, SeedGenerator>();
             services.AddTransient<IPersonGenerator, PersonGenerator>();
             services.AddTransient<IDeathEngine, DeathEngine>();
+            services.AddTransient<IPairingEngine, PairingEngine>();
 
             services.AddSingleton<IHeartbeat, Heartbeat>();
             services.AddSingleton<SimulationManager>();
