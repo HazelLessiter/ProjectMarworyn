@@ -1,3 +1,5 @@
+using ProjectMarworyn.Generators;
+
 namespace ProjectMarworyn.Tests.Mocks
 {
     internal class MockDiceGenerator : IDiceGenerator

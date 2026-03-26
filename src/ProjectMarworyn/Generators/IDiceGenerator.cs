@@ -1,4 +1,4 @@
-﻿namespace ProjectMarworyn
+﻿namespace ProjectMarworyn.Generators
 {
     internal interface IDiceGenerator
     {

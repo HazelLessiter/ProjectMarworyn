@@ -3,7 +3,7 @@ using ProjectMarworyn.Services;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ProjectMarworyn
+namespace ProjectMarworyn.Generators
 {
     internal class SeedGenerator : ISeedGenerator
     {

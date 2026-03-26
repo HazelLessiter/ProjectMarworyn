@@ -1,6 +1,6 @@
 ﻿using ProjectMarworyn.Models;
 
-namespace ProjectMarworyn
+namespace ProjectMarworyn.Generators
 {
     internal interface ISeedGenerator
     {

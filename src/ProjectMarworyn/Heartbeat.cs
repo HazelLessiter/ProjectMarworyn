@@ -1,3 +1,4 @@
+using ProjectMarworyn.Models;
 using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
@@ -59,6 +60,11 @@ namespace ProjectMarworyn
             _consoleService.WriteLine("[SimulationClock] Reset");
             _simulationClock.StartTime = new DateTime(1, 1, 1);
             _simulationClock.SimulationTime = _simulationClock.StartTime;
+        }
+
+        public DateTime GetCurrentTime()
+        {
+            return _simulationClock.SimulationTime;
         }
     }
 }

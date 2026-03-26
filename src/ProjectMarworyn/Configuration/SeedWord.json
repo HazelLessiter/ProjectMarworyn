@@ -111,5 +111,10 @@
   { "id": 109, "word": "Evolution" },
   { "id": 110, "word": "Time" },
   { "id": 111, "word": "Eternity" },
-  { "id": 112, "word": "Age" }
+  { "id": 112, "word": "Age" },
+  { "id": 113, "word": "Raven" },
+  { "id": 114, "word": "Skull" },
+  { "id": 115, "word": "Death" },
+  { "id": 116, "word": "Life" },
+  { "id": 117, "word": "Continuation" }
 ]

@@ -6,5 +6,6 @@ namespace ProjectMarworyn
         void Stop();
         void Tick();
         void Reset();
+        DateTime GetCurrentTime();
     }
 }

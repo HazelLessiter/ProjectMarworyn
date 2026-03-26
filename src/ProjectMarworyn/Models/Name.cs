@@ -1,4 +1,6 @@
-﻿namespace ProjectMarworyn.Models
+﻿using ProjectMarworyn.Models.Enums;
+
+namespace ProjectMarworyn.Models
 {
     internal class Name
     {
