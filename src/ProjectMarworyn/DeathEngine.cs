@@ -26,44 +26,25 @@ namespace ProjectMarworyn
             foreach (var person in people)
             {
                 var age = person.Age;
-                switch(age)
-                {
-                    case (age <= 9)
-                        deathModifier = DeathModifier.Zero;
-                        break;
-                    case (age <= 19)
-                        deathModifier = DeathModifier.Ten;
-                        break;
-                    case (age <= 29)
-                        deathModifier = DeathModifier.Twenty;
-                        break;
-                    case (age <= 39)
-                        deathModifier = DeathModifier.Thirty;
-                        break;
-                    case (age <= 49)
-                        deathModifier = DeathModifier.Fourty;
-                        break;
-                    case (age <= 59)
-                        deathModifier = DeathModifier.Fifty;
-                        break;
-                    case (age <= 69)
-                        deathModifier = DeathModifier.Sixty;
-                        break;
-                    case (age <= 79)
-                        deathModifier = DeathModifier.Seventy;
-                        break;
-                    case (age <= 89)
-                        deathModifier = DeathModifier.Eighty;
-                        break;
-                    case (age <= 99)
-                        deathModifier = DeathModifier.Ninthy;
-                        break;
-                    case (age > 99)
-                        deathModifier = DeathModifier.Hundred;
-                        break;
-                }
 
-                deathChance = deathModifier / 100;
+                //Note: Switch expressions were introduced in C# 8
+                //I should attempt to use some of the newer features in C# post .NET 5
+                deathModifier = age switch
+                {
+                    <= 9 => DeathModifier.Zero,
+                    <= 19 => DeathModifier.Ten,
+                    <= 29 => DeathModifier.Twenty,
+                    <= 39 => DeathModifier.Thirty,
+                    <= 49 => DeathModifier.Fourty,
+                    <= 59 => DeathModifier.Fifty,
+                    <= 69 => DeathModifier.Sixty,
+                    <= 79 => DeathModifier.Seventy,
+                    <= 89 => DeathModifier.Eighty,
+                    <= 99 => DeathModifier.Ninthy,
+                    _ => DeathModifier.Hundred
+                };
+
+                deathChance = (int)deathModifier / 100;
 
                 if (random.Next(0, 101) <= deathChance)
                 {

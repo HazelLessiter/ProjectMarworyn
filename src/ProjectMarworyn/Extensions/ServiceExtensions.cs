@@ -15,10 +15,10 @@ namespace ProjectMarworyn.Extensions
             services.AddTransient<IConsoleService, ConsoleService>();
             services.AddTransient<IDiceGenerator, DiceGenerator>();
             services.AddTransient<ISeedGenerator, SeedGenerator>();
+            services.AddTransient<IPersonGenerator, PersonGenerator>();
+            services.AddTransient<IDeathEngine, DeathEngine>();
+
             services.AddSingleton<IHeartbeat, Heartbeat>();
-            services.AddSingleton<IPersonGenerator, PersonGenerator>();
-            services.AddSingleton<IHeartbeat, Heartbeat>();
-            services.AddSingleton<IDeathEngine, DeathEngine>();
             services.AddSingleton<SimulationManager>();
             services.AddSingleton<SimulationClock>();
 
