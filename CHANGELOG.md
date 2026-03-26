@@ -5,6 +5,11 @@
 ## [1.0.0]
 
 ### Added
+- Life and Death of a Person is now triggered by the Heartbeat and SimulationClock not just a Generation loop
+- People are now defined as a Person instead of just a Name
+- Added PairingEngine
+- Added Death
+- Added SimulationClock
 - Added CODEOWNERS
 - Added `CHANGELOG.md` added to the repository root.
 - Added `README.md` added to the repository root.
