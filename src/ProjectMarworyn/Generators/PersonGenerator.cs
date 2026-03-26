@@ -1,9 +1,21 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Models.Enums;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn.Generators
 {
     internal class PersonGenerator : IPersonGenerator
     {
+        private readonly IDiceGenerator _diceGenerator;
+        private readonly IConsoleService _consoleService;
+
+        public PersonGenerator(IDiceGenerator diceGenerator,
+            IConsoleService consoleService)
+        {
+            _diceGenerator = diceGenerator;
+            _consoleService = consoleService;
+        }
+
         public List<Person> Initialise(List<Name> names)
         {
             var random = new Random();
@@ -12,20 +24,21 @@ namespace ProjectMarworyn.Generators
             var people = new List<Person>();
             foreach (var name in names)
             {
-                var age = random.Next(0, 80);
-                var willHaveChildrenModifier = random.Next(1, 101);
-                var willHaveChildren = willHaveChildrenModifier >= 14;
+                var age = random.Next(0,
+                    80);
 
                 var person = new Person()
                 {
                     Id = id,
                     Name = name,
                     Age = age,
+                    Gender = name.Gender,//TODO: This is janky, longterm I want to move gender away from name to person, this is temporary
                     IsAlive = true,
                     TimeLived = new DateTime(1, 1, 1)
                         .AddYears(age),
-                    WillHaveChildren = willHaveChildren,
-                    TimeFromLastChild = 0
+                    WillHaveChildren = CalcWillHaveChildren(random),
+                    TimeFromLastChild = 0,
+                    HasPair = false
                 };
 
                 id++;
@@ -36,19 +49,101 @@ namespace ProjectMarworyn.Generators
             return people;
         }
 
-        public Person GenerateChildren(Name name)
+        public (List<Person>, List<Person>) GenerateChildren(List<Pair> pairs,
+            int worldSeed,
+            int personId,
+            List<Person> people)
         {
             //For each pair
-            //Where person1 and person2 are both alive
-            //Where person1 age is 18-45 and person2 age is 18+
-            //Where person1 WillHaveChildren = true and person2 WillHaveChildren = true
-            //Where person1 TimeFromLastChild is 2 and person2 TimeFromLastChild is 2
-            //0.25% chance of having a child per tick
-            //If child is born
-            //Generate child name based on parents names
-            //Create new person with name, age 0, WillHaveChildren = 14% chance of false, isAlive = true, TimeLived = (1,1,1), TimeFromLastChild = 0
-            //Add child to generation.Names
-            //console service writeline $"{person1.Name} and {person2.Name} have had a child named {child.Name}"
+            var aliveFurtilePairs = pairs.Where(x => x.FPerson.IsAlive &&
+                    x.MPerson.IsAlive &&
+                    x.FPerson.Age >= 18 &&
+                    x.FPerson.Age <= 45 &&
+                    x.MPerson.Age >= 18 &&
+                    x.FPerson.WillHaveChildren &&
+                    x.MPerson.WillHaveChildren &&
+                    x.FPerson.TimeFromLastChild >= 2 &&
+                    x.MPerson.TimeFromLastChild >= 2)
+                .ToList();
+            var random = _diceGenerator.Create(worldSeed);
+            var children = new List<Person>();
+            List<Person> peopleToUpdate = new List<Person>();
+
+            foreach (var pair in aliveFurtilePairs)
+            {
+                var childChance = random.Next(1,
+                    101);
+
+                if (childChance > 25)
+                {
+                    var gender = new Gender();
+
+                    switch (random.Next(0, 2))
+                    {
+                        case 0:
+                            gender = Gender.Female;
+                            break;
+                        case 1:
+                            gender = Gender.Male;
+                            break;
+                        default:
+                            throw new InvalidOperationException("Error randomising gender");
+                    }
+
+                    var name = gender == Gender.Female ?
+                        new Name
+                        {
+                            FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
+                            Prefix = pair.MPerson.Name.Prefix,
+                            Suffix = pair.FPerson.Name.Suffix,
+                            Gender = Gender.Female
+                        }
+                        : new Name
+                        {
+                            FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
+                            Prefix = pair.FPerson.Name.Prefix,
+                            Suffix = pair.MPerson.Name.Suffix,
+                            Gender = Gender.Female
+                        };
+
+                    personId =+ 1;
+                    var person = new Person()
+                    {
+                        Id = personId,
+                        Age = 0,
+                        IsAlive = true,
+                        Gender = gender,
+                        Name = name,
+                        HasPair = false,
+                        TimeFromLastChild = 0,
+                        TimeLived = new DateTime(1, 1, 1),
+                        WillHaveChildren = CalcWillHaveChildren(random)
+                    };
+
+                    children.Add(person);
+                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
+                }
+
+                peopleToUpdate.Add(pair.FPerson);
+                peopleToUpdate.Add(pair.MPerson);
+                people.Remove(pair.FPerson);
+                people.Remove(pair.MPerson);
+            }
+
+            foreach (var person in peopleToUpdate)
+            {
+                person.TimeFromLastChild = 0;
+                people.Add(person);
+            }
+
+            return (children, people);
+        }
+
+        private bool CalcWillHaveChildren(Random random)
+        {
+            var willHaveChildrenModifier = random.Next(1, 101);
+            var willHaveChildren = willHaveChildrenModifier >= 14;
+            return willHaveChildren;
         }
     }
 }

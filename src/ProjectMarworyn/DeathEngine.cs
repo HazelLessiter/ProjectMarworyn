@@ -1,4 +1,5 @@
-﻿using ProjectMarworyn.Models;
+﻿using ProjectMarworyn.Generators;
+using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Services;
 
@@ -7,21 +8,25 @@ namespace ProjectMarworyn
     internal class DeathEngine : IDeathEngine
     {
         private readonly IConsoleService _consoleService;
+        private readonly IDiceGenerator _diceGenerator;
 
-        public DeathEngine(IConsoleService consoleService)
+        public DeathEngine(IConsoleService consoleService,
+            IDiceGenerator diceGenerator)
         {
             _consoleService = consoleService;
+            _diceGenerator = diceGenerator;
         }
 
         public (List<Person>, Generation) ProcessDeaths(List<Person> people,
-            Generation generation)
+            Generation generation,
+            int worldSeed)
         {
             int deathChance = 0;
             var deathModifier = DeathModifier.Zero;
             var surivors = new List<Person>();
             var names = new List<Name>();
             bool death = false;
-            var random = new Random();//TODO: Use seed
+            var random = _diceGenerator.Create(worldSeed);
 
             foreach (var person in people)
             {

@@ -1,4 +1,4 @@
-﻿namespace ProjectMarworyn
+﻿namespace ProjectMarworyn.Models
 {
     internal class SimulationClock
     {

@@ -1,22 +1,15 @@
 ﻿using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class GenerationManagerTests
     {
         private readonly GenerationManager _generationManager;
-        private readonly MockNameProcessor _mockNameProcessor;
-        private readonly MockDiceGenerator _mockDiceGenerator;
 
         public GenerationManagerTests()
         {
-            _mockNameProcessor = new MockNameProcessor();
-            _mockDiceGenerator = new MockDiceGenerator();
-            _generationManager = new GenerationManager(_mockNameProcessor,
-                new MockOutputService(),
-                _mockDiceGenerator);
+            _generationManager = new GenerationManager();
         }
 
         [Fact]
@@ -143,117 +136,107 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void GenerateChildren_WithNoPairs_ReturnsEmptyNames()
+        public void CheckForExtinction_WithNullPeople_ReturnsTrue()
         {
-            var generation = new Generation
-            {
-                Iteration = 0,
-                Names = new List<Name>()
-            };
+            List<Person> people = null;
 
-            var result = _generationManager.GenerateChildren(generation, 0);
+            var result = _generationManager.CheckForExtinction(people);
 
-            Assert.Empty(result.Names);
-        }
-
-        [Theory]
-        [InlineData(0, 1)]
-        [InlineData(1, 2)]
-        [InlineData(5, 6)]
-        [InlineData(10, 11)]
-        public void GenerateChildren_IncrementsIteration(int startIteration, int expectedIteration)
-        {
-            var generation = new Generation
-            {
-                Iteration = startIteration,
-                Names = new List<Name>()
-            };
-
-            var result = _generationManager.GenerateChildren(generation, 0);
-
-            Assert.Equal(expectedIteration, result.Iteration);
+            Assert.True(result);
         }
 
         [Fact]
-        public void GenerateChildren_WithOnePair_FemaleChildHasMalePrefixAndFemaleSuffix()
+        public void CheckForExtinction_WithEmptyList_ReturnsTrue()
         {
-            var mockNameProcessor = new MockNameProcessor
-            {
-                PairsToReturn = new List<Pair>
-                {
-                    new Pair
-                    {
-                        FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                        MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
-                    }
-                }
-            };
-            var generationManager = new GenerationManager(mockNameProcessor,
-                new MockOutputService(),
-                new MockDiceGenerator(new Random(36)));
-            var generation = new Generation
-            {
-                Iteration = 0,
-                Names = new List<Name>
-                {
-                    new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                    new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
-                }
-            };
+            var people = new List<Person>();
 
-            var result = generationManager.GenerateChildren(generation, 0);
+            var result = _generationManager.CheckForExtinction(people);
 
-            var femaleChildren = result.Names.Where(n => n.Gender == Gender.Female).ToList();
-            Assert.True(femaleChildren.Any());
-            Assert.Equal("John", femaleChildren.First().Prefix);
-            Assert.Equal("Doe", femaleChildren.First().Suffix);
-            Assert.Equal("JohnDoe", femaleChildren.First().FullName);
+            Assert.True(result);
         }
 
         [Fact]
-        public void GenerateChildren_WithOnePair_MaleChildHasFemalePrefixAndMaleSuffix()
+        public void CheckForExtinction_WithOnePerson_ReturnsTrue()
         {
-            var mockNameProcessor = new MockNameProcessor
+            var people = new List<Person>
             {
-                PairsToReturn = new List<Pair>
+                new Person
                 {
-                    new Pair
-                    {
-                        FName = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                        MName = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
-                    }
-                }
-            };
-            var generationManager = new GenerationManager(mockNameProcessor,
-                new MockOutputService(),
-                new MockDiceGenerator(new Random(36)));
-            var generation = new Generation
-            {
-                Iteration = 0,
-                Names = new List<Name>
-                {
-                    new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                    new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                    Id = 1,
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Age = 25,
+                    Gender = Gender.Female,
+                    IsAlive = true
                 }
             };
 
-            var result = generationManager.GenerateChildren(generation, 0);
+            var result = _generationManager.CheckForExtinction(people);
 
-            var maleChildren = result.Names.Where(n => n.Gender == Gender.Male).ToList();
-            Assert.True(maleChildren.Any());
-            Assert.Equal("Jane", maleChildren.First().Prefix);
-            Assert.Equal("Smith", maleChildren.First().Suffix);
-            Assert.Equal("JaneSmith", maleChildren.First().FullName);
+            Assert.True(result);
         }
 
         [Fact]
-        public void GenerateChildren_ReturnsNonNullGeneration()
+        public void CheckForExtinction_WithTwoPeople_ReturnsFalse()
         {
-            var generation = new Generation { Iteration = 3, Names = new List<Name>() };
+            var people = new List<Person>
+            {
+                new Person
+                {
+                    Id = 1,
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Age = 25,
+                    Gender = Gender.Female,
+                    IsAlive = true
+                },
+                new Person
+                {
+                    Id = 2,
+                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male },
+                    Age = 30,
+                    Gender = Gender.Male,
+                    IsAlive = true
+                }
+            };
 
-            var result = _generationManager.GenerateChildren(generation, 0);
+            var result = _generationManager.CheckForExtinction(people);
 
-            Assert.NotNull(result);
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void CheckForExtinction_WithMultiplePeople_ReturnsFalse()
+        {
+            var people = new List<Person>
+            {
+                new Person
+                {
+                    Id = 1,
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Age = 25,
+                    Gender = Gender.Female,
+                    IsAlive = true
+                },
+                new Person
+                {
+                    Id = 2,
+                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male },
+                    Age = 30,
+                    Gender = Gender.Male,
+                    IsAlive = true
+                },
+                new Person
+                {
+                    Id = 3,
+                    Name = new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder", Gender = Gender.Female },
+                    Age = 28,
+                    Gender = Gender.Female,
+                    IsAlive = true
+                }
+            };
+
+            var result = _generationManager.CheckForExtinction(people);
+
+            Assert.False(result);
         }
     }
 }

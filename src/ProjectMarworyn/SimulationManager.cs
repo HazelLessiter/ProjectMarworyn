@@ -7,7 +7,6 @@ namespace ProjectMarworyn
     internal class SimulationManager
     {
         public IFileManager _fileManager;
-        public INameProcessor _nameProcessor;
         public IGenerationManager _generationManager;
         public IConsoleService _consoleService;
         public ISeedGenerator _seedGenerator;
@@ -15,19 +14,19 @@ namespace ProjectMarworyn
         public IPersonGenerator _personGenerator;
         public IAgeProcessor _ageProcessor;
         public IDeathEngine _deathEngine;
+        public IPairingEngine _pairingEngine;
 
         public SimulationManager(IFileManager fileManager,
-            INameProcessor nameProcessor,
             IGenerationManager generationManager,
             IConsoleService consoleService,
             ISeedGenerator seedGenerator,
             IHeartbeat heartbeat,
             IPersonGenerator personGenerator,
             IAgeProcessor ageProcessor,
-            IDeathEngine deathEngine)
+            IDeathEngine deathEngine,
+            IPairingEngine pairingEngine)
         {
             _fileManager = fileManager;
-            _nameProcessor = nameProcessor;
             _generationManager = generationManager;
             _consoleService = consoleService;
             _seedGenerator = seedGenerator;
@@ -35,6 +34,7 @@ namespace ProjectMarworyn
             _personGenerator = personGenerator;
             _ageProcessor = ageProcessor;
             _deathEngine = deathEngine;
+            _pairingEngine = pairingEngine;
         }
 
         public void Start()
@@ -76,17 +76,23 @@ namespace ProjectMarworyn
 
                 //Death
                 (people, currentGeneration) = _deathEngine.ProcessDeaths(people,
-                    currentGeneration);//TODO: Tuples are not ideal, fix
+                    currentGeneration,
+                    worldSeed);//TODO: Tuples are not ideal, fix
 
                 //Pair
-                pairs = _personGenerator.GeneratePairs(people,
+                (pairs, people) = _pairingEngine.GeneratePairs(people,
                     pairs,
                     worldSeed);
 
                 //Generate Children
-                people = _personGenerator.GenerateChildren(people);
+                (var children, people) = _personGenerator.GenerateChildren(pairs,
+                    worldSeed,
+                    people.MaxBy(x => x.Id ).Id,
+                    people);
+
+                people = people.Concat(children)
+                    .ToList();
             }
-        }
         }
     }
 }

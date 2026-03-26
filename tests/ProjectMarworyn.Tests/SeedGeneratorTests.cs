@@ -7,15 +7,14 @@ namespace ProjectMarworyn.Tests
     public class SeedGeneratorTests
     {
         private readonly MockFileManager _mockFileManager;
-        private readonly MockConsoleService _mockConsoleService;
+        private readonly MockOutputService _mockOutputService;
         private readonly SeedGenerator _seedGenerator;
 
         public SeedGeneratorTests()
         {
             _mockFileManager = new MockFileManager();
-            _mockConsoleService = new MockConsoleService();
-            _seedGenerator = new SeedGenerator(_mockFileManager,
-                _mockConsoleService);
+            _mockOutputService = new MockOutputService();
+            _seedGenerator = new SeedGenerator(_mockFileManager, _mockOutputService);
         }
 
         private static List<SeedWord> MakeSeedWords(int count) => Enumerable.Range(1, count)
@@ -53,6 +52,16 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
+        public void GetThreeWords_WithSufficientWords_ReturnsThreeWords()
+        {
+            _mockFileManager.SeedWordsToReturn = MakeSeedWords(10);
+
+            var result = _seedGenerator.GetThreeWords();
+
+            Assert.Equal(3, result.Count);
+        }
+
+        [Fact]
         public void GetThreeWords_ReturnsOnlyWordsFromSeedWordFile()
         {
             _mockFileManager.SeedWordsToReturn = MakeSeedWords(10);
@@ -60,6 +69,16 @@ namespace ProjectMarworyn.Tests
             var result = _seedGenerator.GetThreeWords();
 
             Assert.All(result, w => Assert.Contains(w, _mockFileManager.SeedWordsToReturn));
+        }
+
+        [Fact]
+        public void GetThreeWords_WithExactlyThreeWords_CanReturnAll()
+        {
+            _mockFileManager.SeedWordsToReturn = MakeSeedWords(3);
+
+            var result = _seedGenerator.GetThreeWords();
+
+            Assert.Equal(3, result.Count);
         }
 
         [Fact]
@@ -138,8 +157,10 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void CreateWorldSeed_WritesWorldSeedToConsole()
+        public void CreateWorldSeed_WritesToConsole()
         {
+            var mockOutput = new MockOutputService();
+            var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
             var seedWords = new List<SeedWord>
             {
                 new SeedWord { Id = 1, Word = "Oak" },
@@ -147,10 +168,89 @@ namespace ProjectMarworyn.Tests
                 new SeedWord { Id = 3, Word = "Moss" }
             };
 
-            _seedGenerator.CreateWorldSeed(seedWords);
+            seedGenerator.CreateWorldSeed(seedWords);
 
-            Assert.Single(_mockConsoleService.Lines);
-            Assert.Contains("OAK-WREN-MOSS", _mockConsoleService.Lines[0]);
+            Assert.Single(mockOutput.Messages);
+        }
+
+        [Fact]
+        public void CreateWorldSeed_ConsoleMessageContainsWords()
+        {
+            var mockOutput = new MockOutputService();
+            var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
+            var seedWords = new List<SeedWord>
+            {
+                new SeedWord { Id = 1, Word = "Oak" },
+                new SeedWord { Id = 2, Word = "Wren" },
+                new SeedWord { Id = 3, Word = "Moss" }
+            };
+
+            seedGenerator.CreateWorldSeed(seedWords);
+
+            Assert.Contains("OAK-WREN-MOSS", mockOutput.Messages[0]);
+        }
+
+        [Fact]
+        public void CreateWorldSeed_WithLessThanThreeWords_ReturnsZero()
+        {
+            var seedWords = new List<SeedWord>
+            {
+                new SeedWord { Id = 1, Word = "Oak" },
+                new SeedWord { Id = 2, Word = "Wren" }
+            };
+
+            var result = _seedGenerator.CreateWorldSeed(seedWords);
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void CreateWorldSeed_WithMoreThanThreeWords_ReturnsZero()
+        {
+            var seedWords = new List<SeedWord>
+            {
+                new SeedWord { Id = 1, Word = "Oak" },
+                new SeedWord { Id = 2, Word = "Wren" },
+                new SeedWord { Id = 3, Word = "Moss" },
+                new SeedWord { Id = 4, Word = "Fern" }
+            };
+
+            var result = _seedGenerator.CreateWorldSeed(seedWords);
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void CreateWorldSeed_WithEmptyList_ReturnsZero()
+        {
+            var seedWords = new List<SeedWord>();
+
+            var result = _seedGenerator.CreateWorldSeed(seedWords);
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void CreateWorldSeed_DifferentWordOrder_ReturnsDifferentSeeds()
+        {
+            var seedWordsA = new List<SeedWord>
+            {
+                new SeedWord { Id = 1, Word = "Oak" },
+                new SeedWord { Id = 2, Word = "Wren" },
+                new SeedWord { Id = 3, Word = "Moss" }
+            };
+            var seedWordsB = new List<SeedWord>
+            {
+                new SeedWord { Id = 1, Word = "Wren" },
+                new SeedWord { Id = 2, Word = "Oak" },
+                new SeedWord { Id = 3, Word = "Moss" }
+            };
+
+            var seedA = _seedGenerator.CreateWorldSeed(seedWordsA);
+            var seedB = _seedGenerator.CreateWorldSeed(seedWordsB);
+
+            Assert.NotEqual(seedA, seedB);
         }
     }
 }
+
