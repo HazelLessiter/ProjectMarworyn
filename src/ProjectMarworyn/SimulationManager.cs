@@ -39,11 +39,14 @@ namespace ProjectMarworyn
 
         public void Start()
         {
-            var names = _fileManager.ReadNameFile();
-            var people = _personGenerator.Initialise(names);
-            var currentGeneration = _generationManager.Initialise(names);
             var worldSeed = _seedGenerator.CreateWorldSeed(_seedGenerator
                 .GetThreeWords());
+
+            var names = _fileManager.ReadNameFile();
+            var people = _personGenerator.Initialise(names,
+                worldSeed);
+            var currentGeneration = _generationManager.Initialise(names);
+            
             var pairs = new List<Pair>();
 
             _heartbeat.Start();

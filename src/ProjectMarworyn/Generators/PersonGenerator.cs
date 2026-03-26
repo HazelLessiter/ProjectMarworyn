@@ -16,9 +16,10 @@ namespace ProjectMarworyn.Generators
             _consoleService = consoleService;
         }
 
-        public List<Person> Initialise(List<Name> names)
+        public List<Person> Initialise(List<Name> names,
+            int worldSeed)
         {
-            var random = new Random();
+            var random = _diceGenerator.Create(worldSeed);
 
             var id = 0;
             var people = new List<Person>();

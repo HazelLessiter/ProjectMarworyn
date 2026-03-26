@@ -15,7 +15,8 @@ namespace ProjectMarworyn.Tests
         {
             _mockDiceGenerator = new MockDiceGenerator();
             _mockOutputService = new MockOutputService();
-            _personGenerator = new PersonGenerator(_mockDiceGenerator, _mockOutputService);
+            _personGenerator = new PersonGenerator(_mockDiceGenerator,
+                _mockOutputService);
         }
 
         [Fact]
@@ -23,7 +24,8 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>();
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Empty(result);
         }
@@ -33,7 +35,8 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>();
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.NotNull(result);
         }
@@ -46,7 +49,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Single(result);
         }
@@ -61,7 +65,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Name3", Prefix = "N", Suffix = "3", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Equal(3, result.Count);
         }
@@ -76,7 +81,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Name3", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Equal(0, result[0].Id);
             Assert.Equal(1, result[1].Id);
@@ -89,7 +95,8 @@ namespace ProjectMarworyn.Tests
             var name = new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name", Gender = Gender.Female };
             var names = new List<Name> { name };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Equal(name, result[0].Name);
         }
@@ -103,7 +110,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Male", Gender = Gender.Male }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Equal(Gender.Female, result[0].Gender);
             Assert.Equal(Gender.Male, result[1].Gender);
@@ -117,7 +125,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Test", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.True(result[0].IsAlive);
         }
@@ -130,7 +139,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Test", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.False(result[0].HasPair);
         }
@@ -143,7 +153,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Test", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.Equal(0, result[0].TimeFromLastChild);
         }
@@ -156,7 +167,8 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Test", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             Assert.InRange(result[0].Age, 0, 79);
         }
@@ -169,11 +181,11 @@ namespace ProjectMarworyn.Tests
                 new Name { FullName = "Test", Gender = Gender.Female }
             };
 
-            var result = _personGenerator.Initialise(names);
+            var result = _personGenerator.Initialise(names,
+                0);
 
             var expectedTimeLived = new DateTime(1, 1, 1).AddYears(result[0].Age);
             Assert.Equal(expectedTimeLived, result[0].TimeLived);
         }
     }
 }
-
