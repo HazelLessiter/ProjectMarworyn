@@ -38,7 +38,7 @@ namespace ProjectMarworyn.Generators
                     TimeLived = new DateTime(1, 1, 1)
                         .AddYears(age),
                     WillHaveChildren = CalcWillHaveChildren(random),
-                    TimeFromLastChild = 0,
+                    TimeFromLastChild = 2,
                     HasPair = false
                 };
 
@@ -75,7 +75,7 @@ namespace ProjectMarworyn.Generators
                 var childChance = random.Next(1,
                     101);
 
-                if (childChance > 25)
+                if (childChance < 15)
                 {
                     var gender = new Gender();
 
@@ -91,21 +91,28 @@ namespace ProjectMarworyn.Generators
                             throw new InvalidOperationException("Error randomising gender");
                     }
 
-                    var name = gender == Gender.Female ?
-                        new Name
-                        {
-                            FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
-                            Prefix = pair.MPerson.Name.Prefix,
-                            Suffix = pair.FPerson.Name.Suffix,
-                            Gender = Gender.Female
-                        }
-                        : new Name
+                    var name = new Name();
+
+                    if (gender == Gender.Male)
+                    {
+                        name = new Name
                         {
                             FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
                             Prefix = pair.FPerson.Name.Prefix,
                             Suffix = pair.MPerson.Name.Suffix,
                             Gender = Gender.Male
                         };
+                    }
+                    if (gender == Gender.Female)
+                    {
+                        name = new Name
+                        {
+                            FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
+                            Prefix = pair.MPerson.Name.Prefix,
+                            Suffix = pair.FPerson.Name.Suffix,
+                            Gender = Gender.Female
+                        };
+                    }
 
                     personId++;
                     var person = new Person()

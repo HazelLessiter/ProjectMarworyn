@@ -19,7 +19,7 @@ async function makeClaudeRequest() {
 
 ## Project Context
 
-This is a .NET 9 console application for population simulation. Please review the code with the project's standards in mind.
+This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.
 
 ### Project Standards (from AGENTS.md):
 \`\`\`
@@ -42,7 +42,7 @@ Please provide a thorough code review covering:
 1. **Code Quality**: Does the code follow the project's coding standards?
 2. **Architecture**: Does it fit the established patterns (DI, service extension pattern)?
 3. **Potential Issues**: Any bugs, edge cases, or problems?
-4. **Best Practices**: .NET 9 best practices and patterns
+4. **Best Practices**: .NET 10 best practices and patterns
 5. **Performance**: Any performance concerns?
 6. **Testing**: Should unit tests be added or updated?
 7. **Positive Feedback**: What's done well?

@@ -17,7 +17,8 @@ namespace ProjectMarworyn
 
                 var timeLived = GetTimeLived(person);
 
-                var age = GetAge(person, timeLived);
+                var age = GetAge(person,
+                    timeLived);
                 var timeFromLastChild = GetTimeFromLastChild(person);
 
                 var agedPerson = new Person
@@ -25,10 +26,12 @@ namespace ProjectMarworyn
                     Id = person.Id,
                     Name = person.Name,
                     Age = age,
+                    Gender = person.Gender,
                     IsAlive = person.IsAlive,
                     TimeFromLastChild = timeFromLastChild,
                     TimeLived = timeLived,
                     WillHaveChildren = person.WillHaveChildren,
+                    HasPair = person.HasPair
                 };
 
                 agedPeople.Add(agedPerson);

@@ -29,6 +29,7 @@
 - xUnit test project with mocks for all core services.
 
 ### Fixed
+- Fixed issue where AgeProcessor reset gender of all people to female
 - Incorrect guard logic in `GenerateChildren` that caused premature generation termination.
 - Seed word IDs corrected in `SeedWord.json`.
 - Null guard added to `SeedGenerator.GetThreeWords()`.
