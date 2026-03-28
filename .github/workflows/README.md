@@ -56,7 +56,7 @@ Claude reviews your code based on:
 - **Code Quality**: Adherence to project coding standards
 - **Architecture**: Compatibility with established patterns (DI, service extensions)
 - **Potential Issues**: Bugs, edge cases, and problems
-- **Best Practices**: .NET 9 best practices
+- **Best Practices**: .NET 10 best practices
 - **Performance**: Performance concerns
 - **Testing**: Test coverage recommendations
 - **Positive Feedback**: What's done well

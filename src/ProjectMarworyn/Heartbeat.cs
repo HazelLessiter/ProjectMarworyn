@@ -32,7 +32,7 @@ namespace ProjectMarworyn
             if (_simulationClock.IsRunning)
             {
                 _simulationClock.IsRunning = false;
-                _consoleService.WriteLine($"[SimulationClock] Stopped at tick {_simulationClock.TickCount}");
+                _consoleService.WriteLine($"[SimulationClock] Stopped at day {_simulationClock.TickCount}");
 
                 _simulationClock.EndTime = _simulationClock.SimulationTime;
             }
@@ -50,7 +50,7 @@ namespace ProjectMarworyn
             _simulationClock.SimulationTime = _simulationClock.SimulationTime.AddDays(1);//TODO: Make configurable based on simulation speed setting
             _simulationClock.ElapsedTime = _simulationClock.SimulationTime - _simulationClock.StartTime;
 
-            _consoleService.WriteLine($"[SimulationClock] Tick #{_simulationClock.TickCount}");
+            _consoleService.WriteLine($"[SimulationClock] Day {_simulationClock.TickCount}");
         }
 
         public void Reset()

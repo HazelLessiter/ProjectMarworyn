@@ -28,7 +28,7 @@ namespace ProjectMarworyn
             bool death = false;
             var random = _diceGenerator.Create(worldSeed);
 
-            foreach (var person in people)
+            foreach (var person in people.Where(x => x.IsAlive == true))
             {
                 var age = person.Age;
 
@@ -55,7 +55,7 @@ namespace ProjectMarworyn
                 {
                     person.IsAlive = false;
                     death = true;
-                    _consoleService.WriteLine($"{person.Name} has died at age {person.Age}");
+                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}");
                 }
                 else
                 {
