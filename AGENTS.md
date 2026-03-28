@@ -57,6 +57,41 @@ ProjectMarworyn/
 - **var** Prefer var
 - **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
 
+### Parameter Formatting
+- **Multi-parameter methods:** When a method call has multiple parameters, each parameter should be on a new line with one level of indentation
+- **Example (Preferred):**
+  ```csharp
+  //Each new parameter after the first one on a new line and indented by one level
+  var age = GetAge(person,
+      timeLived);
+  ```
+- **Not:**
+  ```csharp
+  //All parameteres on one line
+  var age = GetAge(person, timeLived);
+  ```
+  - **Not:**
+  ```csharp
+  //Parameters on new line, all parameters on one line, open bracket left on first line
+  var age = GetAge(
+    person, timeLived);
+  ```
+    - **Not:**
+  ```csharp
+  //All parameteres indented once with a new line, but no parameter on the first line, just an open bracket
+  var age = GetAge(
+    person,
+    timeLived);
+  ```
+    - **Not:**
+  ```csharp
+  //First parameter on the first line, all other parameters with a new line and indented, but the indentation is alignment based
+  var age = GetAge(person,
+                   timeLived);
+  ```
+- **Rationale:** Improves readability, makes diffs clearer, and follows the project's established formatting convention
+- **Note:** This applies to method calls with multiple parameters; single-parameter calls can remain on one line
+
 ### Naming Conventions
 - **Interfaces:** Prefix with `I` (e.g., `IFileManager`)
 - **Models:** Plain nouns (e.g., `Name`, `Pair`)
