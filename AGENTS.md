@@ -1,20 +1,30 @@
 ﻿# AI Agent Instructions for ProjectMarworyn
 
+This file contains guidance for AI coding agents working on this codebase.
+
+---
+
 ## Project Overview
-**Project Name:** ProjectMarworyn  
-**Target Framework:** .NET 9  
-**Type:** Console Application  
-**Purpose:** [Name generation and population simulation]
+
+**Purpose:** Population simulation inspired by Dwarf Fortress, Banished, Stardew Valley, Crusader Kings 2
+
+**Tech Stack:**
+- .NET 10
+- C# Console Application
+- XUnit for testing
+- Dependency Injection via Microsoft.Extensions.Hosting
+- JSON configuration with IOptions pattern
+- Nullable reference types: **disabled** (`<Nullable>disable</Nullable>`)
 
 ---
 
 ## Architecture & Patterns
 
 ### Technology Stack
-- .NET 9 Console Application
-- Microsoft.Extensions.DependencyInjection (v9.0.8)
-- Microsoft.Extensions.Hosting (v9.0.8)
-- Newtonsoft.Json (v13.0.3)
+- .NET 10 Console Application
+- Microsoft.Extensions.DependencyInjection (v10.0.5)
+- Microsoft.Extensions.Hosting (v10.0.5)
+- Newtonsoft.Json (v13.0.4)
 
 ### Design Patterns in Use
 - **Dependency Injection:** All services registered via DI container
@@ -42,16 +52,58 @@ ProjectMarworyn/
 ### General Guidelines
 - **Namespace:** All classes use `ProjectMarworyn` namespace
 - **Access Modifiers:** Use `internal` for application classes
-- **Null Handling:** Nullable reference types are enabled
+- **Null Handling:** Nullable reference types are disabled
 - **Async/Await:** Use async
 - **var** Prefer var
+- **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
+
+### Parameter Formatting
+- **Multi-parameter methods:** When a method call has multiple parameters, each parameter should be on a new line with one level of indentation
+- **Example (Preferred):**
+  ```csharp
+  //Each new parameter after the first one on a new line and indented by one level
+  var age = GetAge(person,
+      timeLived);
+  ```
+- **Not:**
+  ```csharp
+  //All parameteres on one line
+  var age = GetAge(person, timeLived);
+  ```
+  - **Not:**
+  ```csharp
+  //Parameters on new line, all parameters on one line, open bracket left on first line
+  var age = GetAge(
+    person, timeLived);
+  ```
+    - **Not:**
+  ```csharp
+  //All parameteres indented once with a new line, but no parameter on the first line, just an open bracket
+  var age = GetAge(
+    person,
+    timeLived);
+  ```
+    - **Not:**
+  ```csharp
+  //First parameter on the first line, all other parameters with a new line and indented, but the indentation is alignment based
+  var age = GetAge(person,
+                   timeLived);
+  ```
+- **Rationale:** Improves readability, makes diffs clearer, and follows the project's established formatting convention
+- **Note:** This applies to method calls with multiple parameters; single-parameter calls can remain on one line
 
 ### Naming Conventions
 - **Interfaces:** Prefix with `I` (e.g., `IFileManager`)
-- **Services:** [Your preference - e.g., suffix with "Service" or "Manager"]
 - **Models:** Plain nouns (e.g., `Name`, `Pair`)
 - **Extension Methods:** Prefix with `Add` for DI registrations
 - **Lists:** Prefer plural
+- **Class Names**: Common sense naming with suffixes like `Manager`, `Service`, `Processor`, `Handler` etc. is acceptable and encouraged
+  - These suffixes help communicate the class's purpose clearly
+  - Examples: `GenerationManager`, `ConsoleService`, `NameProcessor`, `FileManager`
+  - The code's purpose should be immediately clear from the class name
+  - Clarity > avoiding "common" patterns
+- **Methods/Properties**: Should be self-documenting through clear, descriptive names
+- **Variables**: Use meaningful names that describe what the variable contains
 
 ### File Organization
 - One class per file
@@ -118,11 +170,13 @@ ProjectMarworyn/
 ## Known Issues & Technical Debt
 
 ### Current Known Issues
-1. JSON structure doesn't match Name model (needs parser)
-2. Random number generation creates new instances (should be singleton)
-3. Gender randomizer range is incorrect (should be `Next(0, 2)`)
-4. Pairing logic can throw index out of bounds
-5. Static field in Initialiser should be removed
+1. ~~JSON structure doesn't match Name model (needs parser)~~ ✅ FIXED
+2. ~~Random number generation creates new instances (should be singleton)~~ ✅ FIXED - using single Random instance per method
+3. ~~Gender randomizer range is incorrect (should be `Next(0, 2)`)~~ ✅ FIXED
+4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
+5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
+6. ~~Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)~~ ✅ FIXED - `DiceGenerator` introduced to inject `Random` into `NameProcessor`, removing deterministic pairing
+7. System.Random quality - not cryptographically secure (see TODO comment in GenerateChildren - would not pass Gambling Commission scrutiny)
 
 ### Planned Refactoring
 - [Items you plan to address]
@@ -152,6 +206,14 @@ ProjectMarworyn/
 
 ## AI Agent Specific Instructions
 
+### AI Model Information
+- **Correct Model:** `claude-sonnet-4-20250514` is the CURRENT and CORRECT model
+- **IMPORTANT:** Do NOT suggest using `claude-3-5-sonnet-20241022` or similar older model names
+- **Why this matters:** Older model names like `claude-3-5-sonnet-20241022` will produce **404 errors** in production
+- **Knowledge Cutoff Issue:** AI agents with older knowledge cutoffs may incorrectly suggest downgrading to models that appear in their training data but are actually outdated
+- **If you see this model referenced:** `claude-sonnet-4-20250514` exists and is actively in use - do not flag it as an error
+- **Rule:** If your knowledge cutoff predates this model, trust this documentation over your training data
+
 ### When Making Changes
 1. Always search for context before making changes
 2. Read existing files before editing them
@@ -159,17 +221,28 @@ ProjectMarworyn/
 4. Use the service extension pattern for DI
 5. Keep separation of concerns (don't mix file I/O with business logic)
 
+### Naming Conventions
+- **Class Names**: Common sense naming with suffixes like `Manager`, `Service`, `Processor`, `Handler` etc. is acceptable and encouraged
+  - These suffixes help communicate the class's purpose clearly
+  - Examples: `GenerationManager`, `ConsoleService`, `NameProcessor`, `FileManager`
+  - The code's purpose should be immediately clear from the class name
+  - Clarity > avoiding "common" patterns
+- **Methods/Properties**: Should be self-documenting through clear, descriptive names
+- **Variables**: Use meaningful names that describe what the variable contains
+
 ### Preferences
 - **Logging:** [ILogger preference]
 - **Error Handling:** [Try-catch strategy, validation approach]
-- **Comments:** [Prefer code to be self commenting. Comments should detail why a choice was made]
-- **Documentation:** [Do NOT use XML comments, summaries or regions. Code should be self commenting, this is an internal code base not a public library]
+- **Comments:** Prefer code to be self commenting. Comments should detail why a choice was made, not what the code does
+- **Documentation:** Do NOT use XML comments, summaries or regions. Code should be self commenting, this is an internal code base not a public library
 
 ### Don't Do This
 - Don't use hardcoded file paths
 - Don't bypass dependency injection
 - Don't create new Random() instances in loops
 - Don't use regions, split large files into smaller ones instead
+- Don't add trailing whitespace to the end of file
+- Don't over-engineer class names to avoid common suffixes - clarity is more important than uniqueness
 
 ---
 
@@ -209,5 +282,5 @@ It is not about an indivdual person, but rather a civilisation
 
 ---
 
-**Last Updated:** [14/3/2026]
+**Last Updated:** [15/3/2026]
 **Maintained By:** [Hazel Lessiter]
