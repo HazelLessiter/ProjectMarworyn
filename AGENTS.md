@@ -56,6 +56,7 @@ ProjectMarworyn/
 - **Async/Await:** Use async
 - **var** Prefer var
 - **git** Default branch is main. Update branches are named: Update/Version[num]_[Mon][yy]
+- Lines must not end with whitespace characters (spaces or tabs). Trailing whitespace on any line is a violation and should be flagged as CHANGE REQUESTED
 
 ### Parameter Formatting
 - **Multi-parameter methods:** When a method call has multiple parameters, each parameter should be on a new line with one level of indentation
