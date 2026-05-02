@@ -164,6 +164,7 @@ ProjectMarworyn/
 - I prioritise unit tests that test the behaviour, not the implementation.
 - I want tests to not be brittle. A minor refactor that does not change any behaviour should not break any tests
 - A change in behaviour should be flagged by the tests
+- Code additions without proper unit test coverage as defined in the Testing section of the README.md should not be approved.
 
 ---
 
@@ -176,7 +177,6 @@ ProjectMarworyn/
 4. ~~Pairing logic can throw index out of bounds~~ ✅ FIXED - added boundary check
 5. ~~Static field in Initialiser should be removed~~ ✅ FIXED
 6. ~~Pairing is deterministic - same people always pair together every run (needs shuffling/randomization)~~ ✅ FIXED - `DiceGenerator` introduced to inject `Random` into `NameProcessor`, removing deterministic pairing
-7. System.Random quality - not cryptographically secure (see TODO comment in GenerateChildren - would not pass Gambling Commission scrutiny)
 
 ### Planned Refactoring
 - [Items you plan to address]
