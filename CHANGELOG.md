@@ -4,12 +4,12 @@
 
 ## [1.0.2] - In Progress
 
-## Fixed
+### Fixed
 - Fixed issue where no one could die
 
 ## [1.0.1] - 2nd May 2026
 
-## Added
+### Added
 - Added PolyForm Non Commercial Attribution license
 
 ## [1.0.0] - 14th March 2026
