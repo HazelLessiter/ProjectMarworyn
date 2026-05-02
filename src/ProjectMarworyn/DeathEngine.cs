@@ -51,7 +51,7 @@ namespace ProjectMarworyn
 
                 deathChance = (int)deathModifier / 100.0;
 
-                if (random.Next(0, 101) <= deathChance)
+                if (random.NextDouble(0, 101) <= deathChance)
                 {
                     person.IsAlive = false;
                     death = true;
