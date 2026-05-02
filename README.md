@@ -3,7 +3,7 @@
 A population simulation console application inspired by games such as Dwarf Fortress, Banished, Stardew Valley, and Crusader Kings 2. Starting from a seeded initial population, the simulation runs generation-by-generation — pairing individuals, producing children with blended names, and continuing until the population falls below two people.
 
 ## License
-This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [license.md](license.md) file for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Features
 
