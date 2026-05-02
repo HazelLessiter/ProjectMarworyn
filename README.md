@@ -188,4 +188,51 @@ The **Heartbeat** system provides a universal simulation clock that decouples in
   - `Stop()` — pauses the simulation
   - `Reset()` — clears all state back to defaults
 
-This architecture allows future features like birth/death events, aging, and seasonal changes to occur based on the simulation clock instead of generation boundaries.
+This architecture allows future features like birth/death events, aging, and seasonal changes to occur based on the simulation clock.
+
+## Testing
+
+Project Marworyn follows a pragmatic, behaviour-focused testing approach. Tests exist to verify that the software works correctly, they do not exist to hit coverage targets or satisfy process for its own sake.
+
+### Principles
+
+- Tests must be falsifiable. A test that cannot fail provides no value.
++ An example of a meaningless test is a test that tests a property getter and setter. This is testing that a core component of C# is functional which is not the purpose of this test suite.
+- No enforced coverage percentage. Coverage is a tool, not a goal.
+- Do not test external framework or external library code. Test your behaviour, not Microsoft's.
+- Tests may be written before or after implementation. What matters is that they exist and are meaningful.
+- A new bug fix should ideally be covered by a new unit test.
+- Most importantly, this is critical, a unit test does NOT exist to test implementation details.
+- Tests that fail every single time a minor refactor occurs even if the behaviour is unchanged are bad brittle tests.
+- Tests must pass or fail reliably, a flakey test is a bad test.
+
+### What is a "Unit"
+
+A unit is a discrete **unit of behaviour**, not necessarily a single method or class. A unit test may cover a single method, a complex calculation, or a chain of methods. A **unit of behaviour** refers to whatever represents a coherent, testable isolated piece of behaviour. Crucially a **unit of behaviour** is divorced from a **unit of implementation**.
+
+### Framework
+
+xUnit
+
+### Naming Convention
+
+Tests follow the pattern:
+
+```
+Action_Condition_ExpectedResult()
+```
+
+For example:
+```
+GetAge_BornToday_Returns0()
+GetAge_LeapYearBirthday_ReturnsCorrectAge()
+GetAge_NegativeDate_ThrowsException()
+```
+
+A single method with multiple code paths should have multiple tests — one per distinct behaviour or edge case.
+
+### Style
+
+- Arrange/Act/Assert structure is encouraged but not mandated
+- No Should-style naming
+- Test names should read as a description of behaviour, not an implementation detail
