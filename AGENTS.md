@@ -165,7 +165,7 @@ ProjectMarworyn/
 - I prioritise unit tests that test the behaviour, not the implementation.
 - I want tests to not be brittle. A minor refactor that does not change any behaviour should not break any tests
 - A change in behaviour should be flagged by the tests
-- Code additions without proper unit test coverage as defined in the Testing section of the README.md should not be approved.
+- Code additions without proper unit test coverage as defined in the Testing section of the README.md should not be approved, must be CHANGES REQUESTED. Not minor suggestions, even if the code needs re-architecting to be unit testable.
 
 ---
 
