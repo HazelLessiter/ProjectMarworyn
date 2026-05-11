@@ -79,5 +79,7 @@
   { "FullName": "Drew", "Prefix": "D", "Suffix": "rew", "Gender": 1},
   { "FullName": "Marple", "Prefix": "Mar", "Suffix": "ple", "Gender": 0},
   { "FullName": "Belladonna", "Prefix": "Bella", "Suffix": "donna", "Gender": 0},
-  { "FullName": "Alexander", "Prefix": "Ale", "Suffix": "xander", "Gender": 1}
+  { "FullName": "Alexander", "Prefix": "Ale", "Suffix": "xander", "Gender": 1},
+  { "FullName": "Grace", "Prefix": "Gra", "Suffix": "ce", "Gender": 0},
+  { "FullName": "Xander", "Prefix": "Xan", "Suffix": "der", "Gender": 1}
 ]
