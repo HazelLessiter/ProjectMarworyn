@@ -133,3 +133,6 @@ orleans.codegen.cs
 
 # Local configuration
 appsettings.Development.json
+
+# Claude Code
+.claude/

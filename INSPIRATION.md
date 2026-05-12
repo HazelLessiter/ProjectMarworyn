@@ -1,4 +1,4 @@
-#Inspirations
+# Inspiration
 
 In no particular order.
 

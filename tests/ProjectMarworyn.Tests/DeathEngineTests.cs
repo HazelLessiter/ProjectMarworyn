@@ -92,8 +92,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive", Gender = Gender.Male }, Age = 30, Gender = Gender.Male, IsAlive = true };
-            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead", Gender = Gender.Female }, Age = 30, Gender = Gender.Female, IsAlive = false };
+            var alivePerson = CreatePerson(30);
+            var deadPerson = CreatePerson(30, isAlive: false);
             var people = new List<Person> { alivePerson, deadPerson };
 
             var (survivors, _) = engine.ProcessDeaths(people,
@@ -282,13 +282,12 @@ namespace ProjectMarworyn.Tests
             bool upperDies)
         {
             var engine = CreateEngine(nextDoubleValue);
-            var generation = CreateGeneration();
 
             var (lowerSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
-                generation,
+                CreateGeneration(),
                 0);
             var (upperSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
-                generation,
+                CreateGeneration(),
                 0);
 
             if (lowerDies)
