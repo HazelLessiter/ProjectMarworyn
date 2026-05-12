@@ -45,7 +45,7 @@ namespace ProjectMarworyn
                     <= 69 => DeathModifier.Sixty,
                     <= 79 => DeathModifier.Seventy,
                     <= 89 => DeathModifier.Eighty,
-                    <= 99 => DeathModifier.Ninthy,
+                    <= 99 => DeathModifier.Ninety,
                     _ => DeathModifier.Hundred
                 };
 

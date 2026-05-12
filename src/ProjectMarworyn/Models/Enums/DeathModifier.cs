@@ -11,7 +11,7 @@
         Sixty = 20,
         Seventy = 25,
         Eighty = 50,
-        Ninthy = 100,
+        Ninety = 100,
         Hundred = 250,
     }
 }

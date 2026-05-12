@@ -92,8 +92,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = CreatePerson(30);
-            var deadPerson = CreatePerson(30, isAlive: false);
+            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive", Gender = Gender.Male }, Age = 30, Gender = Gender.Male, IsAlive = true };
+            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead", Gender = Gender.Female }, Age = 30, Gender = Gender.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
             var (survivors, _) = engine.ProcessDeaths(people,
@@ -240,7 +240,7 @@ namespace ProjectMarworyn.Tests
         [InlineData(75,  0.00275, false)]
         [InlineData(85,  0.0045,  true)]  // Eighty (80-89, modifier  50): threshold 0.005
         [InlineData(85,  0.0055,  false)]
-        [InlineData(95,  0.009,   true)]  // Ninthy (90-99, modifier 100): threshold 0.01
+        [InlineData(95,  0.009,   true)]  // Ninety (90-99, modifier 100): threshold 0.01
         [InlineData(95,  0.011,   false)]
         [InlineData(105, 0.0225,  true)]  // Hundred(100+,  modifier 250): threshold 0.025
         [InlineData(105, 0.0275,  false)]
@@ -273,8 +273,8 @@ namespace ProjectMarworyn.Tests
         [InlineData(59, 60,  0.00175, false, true)]   // Fifty→Sixty
         [InlineData(69, 70,  0.00225, false, true)]   // Sixty→Seventy
         [InlineData(79, 80,  0.00375, false, true)]   // Seventy→Eighty
-        [InlineData(89, 90,  0.0075,  false, true)]   // Eighty→Ninthy
-        [InlineData(99, 100, 0.0175,  false, true)]   // Ninthy→Hundred
+        [InlineData(89, 90,  0.0075,  false, true)]   // Eighty→Ninety
+        [InlineData(99, 100, 0.0175,  false, true)]   // Ninety→Hundred
         public void ProcessDeaths_AgeBoundaryTransition_CorrectModifierApplied(int lowerAge,
             int upperAge,
             double nextDoubleValue,
@@ -282,12 +282,13 @@ namespace ProjectMarworyn.Tests
             bool upperDies)
         {
             var engine = CreateEngine(nextDoubleValue);
+            var generation = CreateGeneration();
 
             var (lowerSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
-                CreateGeneration(),
+                generation,
                 0);
             var (upperSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
-                CreateGeneration(),
+                generation,
                 0);
 
             if (lowerDies)
