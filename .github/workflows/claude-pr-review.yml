@@ -47,7 +47,7 @@ jobs:
               issue_number: context.payload.pull_request.number
             });
             const claudeComment = comments.data.find(c =>
-              c.body.startsWith('## 🤖 Claude AI Code Review')
+              c.body.startsWith('<!-- claude-pr-review -->')
             );
             return claudeComment ? claudeComment.id : null;
 
@@ -69,7 +69,8 @@ jobs:
             const fs = require('fs');
             const review = fs.readFileSync('claude_review.txt', 'utf8');
 
-            const comment = `## 🤖 Claude AI Code Review
+            const comment = `<!-- claude-pr-review -->
+            ## 🤖 Claude AI Code Review
 
             ${review}
 
