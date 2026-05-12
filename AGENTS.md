@@ -18,6 +18,12 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ---
 
+## Do Not Flag As Issues
+
+- **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. Do not suggest adding one. If a file does end with a trailing newline, flag it for removal.
+
+---
+
 ## When Making Changes
 
 1. Search for existing context before writing new code
