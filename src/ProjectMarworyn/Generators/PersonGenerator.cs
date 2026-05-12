@@ -38,7 +38,7 @@ namespace ProjectMarworyn.Generators
                     TimeLived = new DateTime(1, 1, 1)
                         .AddYears(age),
                     WillHaveChildren = CalcWillHaveChildren(random),
-                    TimeFromLastChild = 2,
+                    TimeFromLastChild = 2,//This is set to 2 to allow people to have children in the first iteration, lastChildThreshold could be a const instead?
                     HasPair = false
                 };
 
