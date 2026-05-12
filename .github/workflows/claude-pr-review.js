@@ -1,8 +1,7 @@
-﻿const fs = require('fs');
-const https = require('https');
+const fs = require('fs');
+const Anthropic = require('@anthropic-ai/sdk');
 
 async function makeClaudeRequest() {
-  // Read files
   const diff = fs.readFileSync('pr_diff.txt', 'utf8');
   let agentsContext = '';
   try {
@@ -54,59 +53,19 @@ Format your review as:
 - Be constructive and specific
 - Provide code examples for suggestions when helpful`;
 
-  const requestBody = JSON.stringify({
+  const client = new Anthropic();
+
+  const message = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
-    messages: [
-      {
-        role: 'user',
-        content: prompt
-      }
-    ]
+    messages: [{ role: 'user', content: prompt }]
   });
 
-  const options = {
-    hostname: 'api.anthropic.com',
-    path: '/v1/messages',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'Content-Length': Buffer.byteLength(requestBody)
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let data = '';
-
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(data);
-        } else {
-          reject(new Error(`API request failed with status ${res.statusCode}: ${data}`));
-        }
-      });
-    });
-
-    req.on('error', (error) => {
-      reject(error);
-    });
-
-    req.write(requestBody);
-    req.end();
-  });
+  return message.content[0].text;
 }
 
 makeClaudeRequest()
-  .then(responseData => {
-    const response = JSON.parse(responseData);
-    const review = response.content[0].text;
+  .then(review => {
     fs.writeFileSync('claude_review.txt', review);
     console.log('Review generated successfully');
   })

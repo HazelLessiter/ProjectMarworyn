@@ -33,6 +33,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm install @anthropic-ai/sdk
+
       - name: Request Claude review
         id: claude-review
         env:
