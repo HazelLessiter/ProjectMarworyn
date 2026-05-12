@@ -20,7 +20,7 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ## Do Not Flag As Issues
 
-- **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. Do not suggest adding one. If a file does end with a trailing newline, flag it for removal.
+- **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. Do not suggest adding one. If a file does end with a trailing newline, flag it for removal. \ No newline at end of file in diffs is CORRECT and INTENTIONAL. Do NOT flag it. Do NOT mention it. Do NOT suggest adding a newline. If you suggest adding a newline at the end of a file, YOU ARE IN VIOLATION OF THE CODING STANDARDS. C# in 2026 DOES NOT require a newline at the end of the file. Unused code is NOT WELCOME in a codebase as a standard rule. The only reason to add it is tradition and history. None of which applies to a codebase in 2026. To be blunt, I repeat: **\ No newline at end of file in diffs is CORRECT and INTENTIONAL.**
 
 ---
 
