@@ -27,11 +27,19 @@ This project is licensed under the PolyForm Noncommercial License 1.0.0 - see th
 
 ## Code Standards
 
+### General
+
+- **Namespace:** All classes use the `ProjectMarworyn` namespace
+- **Access modifiers:** Use `internal` for application classes
+- **Nullable reference types:** Disabled (`<Nullable>disable</Nullable>`)
+- **Async/await:** Use async/await throughout
+- **var:** Prefer `var` for local variable declarations
+- **Trailing whitespace:** Lines must not end with trailing whitespace; `.cs` files must not end with an empty newline
+- **Git branches:** Default branch is `main`; update branches are named `Update/Version[num]_[Mon][yy]`
+
 ### Parameter Formatting
 When method calls contain multiple parameters, each parameter should be placed on a new line with one level of indentation:
 
-###csharp
-### Parameter Formatting
 - **Multi-parameter methods:** When a method call has multiple parameters, each parameter should be on a new line with one level of indentation
 - **Example (Preferred):**
   ```csharp
@@ -68,7 +76,47 @@ When method calls contain multiple parameters, each parameter should be placed o
 
 This convention improves readability and makes version control diffs clearer. Single-parameter method calls may remain on one line.
 
-For complete coding standards and AI agent instructions, see [AGENTS.md](AGENTS.md).
+### Naming Conventions
+
+| Element | Convention | Example |
+|---|---|---|
+| Interfaces | Prefix with `I` | `IFileManager` |
+| Models | Plain nouns | `Name`, `Pair` |
+| DI extension methods | Prefix with `Add` | `AddServices` |
+| Lists / collections | Plural names | `names`, `people` |
+| Classes | Meaningful suffixes encouraged | `GenerationManager`, `ConsoleService` |
+
+Methods, properties, and variables should be self-documenting through clear, descriptive names. Clarity over brevity.
+
+### File Organisation
+
+- One class per file
+- File name must match class name exactly
+- Group related classes in folders (`Models/`, `Extensions/`, `Services/`, etc.)
+
+### Architecture
+
+- **Dependency injection:** All services registered through the DI container; registrations live in `Extensions/ServiceExtensions.cs`
+- **Service lifetimes:** Transient for stateless services, Singleton for application-wide state
+- **Separation of concerns:** Do not mix file I/O with business logic
+- **Interface segregation:** Define services with interfaces
+
+### Comments
+
+- Prefer self-documenting code through clear naming
+- Add a comment only when the *why* is non-obvious: a hidden constraint, a workaround, a subtle invariant
+- Do not use XML doc comments, summaries, or `#region` blocks
+- Comments describe *why*, never *what*
+
+### What Not To Do
+
+- Don't hardcode file paths; use relative paths from the application directory
+- Don't bypass dependency injection
+- Don't create `new Random()` instances inside loops
+- Don't use `#region`; split large files into smaller ones instead
+- Don't add trailing whitespace to lines or to the end of files
+
+For AI agent-specific instructions, see [AGENTS.md](AGENTS.md).
 
 ## Project Structure
 

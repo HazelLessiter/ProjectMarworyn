@@ -3,6 +3,13 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 async function makeClaudeRequest() {
   const diff = fs.readFileSync('pr_diff.txt', 'utf8');
+  let readmeContext = '';
+  try {
+    readmeContext = fs.readFileSync('README.md', 'utf8');
+  } catch (e) {
+    console.log('README.md not found');
+  }
+
   let agentsContext = '';
   try {
     agentsContext = fs.readFileSync('AGENTS.md', 'utf8');
@@ -20,7 +27,12 @@ async function makeClaudeRequest() {
 
 This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.
 
-### Project Standards (from AGENTS.md):
+### Project Standards (from README.md):
+\`\`\`
+${readmeContext}
+\`\`\`
+
+### AI Agent Supplementary Instructions (from AGENTS.md):
 \`\`\`
 ${agentsContext}
 \`\`\`
