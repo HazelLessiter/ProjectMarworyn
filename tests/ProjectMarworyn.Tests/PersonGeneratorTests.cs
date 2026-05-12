@@ -146,7 +146,7 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void Initialise_SetsTimeFromLastChildToZero()
+        public void Initialise_SetsTimeFromLastChildToTwo()
         {
             var names = new List<Name>
             {
@@ -156,7 +156,7 @@ namespace ProjectMarworyn.Tests
             var result = _personGenerator.Initialise(names,
                 0);
 
-            Assert.Equal(0, result[0].TimeFromLastChild);
+            Assert.Equal(2, result[0].TimeFromLastChild);
         }
 
         [Fact]
