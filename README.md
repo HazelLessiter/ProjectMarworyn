@@ -108,6 +108,19 @@ Methods, properties, and variables should be self-documenting through clear, des
 - Do not use XML doc comments, summaries, or `#region` blocks
 - Comments describe *why*, never *what*
 
+### Changelog Format
+
+Entries in `CHANGELOG.md` use a hyphen-as-prefix style with no space after the hyphen. This is an intentional stylistic choice — it avoids the excessive whitespace Markdown renderers add to standard bullet lists and gives the changelog a retro aesthetic consistent with the project's theme.
+
+- `-Main entry` — top-level change
+- `+Sub-point` — detail or side effect nested under the entry above
+
+Example:
+```
+-Name.json is now InitialPeople.json
++As a side effect of the above: DeathEngine tuple has been removed
+```
+
 ### What Not To Do
 
 - Don't hardcode file paths; use relative paths from the application directory
