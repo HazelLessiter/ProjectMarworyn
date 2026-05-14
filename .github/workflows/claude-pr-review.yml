@@ -29,39 +29,6 @@ jobs:
           git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
           echo "Diff saved to pr_diff.txt"
 
-      - name: Fetch linked issues
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const prBody = context.payload.pull_request.body || '';
-            const pattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
-            const numbers = new Set();
-            let match;
-            while ((match = pattern.exec(prBody)) !== null) {
-              numbers.add(parseInt(match[1]));
-            }
-            const issues = [];
-            for (const number of numbers) {
-              try {
-                const { data } = await github.rest.issues.get({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: number
-                });
-                issues.push({
-                  number: data.number,
-                  title: data.title,
-                  body: data.body || '',
-                  labels: data.labels.map(l => l.name)
-                });
-              } catch (e) {
-                console.log(`Could not fetch issue #${number}: ${e.message}`);
-              }
-            }
-            fs.writeFileSync('linked_issues.json', JSON.stringify(issues, null, 2));
-            console.log(`Fetched ${issues.length} linked issue(s)`);
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -89,6 +56,8 @@ jobs:
         id: claude-review
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
@@ -137,4 +106,3 @@ jobs:
           path: |
             claude_review.txt
             pr_diff.txt
-            linked_issues.json

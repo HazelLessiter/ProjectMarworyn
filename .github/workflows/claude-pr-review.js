@@ -1,5 +1,53 @@
 const fs = require('fs');
+const https = require('https');
 const Anthropic = require('@anthropic-ai/sdk');
+
+function fetchIssue(token, repo, number) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${repo}/issues/${number}`,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'User-Agent': 'claude-pr-review',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    };
+    https.get(options, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+      });
+    }).on('error', reject);
+  });
+}
+
+async function fetchLinkedIssues(prBody, token, repo) {
+  const pattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
+  const numbers = new Set();
+  let match;
+  while ((match = pattern.exec(prBody)) !== null) {
+    numbers.add(parseInt(match[1]));
+  }
+  const issues = [];
+  for (const number of numbers) {
+    try {
+      const data = await fetchIssue(token, repo, number);
+      if (data.number) {
+        issues.push({
+          number: data.number,
+          title: data.title,
+          body: data.body || '',
+          labels: (data.labels || []).map(l => l.name)
+        });
+      }
+    } catch (e) {
+      console.log(`Could not fetch issue #${number}: ${e.message}`);
+    }
+  }
+  return issues;
+}
 
 async function makeClaudeRequest() {
   const diff = fs.readFileSync('pr_diff.txt', 'utf8');
@@ -17,16 +65,15 @@ async function makeClaudeRequest() {
     console.log('AGENTS.md not found');
   }
 
-  let linkedIssues = [];
-  try {
-    linkedIssues = JSON.parse(fs.readFileSync('linked_issues.json', 'utf8'));
-  } catch (e) {
-    console.log('No linked issues found');
-  }
-
   const title = process.env.PR_TITLE || 'No title';
   const description = process.env.PR_BODY || 'No description';
   const author = process.env.PR_AUTHOR || 'Unknown';
+  const token = process.env.GITHUB_TOKEN || '';
+  const repo = process.env.GITHUB_REPOSITORY || '';
+
+  const linkedIssues = token && repo
+    ? await fetchLinkedIssues(description, token, repo)
+    : [];
 
   const prompt = `You are reviewing a pull request for the ProjectMarworyn project.
 
