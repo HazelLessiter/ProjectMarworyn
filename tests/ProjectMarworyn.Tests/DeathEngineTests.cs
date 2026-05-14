@@ -17,7 +17,7 @@ namespace ProjectMarworyn.Tests
             new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "TestPerson", Gender = Gender.Male },
+                Name = new Name { FullName = "TestPerson" },
                 Age = age,
                 Gender = Gender.Male,
                 IsAlive = isAlive
@@ -92,8 +92,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive", Gender = Gender.Male }, Age = 30, Gender = Gender.Male, IsAlive = true };
-            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead", Gender = Gender.Female }, Age = 30, Gender = Gender.Female, IsAlive = false };
+            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Gender = Gender.Male, IsAlive = true };
+            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Gender = Gender.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
             var (survivors, _) = engine.ProcessDeaths(people,
@@ -147,8 +147,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_GenerationNamesMatchSurvivors()
         {
             var engine = CreateEngine(1.0);
-            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1", Gender = Gender.Female }, Age = 10, Gender = Gender.Female, IsAlive = true };
-            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2", Gender = Gender.Male }, Age = 15, Gender = Gender.Male, IsAlive = true };
+            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Gender = Gender.Female, IsAlive = true };
+            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Gender = Gender.Male, IsAlive = true };
             var people = new List<Person> { person1, person2 };
 
             var (survivors, currentGeneration) = engine.ProcessDeaths(people,
@@ -202,7 +202,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "John Smith", Gender = Gender.Male },
+                Name = new Name { FullName = "John Smith" },
                 Age = 55,
                 Gender = Gender.Male,
                 IsAlive = true

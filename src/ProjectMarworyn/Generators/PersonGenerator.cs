@@ -33,7 +33,6 @@ namespace ProjectMarworyn.Generators
                     Id = id,
                     Name = name,
                     Age = age,
-                    Gender = name.Gender,//TODO: This is janky, longterm I want to move gender away from name to person, this is temporary
                     IsAlive = true,
                     TimeLived = new DateTime(1, 1, 1)
                         .AddYears(age),
@@ -100,7 +99,6 @@ namespace ProjectMarworyn.Generators
                             FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
                             Prefix = pair.FPerson.Name.Prefix,
                             Suffix = pair.MPerson.Name.Suffix,
-                            Gender = Gender.Male
                         };
                     }
                     if (gender == Gender.Female)
@@ -110,7 +108,6 @@ namespace ProjectMarworyn.Generators
                             FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
                             Prefix = pair.MPerson.Name.Prefix,
                             Suffix = pair.FPerson.Name.Suffix,
-                            Gender = Gender.Female
                         };
                     }
 

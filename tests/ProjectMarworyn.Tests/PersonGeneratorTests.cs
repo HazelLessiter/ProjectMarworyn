@@ -46,7 +46,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name", Gender = Gender.Female }
+                new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -60,9 +60,9 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Name1", Prefix = "N", Suffix = "1", Gender = Gender.Female },
-                new Name { FullName = "Name2", Prefix = "N", Suffix = "2", Gender = Gender.Male },
-                new Name { FullName = "Name3", Prefix = "N", Suffix = "3", Gender = Gender.Female }
+                new Name { FullName = "Name1", Prefix = "N", Suffix = "1" },
+                new Name { FullName = "Name2", Prefix = "N", Suffix = "2" },
+                new Name { FullName = "Name3", Prefix = "N", Suffix = "3" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -76,9 +76,9 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Name1", Gender = Gender.Female },
-                new Name { FullName = "Name2", Gender = Gender.Male },
-                new Name { FullName = "Name3", Gender = Gender.Female }
+                new Name { FullName = "Name1" },
+                new Name { FullName = "Name2" },
+                new Name { FullName = "Name3" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -92,7 +92,7 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void Initialise_AssignsNameToPerson()
         {
-            var name = new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name", Gender = Gender.Female };
+            var name = new Name { FullName = "TestName", Prefix = "Test", Suffix = "Name" };
             var names = new List<Name> { name };
 
             var result = _personGenerator.Initialise(names,
@@ -102,27 +102,11 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void Initialise_AssignsGenderFromName()
-        {
-            var names = new List<Name>
-            {
-                new Name { FullName = "Female", Gender = Gender.Female },
-                new Name { FullName = "Male", Gender = Gender.Male }
-            };
-
-            var result = _personGenerator.Initialise(names,
-                0);
-
-            Assert.Equal(Gender.Female, result[0].Gender);
-            Assert.Equal(Gender.Male, result[1].Gender);
-        }
-
-        [Fact]
         public void Initialise_SetsIsAliveToTrue()
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Test", Gender = Gender.Female }
+                new Name { FullName = "Test" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -136,7 +120,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Test", Gender = Gender.Female }
+                new Name { FullName = "Test" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -150,7 +134,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Test", Gender = Gender.Female }
+                new Name { FullName = "Test" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -164,7 +148,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Test", Gender = Gender.Female }
+                new Name { FullName = "Test" }
             };
 
             var result = _personGenerator.Initialise(names,
@@ -178,7 +162,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "Test", Gender = Gender.Female }
+                new Name { FullName = "Test" }
             };
 
             var result = _personGenerator.Initialise(names,

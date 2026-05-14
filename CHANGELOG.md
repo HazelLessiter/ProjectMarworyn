@@ -6,6 +6,7 @@
 
 - Fixed issue where no one could die
 - Claude PRs now apply to all branches, not just `main` and `Update/**`
+- Removed Gender from Name, is now applied to Person only
 
 ## [1.0.1] - 2nd May 2026
 

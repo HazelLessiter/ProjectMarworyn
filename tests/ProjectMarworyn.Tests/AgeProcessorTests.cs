@@ -38,7 +38,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test"},
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 1, 1).AddYears(25),
@@ -58,7 +58,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 12, 31),
@@ -78,7 +78,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -98,7 +98,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = false,
                 TimeLived = new DateTime(1, 1, 1).AddYears(25),
@@ -117,9 +117,9 @@ namespace ProjectMarworyn.Tests
         {
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "Alive", Gender = Gender.Female }, Age = 25, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
-                new Person { Id = 2, Name = new Name { FullName = "Dead", Gender = Gender.Male }, Age = 30, IsAlive = false, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
-                new Person { Id = 3, Name = new Name { FullName = "Alive2", Gender = Gender.Female }, Age = 28, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false }
+                new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 25, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
+                new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, IsAlive = false, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
+                new Person { Id = 3, Name = new Name { FullName = "Alive2" }, Age = 28, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false }
             };
 
             var result = _ageProcessor.Age(people);
@@ -133,7 +133,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -153,7 +153,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -173,7 +173,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -193,7 +193,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -213,7 +213,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 42,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -230,7 +230,7 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void Age_PreservesPersonName()
         {
-            var name = new Name { FullName = "TestName", Gender = Gender.Female };
+            var name = new Name { FullName = "TestName" };
             var person = new Person
             {
                 Id = 1,
@@ -254,7 +254,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -274,7 +274,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = new DateTime(1, 6, 15),
@@ -293,9 +293,9 @@ namespace ProjectMarworyn.Tests
         {
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "P1", Gender = Gender.Female }, Age = 20, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
-                new Person { Id = 2, Name = new Name { FullName = "P2", Gender = Gender.Male }, Age = 30, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
-                new Person { Id = 3, Name = new Name { FullName = "P3", Gender = Gender.Female }, Age = 40, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false }
+                new Person { Id = 1, Name = new Name { FullName = "P1" }, Age = 20, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
+                new Person { Id = 2, Name = new Name { FullName = "P2" }, Age = 30, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false },
+                new Person { Id = 3, Name = new Name { FullName = "P3" }, Age = 40, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = 0, WillHaveChildren = false }
             };
 
             var result = _ageProcessor.Age(people);
@@ -314,7 +314,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "Test", Gender = Gender.Female },
+                Name = new Name { FullName = "Test" },
                 Age = 25,
                 IsAlive = true,
                 TimeLived = timeLived,

@@ -37,8 +37,8 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male }
+                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
+                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" }
             };
 
             var result = _generationManager.Initialise(names);
@@ -52,7 +52,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female }
+                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }
             };
 
             var result = _generationManager.Initialise(names);
@@ -65,7 +65,7 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female }
+                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }
             };
 
             var result = _generationManager.Initialise(names);
@@ -79,9 +79,9 @@ namespace ProjectMarworyn.Tests
         {
             var names = new List<Name>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
-                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male },
-                new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder", Gender = Gender.Female }
+                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
+                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" },
+                new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder" }
             };
 
             var result = _generationManager.Initialise(names);
@@ -89,10 +89,8 @@ namespace ProjectMarworyn.Tests
             Assert.Equal(3, result.Names.Count);
             Assert.Equal("Jane", result.Names[0].Prefix);
             Assert.Equal("Doe", result.Names[0].Suffix);
-            Assert.Equal(Gender.Female, result.Names[0].Gender);
             Assert.Equal("John", result.Names[1].Prefix);
             Assert.Equal("Smith", result.Names[1].Suffix);
-            Assert.Equal(Gender.Male, result.Names[1].Gender);
         }
 
         [Fact]
@@ -125,8 +123,7 @@ namespace ProjectMarworyn.Tests
                 {
                     FullName = $"Name{i}",
                     Prefix = $"Prefix{i}",
-                    Suffix = $"Suffix{i}",
-                    Gender = i % 2 == 0 ? Gender.Female : Gender.Male
+                    Suffix = $"Suffix{i}"
                 });
             }
 
@@ -163,7 +160,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 1,
-                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
                     Age = 25,
                     Gender = Gender.Female,
                     IsAlive = true
@@ -183,7 +180,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 1,
-                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
                     Age = 25,
                     Gender = Gender.Female,
                     IsAlive = true
@@ -191,7 +188,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 2,
-                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male },
+                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" },
                     Age = 30,
                     Gender = Gender.Male,
                     IsAlive = true
@@ -211,7 +208,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 1,
-                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe", Gender = Gender.Female },
+                    Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
                     Age = 25,
                     Gender = Gender.Female,
                     IsAlive = true
@@ -219,7 +216,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 2,
-                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith", Gender = Gender.Male },
+                    Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" },
                     Age = 30,
                     Gender = Gender.Male,
                     IsAlive = true
@@ -227,7 +224,7 @@ namespace ProjectMarworyn.Tests
                 new Person
                 {
                     Id = 3,
-                    Name = new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder", Gender = Gender.Female },
+                    Name = new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder" },
                     Age = 28,
                     Gender = Gender.Female,
                     IsAlive = true
