@@ -82,6 +82,10 @@ async function makeClaudeRequest() {
 
   const prompt = `You are reviewing a pull request for the ProjectMarworyn project.
 
+## Critical: Pre-Flight Rules
+
+Before writing any feedback item, check it against the "Do Not Flag As Issues" section of AGENTS.md below. If your observation matches anything listed there, discard it entirely and do not include it in your review in any form. These are hard rules, not guidelines. Violating them by flagging a documented intentional choice is itself an error in your review.
+
 ## Project Context
 
 This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.

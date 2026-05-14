@@ -20,7 +20,7 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ## Do Not Flag As Issues
 
-- **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. Do not suggest adding one. If a file does end with a trailing newline, flag it for removal.
+- **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. The `\ No newline at end of file` marker in a git diff confirms the file correctly follows this standard — it is not an error and must not be flagged or mentioned. Do not mention the absence of a trailing newline in your review at all, not even to confirm it is intentional. The only case worth flagging is the inverse: if a file ends with a blank line or trailing newline when it should not.
 - **Changelog format** — `CHANGELOG.md` uses `-Entry` and `+Sub-point` (no space after the prefix) as a documented code standard. Do not flag this as non-standard Markdown, suggest adding spaces, or convert it to standard bullet points. See the Changelog Format section of `README.md` for the full specification.
 - **Blank lines between code blocks** — empty lines used for readability (e.g. between variable declarations and method calls) are intentional and must not be flagged as trailing whitespace. Trailing whitespace means a line that contains actual whitespace characters after the last non-whitespace character (`var x = y;   `). A completely empty line (`\n`) is a paragraph break, not trailing whitespace.
 
