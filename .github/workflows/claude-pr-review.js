@@ -17,6 +17,13 @@ async function makeClaudeRequest() {
     console.log('AGENTS.md not found');
   }
 
+  let linkedIssues = [];
+  try {
+    linkedIssues = JSON.parse(fs.readFileSync('linked_issues.json', 'utf8'));
+  } catch (e) {
+    console.log('No linked issues found');
+  }
+
   const title = process.env.PR_TITLE || 'No title';
   const description = process.env.PR_BODY || 'No description';
   const author = process.env.PR_AUTHOR || 'Unknown';
@@ -41,7 +48,14 @@ ${agentsContext}
 **Title:** ${title}
 **Description:** ${description}
 **Author:** ${author}
+${linkedIssues.length > 0 ? `
+## Linked Issues
 
+${linkedIssues.map(issue => `### Issue #${issue.number}: ${issue.title}
+${issue.labels.length > 0 ? `**Labels:** ${issue.labels.join(', ')}` : ''}
+
+${issue.body}`).join('\n\n')}
+` : ''}
 ## Changes
 \`\`\`diff
 ${diff}
@@ -56,7 +70,8 @@ Please provide a thorough code review covering:
 4. **Best Practices**: .NET 10 best practices and patterns
 5. **Performance**: Any performance concerns?
 6. **Testing**: Should unit tests be added or updated?
-7. **Positive Feedback**: What's done well?
+7. **Linked Issues**: If linked issues are provided, does this PR fully address them? Call out any gaps.
+8. **Positive Feedback**: What's done well?
 
 Format your review as:
 - Use markdown
