@@ -20,7 +20,7 @@
     <None Update="Appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Configuration\Name.json">
+    <None Update="Configuration\InitialPeople.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Configuration\SeedWord.json">

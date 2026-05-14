@@ -42,10 +42,10 @@ namespace ProjectMarworyn
             var worldSeed = _seedGenerator.CreateWorldSeed(_seedGenerator
                 .GetThreeWords());
 
-            var names = _fileManager.ReadNameFile();
-            var people = _personGenerator.Initialise(names,
+            var initialPeople = _fileManager.ReadInitialPersonFile();
+            var people = _personGenerator.Initialise(initialPeople,
                 worldSeed);
-            var currentGeneration = _generationManager.Initialise(names);
+            var currentGeneration = _generationManager.Initialise(people);
             
             var pairs = new List<Pair>();
 
@@ -80,12 +80,12 @@ namespace ProjectMarworyn
                 
 
                 //Death
-                (people, currentGeneration) = _deathEngine.ProcessDeaths(people,
+                currentGeneration = _deathEngine.ProcessDeaths(people,
                     currentGeneration,
                     worldSeed);//TODO: Tuples are not ideal, fix
 
                 //Pair
-                (pairs, people) = _pairingEngine.GeneratePairs(people,
+                (pairs, people) = _pairingEngine.GeneratePairs(currentGeneration.People,
                     pairs,
                     worldSeed);
 

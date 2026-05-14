@@ -7,6 +7,8 @@
 - Fixed issue where no one could die
 - Claude PRs now apply to all branches, not just `main` and `Update/**`
 - Removed Gender from Name, is now applied to Person only
+- Name.json is now InitialPeople.json
++ As a side effect of the above: DeathEngine tuple has been removed
 
 ## [1.0.1] - 2nd May 2026
 

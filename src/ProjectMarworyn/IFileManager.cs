@@ -4,7 +4,7 @@ namespace ProjectMarworyn
 {
     internal interface IFileManager
     {
-        public List<Name> ReadNameFile();
+        public List<InitialPerson> ReadInitialPersonFile();
         public List<SeedWord> ReadSeedWordFile();
     }
 }

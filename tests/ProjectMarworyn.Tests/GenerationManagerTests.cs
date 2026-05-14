@@ -1,4 +1,4 @@
-﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
 
 namespace ProjectMarworyn.Tests
@@ -13,123 +13,125 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void Initialise_WithEmptyList_ReturnsGenerationWithEmptyNames()
+        public void Initialise_WithEmptyList_ReturnsGenerationWithNoPeople()
         {
-            var names = new List<Name>();
+            var people = new List<Person>();
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
-            Assert.Empty(result.Names);
+            Assert.Empty(result.People);
         }
 
         [Fact]
         public void Initialise_WithEmptyList_ReturnsIterationZero()
         {
-            var names = new List<Name>();
+            var people = new List<Person>();
 
-            var result = _generationManager.Initialise(names);
-
-            Assert.Equal(0, result.Iteration);
-        }
-
-        [Fact]
-        public void Initialise_WithNames_ReturnsGenerationWithSameNames()
-        {
-            var names = new List<Name>
-            {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
-                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" }
-            };
-
-            var result = _generationManager.Initialise(names);
-
-            Assert.Equal(2, result.Names.Count);
-            Assert.Equal(names, result.Names);
-        }
-
-        [Fact]
-        public void Initialise_WithNames_ReturnsIterationZero()
-        {
-            var names = new List<Name>
-            {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }
-            };
-
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
             Assert.Equal(0, result.Iteration);
         }
 
         [Fact]
-        public void Initialise_WithSingleName_ReturnsGenerationWithSingleName()
+        public void Initialise_WithPeople_ReturnsGenerationWithSamePeople()
         {
-            var names = new List<Name>
+            var people = new List<Person>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }
+                new Person { Id = 0, Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }, Age = 25, Gender = Gender.Female, IsAlive = true },
+                new Person { Id = 1, Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" }, Age = 30, Gender = Gender.Male, IsAlive = true }
             };
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
-            Assert.Single(result.Names);
-            Assert.Equal("JaneDoe", result.Names[0].FullName);
+            Assert.Equal(2, result.People.Count);
+            Assert.Equal(people, result.People);
         }
 
         [Fact]
-        public void Initialise_WithMultipleNames_PreservesNameProperties()
+        public void Initialise_WithPeople_ReturnsIterationZero()
         {
-            var names = new List<Name>
+            var people = new List<Person>
             {
-                new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
-                new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" },
-                new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder" }
+                new Person { Id = 0, Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }, Age = 25, Gender = Gender.Female, IsAlive = true }
             };
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
-            Assert.Equal(3, result.Names.Count);
-            Assert.Equal("Jane", result.Names[0].Prefix);
-            Assert.Equal("Doe", result.Names[0].Suffix);
-            Assert.Equal("John", result.Names[1].Prefix);
-            Assert.Equal("Smith", result.Names[1].Suffix);
+            Assert.Equal(0, result.Iteration);
+        }
+
+        [Fact]
+        public void Initialise_WithSinglePerson_ReturnsGenerationWithSinglePerson()
+        {
+            var people = new List<Person>
+            {
+                new Person { Id = 0, Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }, Age = 25, Gender = Gender.Female, IsAlive = true }
+            };
+
+            var result = _generationManager.Initialise(people);
+
+            Assert.Single(result.People);
+            Assert.Equal("JaneDoe", result.People[0].Name.FullName);
+        }
+
+        [Fact]
+        public void Initialise_WithMultiplePeople_PreservesPersonProperties()
+        {
+            var people = new List<Person>
+            {
+                new Person { Id = 0, Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" }, Age = 25, Gender = Gender.Female, IsAlive = true },
+                new Person { Id = 1, Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" }, Age = 30, Gender = Gender.Male, IsAlive = true },
+                new Person { Id = 2, Name = new Name { FullName = "AliceWonder", Prefix = "Alice", Suffix = "Wonder" }, Age = 28, Gender = Gender.Female, IsAlive = true }
+            };
+
+            var result = _generationManager.Initialise(people);
+
+            Assert.Equal(3, result.People.Count);
+            Assert.Equal("Jane", result.People[0].Name.Prefix);
+            Assert.Equal("Doe", result.People[0].Name.Suffix);
+            Assert.Equal("John", result.People[1].Name.Prefix);
+            Assert.Equal("Smith", result.People[1].Name.Suffix);
         }
 
         [Fact]
         public void Initialise_ReturnsNonNullGeneration()
         {
-            var names = new List<Name>();
+            var people = new List<Person>();
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
             Assert.NotNull(result);
         }
 
         [Fact]
-        public void Initialise_ReturnsNonNullNamesList()
+        public void Initialise_ReturnsNonNullPeopleList()
         {
-            var names = new List<Name>();
+            var people = new List<Person>();
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
-            Assert.NotNull(result.Names);
+            Assert.NotNull(result.People);
         }
 
         [Fact]
-        public void Initialise_WithLargeNameList_ReturnsAllNames()
+        public void Initialise_WithLargePersonList_ReturnsAllPeople()
         {
-            var names = new List<Name>();
+            var people = new List<Person>();
             for (int i = 0; i < 100; i++)
             {
-                names.Add(new Name
+                people.Add(new Person
                 {
-                    FullName = $"Name{i}",
-                    Prefix = $"Prefix{i}",
-                    Suffix = $"Suffix{i}"
+                    Id = i,
+                    Name = new Name { FullName = $"Name{i}", Prefix = $"Prefix{i}", Suffix = $"Suffix{i}" },
+                    Age = 25,
+                    Gender = Gender.Female,
+                    IsAlive = true
                 });
             }
 
-            var result = _generationManager.Initialise(names);
+            var result = _generationManager.Initialise(people);
 
-            Assert.Equal(100, result.Names.Count);
+            Assert.Equal(100, result.People.Count);
         }
 
         [Fact]

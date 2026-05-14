@@ -4,7 +4,7 @@ namespace ProjectMarworyn
 {
     internal interface IGenerationManager
     {
-        Generation Initialise(List<Name> names);
+        Generation Initialise(List<Person> people);
         bool CheckForExtinction(List<Person> people);
     }
 }

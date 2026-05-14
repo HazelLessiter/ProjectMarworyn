@@ -14,15 +14,15 @@ namespace ProjectMarworyn
             _appSettings = appSettings.Value;
         }
 
-        public List<Name> ReadNameFile()
+        public List<InitialPerson> ReadInitialPersonFile()
         {
             try
             {
                 var file = File.ReadAllText(_appSettings.NameFilePath);
 
-                var names = JsonConvert.DeserializeObject<List<Name>>(file);
+                var initialPeople = JsonConvert.DeserializeObject<List<InitialPerson>>(file);
 
-                return names;
+                return initialPeople;
             }
             catch (FileNotFoundException ex)
             {

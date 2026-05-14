@@ -16,14 +16,14 @@ namespace ProjectMarworyn.Generators
             _consoleService = consoleService;
         }
 
-        public List<Person> Initialise(List<Name> names,
+        public List<Person> Initialise(List<InitialPerson> initialPeople,
             int worldSeed)
         {
             var random = _diceGenerator.Create(worldSeed);
 
             var id = 0;
             var people = new List<Person>();
-            foreach (var name in names)
+            foreach (var initialPerson in initialPeople)
             {
                 var age = random.Next(0,
                     80);
@@ -31,7 +31,13 @@ namespace ProjectMarworyn.Generators
                 var person = new Person()
                 {
                     Id = id,
-                    Name = name,
+                    Name = new Name()
+                    {
+                        FullName = initialPerson.FullName,
+                        Prefix = initialPerson.Prefix,
+                        Suffix = initialPerson.Suffix
+                    },
+                    Gender = initialPerson.Gender,
                     Age = age,
                     IsAlive = true,
                     TimeLived = new DateTime(1, 1, 1)
