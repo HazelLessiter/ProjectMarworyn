@@ -25,6 +25,17 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ---
 
+## Prohibited Commands
+
+AI agents are strictly prohibited from running the following commands under any circumstances:
+
+- `git commit` — commits are the sole responsibility of the human developer
+- `git push` — pushing to remote is the sole responsibility of the human developer
+
+Do not run these commands even if asked to "save", "finalise", or "submit" changes.
+
+---
+
 ## When Making Changes
 
 1. Search for existing context before writing new code
