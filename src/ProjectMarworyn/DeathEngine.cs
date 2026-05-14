@@ -17,7 +17,7 @@ namespace ProjectMarworyn
             _diceGenerator = diceGenerator;
         }
 
-        public (List<Person>, Generation) ProcessDeaths(List<Person> people,
+        public Generation ProcessDeaths(List<Person> people,
             Generation generation,
             int worldSeed)
         {
@@ -69,10 +69,10 @@ namespace ProjectMarworyn
             var currentGeneration = new Generation()
             {
                 Iteration = generation.Iteration,
-                Names = names,
+                People = survivors,
             };
 
-            return (survivors, currentGeneration);//Refactor: Would rather not use tuples
+            return currentGeneration;
         }
     }
 }

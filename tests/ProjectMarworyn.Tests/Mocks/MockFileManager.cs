@@ -4,12 +4,12 @@ namespace ProjectMarworyn.Tests.Mocks
 {
     internal class MockFileManager : IFileManager
     {
-        public List<Name> NamesToReturn { get; set; } = new List<Name>();
+        public List<InitialPerson> InitialPeopleToReturn { get; set; } = new List<InitialPerson>();
         public List<SeedWord> SeedWordsToReturn { get; set; } = new List<SeedWord>();
 
-        public List<Name> ReadNameFile()
+        public List<InitialPerson> ReadInitialPersonFile()
         {
-            return NamesToReturn;
+            return InitialPeopleToReturn;
         }
 
         public List<SeedWord> ReadSeedWordFile()

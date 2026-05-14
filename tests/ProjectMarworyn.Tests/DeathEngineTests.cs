@@ -17,14 +17,14 @@ namespace ProjectMarworyn.Tests
             new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "TestPerson", Gender = Gender.Male },
+                Name = new Name { FullName = "TestPerson" },
                 Age = age,
                 Gender = Gender.Male,
                 IsAlive = isAlive
             };
 
         private static Generation CreateGeneration(int iteration = 1) =>
-            new Generation { Iteration = iteration, Names = new List<Name>() };
+            new Generation { Iteration = iteration, People = new List<Person>() };
 
         private DeathEngine CreateEngine(double nextDoubleValue)
         {
@@ -38,12 +38,11 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(1.0);
 
-            var (survivors, currentGeneration) = engine.ProcessDeaths(new List<Person>(),
+            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(),
                 0);
 
-            Assert.Empty(survivors);
-            Assert.Empty(currentGeneration.Names);
+            Assert.Empty(currentGeneration.People);
         }
 
         [Fact]
@@ -51,7 +50,7 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(1.0);
 
-            var (_, currentGeneration) = engine.ProcessDeaths(new List<Person>(),
+            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(5),
                 0);
 
@@ -63,13 +62,12 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(1.0);
 
-            var (survivors, currentGeneration) = engine.ProcessDeaths(new List<Person>(),
+            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(),
                 0);
 
-            Assert.NotNull(survivors);
             Assert.NotNull(currentGeneration);
-            Assert.NotNull(currentGeneration.Names);
+            Assert.NotNull(currentGeneration.People);
         }
 
         [Fact]
@@ -80,11 +78,11 @@ namespace ProjectMarworyn.Tests
             var engine = CreateEngine(0.0);
             var people = new List<Person> { CreatePerson(50, isAlive: false) };
 
-            var (survivors, _) = engine.ProcessDeaths(people,
+            var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
                 0);
 
-            Assert.Empty(survivors);
+            Assert.Empty(result.People);
             Assert.Empty(_mockOutputService.Messages);
         }
 
@@ -92,16 +90,16 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive", Gender = Gender.Male }, Age = 30, Gender = Gender.Male, IsAlive = true };
-            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead", Gender = Gender.Female }, Age = 30, Gender = Gender.Female, IsAlive = false };
+            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Gender = Gender.Male, IsAlive = true };
+            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Gender = Gender.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
-            var (survivors, _) = engine.ProcessDeaths(people,
+            var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
                 0);
 
-            Assert.Single(survivors);
-            Assert.Contains(alivePerson, survivors);
+            Assert.Single(result.People);
+            Assert.Contains(alivePerson, result.People);
         }
 
         [Fact]
@@ -136,27 +134,27 @@ namespace ProjectMarworyn.Tests
             var engine = CreateEngine(1.0);
             var people = new List<Person> { CreatePerson(10), CreatePerson(20), CreatePerson(30) };
 
-            var (survivors, _) = engine.ProcessDeaths(people,
+            var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
                 0);
 
-            Assert.All(survivors, person => Assert.True(person.IsAlive));
+            Assert.All(result.People, person => Assert.True(person.IsAlive));
         }
 
         [Fact]
-        public void ProcessDeaths_GenerationNamesMatchSurvivors()
+        public void ProcessDeaths_SurvivingPeopleStoredInGeneration()
         {
             var engine = CreateEngine(1.0);
-            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1", Gender = Gender.Female }, Age = 10, Gender = Gender.Female, IsAlive = true };
-            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2", Gender = Gender.Male }, Age = 15, Gender = Gender.Male, IsAlive = true };
+            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Gender = Gender.Female, IsAlive = true };
+            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Gender = Gender.Male, IsAlive = true };
             var people = new List<Person> { person1, person2 };
 
-            var (survivors, currentGeneration) = engine.ProcessDeaths(people,
+            var currentGeneration = engine.ProcessDeaths(people,
                 CreateGeneration(),
                 0);
 
-            Assert.Equal(survivors.Count, currentGeneration.Names.Count);
-            Assert.All(survivors, person => Assert.Contains(person.Name, currentGeneration.Names));
+            Assert.Equal(2, currentGeneration.People.Count);
+            Assert.All(currentGeneration.People, person => Assert.True(person.IsAlive));
         }
 
         [Fact]
@@ -164,7 +162,7 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(1.0);
 
-            var (_, currentGeneration) = engine.ProcessDeaths(new List<Person> { CreatePerson(20) },
+            var currentGeneration = engine.ProcessDeaths(new List<Person> { CreatePerson(20) },
                 CreateGeneration(7),
                 0);
 
@@ -202,7 +200,7 @@ namespace ProjectMarworyn.Tests
             var person = new Person
             {
                 Id = 1,
-                Name = new Name { FullName = "John Smith", Gender = Gender.Male },
+                Name = new Name { FullName = "John Smith" },
                 Age = 55,
                 Gender = Gender.Male,
                 IsAlive = true
@@ -250,14 +248,14 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(nextDoubleValue);
 
-            var (survivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(age) },
+            var result = engine.ProcessDeaths(new List<Person> { CreatePerson(age) },
                 CreateGeneration(),
                 0);
 
             if (expectsDeath)
-                Assert.Empty(survivors);
+                Assert.Empty(result.People);
             else
-                Assert.Single(survivors);
+                Assert.Single(result.People);
         }
 
         // Verifies the switch expression assigns the correct DeathModifier at every age boundary.
@@ -284,12 +282,12 @@ namespace ProjectMarworyn.Tests
             var engine = CreateEngine(nextDoubleValue);
             var generation = CreateGeneration();
 
-            var (lowerSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
+            var lowerSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
                 generation,
-                0);
-            var (upperSurvivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
+                0).People;
+            var upperSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
                 generation,
-                0);
+                0).People;
 
             if (lowerDies)
                 Assert.Empty(lowerSurvivors);
@@ -311,11 +309,11 @@ namespace ProjectMarworyn.Tests
         {
             var engine = CreateEngine(0.0055);
 
-            var (survivors, _) = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
+            var result = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
                 CreateGeneration(),
                 0);
 
-            Assert.Single(survivors);
+            Assert.Single(result.People);
         }
     }
 }

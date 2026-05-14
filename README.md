@@ -10,7 +10,7 @@ This project is licensed under the PolyForm Noncommercial License 1.0.0 - see th
 
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.
 - **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes.
-- **Generational loop** — each generation pairs females and males, produces 0–3 children per pair, and passes the survivors to the next generation.
+- **Generational loop** — each generation pairs individuals, produces 0–3 children per pair, and passes the survivors to the next generation.
 - **Simulation clock** — a universal heartbeat system tracks simulation time independently from real-world time, with each tick advancing the simulation by one day.
 - **Configurable delay** — a millisecond delay between console outputs keeps the simulation readable.
 
@@ -108,6 +108,19 @@ Methods, properties, and variables should be self-documenting through clear, des
 - Do not use XML doc comments, summaries, or `#region` blocks
 - Comments describe *why*, never *what*
 
+### Changelog Format
+
+Entries in `CHANGELOG.md` use a hyphen-as-prefix style with no space after the hyphen. This is an intentional stylistic choice — it avoids the excessive whitespace Markdown renderers add to standard bullet lists and gives the changelog a retro aesthetic consistent with the project's theme.
+
+- `-Main entry` — top-level change
+- `+Sub-point` — detail or side effect nested under the entry above
+
+Example:
+```
+-Name.json is now InitialPeople.json
++As a side effect of the above: DeathEngine tuple has been removed
+```
+
 ### What Not To Do
 
 - Don't hardcode file paths; use relative paths from the application directory
@@ -126,25 +139,38 @@ ProjectMarworyn/
 │   └── ProjectMarworyn/
 │       ├── Configuration/
 │       │   ├── AppSettings.cs        # Strongly-typed settings
-│       │   ├── Name.json             # Initial population data
+│       │   ├── InitialPeople.json             # Initial population data (deserialises to InitialPerson)
 │       │   └── SeedWord.json         # Word pool for world seed generation
 │       ├── Extensions/
 │       │   └── ServiceExtensions.cs  # DI registrations
+│       ├── Generators/
+│       │   ├── DiceGenerator.cs      # Seeded Random factory
+│       │   ├── IDiceGenerator.cs
+│       │   ├── PersonGenerator.cs    # Creates Person instances from initial data and birth events
+│       │   ├── IPersonGenerator.cs
+│       │   ├── SeedGenerator.cs      # World seed creation
+│       │   └── ISeedGenerator.cs
 │       ├── Models/
-│       │   ├── Generation.cs         # Iteration + name list
-│       │   ├── Gender.cs             # Female / Male enum
-│       │   ├── Name.cs               # FullName, Prefix, Suffix, Gender
-│       │   ├── Pair.cs               # Matched female + male
+│       │   ├── Enums/
+│       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
+│       │   │   └── Gender.cs         # Female / Male enum
+│       │   ├── Generation.cs         # Iteration + person list
+│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Gender — maps from InitialPeople.json
+│       │   ├── Name.cs               # FullName, Prefix, Suffix
+│       │   ├── Pair.cs               # Matched pair of individuals
+│       │   ├── Person.cs             # Individual with age, gender, name, and simulation state
+│       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
 │       ├── Services/
 │       │   ├── IConsoleService.cs
 │       │   └── ConsoleService.cs     # Console output wrapper
-│       ├── DiceGenerator.cs          # Seeded Random factory
-│       ├── FileManager.cs            # Reads Name.json & SeedWord.json
-│       ├── GenerationManager.cs      # Pairs names and produces children
-│       ├── Initialiser.cs            # Application entry logic
-│       ├── NameProcessor.cs          # Pairing and gender-count logic
-│       ├── SeedGenerator.cs          # World seed creation
+│       ├── AgeProcessor.cs           # Advances person age each tick
+│       ├── DeathEngine.cs            # Calculates and applies death outcomes
+│       ├── FileManager.cs            # Reads InitialPeople.json & SeedWord.json
+│       ├── GenerationManager.cs      # Manages generation state and extinction checks
+│       ├── Heartbeat.cs              # Drives the simulation clock
+│       ├── PairingEngine.cs          # Pairs eligible individuals each generation
+│       ├── SimulationManager.cs      # Orchestrates the simulation loop
 │       └── Program.cs                # Host setup and startup
 └── tests/
     └── ProjectMarworyn.Tests/        # xUnit test project
@@ -177,7 +203,7 @@ Settings are read from `src/ProjectMarworyn/Appsettings.json` under the `Configu
 {
   "Configuration": {
     "Delay": 500,
-    "NameFilePath": "Configuration/Name.json",
+    "InitialPeopleFilePath": "Configuration/InitialPeople.json",
     "SeedWordFilePath": "Configuration/SeedWord.json"
   }
 }
@@ -186,10 +212,12 @@ Settings are read from `src/ProjectMarworyn/Appsettings.json` under the `Configu
 | Setting | Description |
 |---|---|
 | `Delay` | Milliseconds to pause between console outputs |
-| `NameFilePath` | Relative path to the initial population JSON file |
+| `InitialPeopleFilePath` | Relative path to the initial population JSON file |
 | `SeedWordFilePath` | Relative path to the seed-word pool JSON file |
 
-### Name file format (`Name.json`)
+### Initial population file format (`InitialPeople.json`)
+
+Deserialises into `InitialPerson`. Each entry defines one member of the starting population.
 
 ```json
 [
@@ -211,12 +239,14 @@ Three words are chosen at random and combined (e.g. `ACORN-BIRCH-BROOK`) then SH
 
 ## How the Simulation Works
 
-1. **Load** — the initial population is read from `Name.json`.
+1. **Load** — the initial population is read from `InitialPeople.json` and each entry is created as a `Person` with a randomly assigned age.
 2. **Seed** — three words are drawn randomly from `SeedWord.json` and hashed to produce the world seed.
 3. **Loop** — while more than one person remains:
-   - Female and male names are paired using the seeded random number generator.
-   - Each pair produces 0–3 children. A child's name is a blend of both parents' names.
-   - The new generation's names are passed into the next iteration.
+   - The simulation clock ticks, advancing in-world time by one day.
+   - Ages are updated and death is evaluated for each person based on their age bracket.
+   - Eligible individuals are paired using the seeded random number generator.
+   - Each pair may produce a child. A child's name is a blend of both parents' prefixes and suffixes, and their gender is assigned at birth.
+   - Survivors are passed into the next iteration.
 4. **End** — when fewer than two individuals remain the simulation reports extinction and exits.
 
 ## Simulation Clock Architecture

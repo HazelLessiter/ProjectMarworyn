@@ -16,14 +16,14 @@ namespace ProjectMarworyn.Generators
             _consoleService = consoleService;
         }
 
-        public List<Person> Initialise(List<Name> names,
+        public List<Person> Initialise(List<InitialPerson> initialPeople,
             int worldSeed)
         {
             var random = _diceGenerator.Create(worldSeed);
 
             var id = 0;
             var people = new List<Person>();
-            foreach (var name in names)
+            foreach (var initialPerson in initialPeople)
             {
                 var age = random.Next(0,
                     80);
@@ -31,9 +31,14 @@ namespace ProjectMarworyn.Generators
                 var person = new Person()
                 {
                     Id = id,
-                    Name = name,
+                    Name = new Name()
+                    {
+                        FullName = initialPerson.FullName,
+                        Prefix = initialPerson.Prefix,
+                        Suffix = initialPerson.Suffix
+                    },
+                    Gender = initialPerson.Gender,
                     Age = age,
-                    Gender = name.Gender,//TODO: This is janky, longterm I want to move gender away from name to person, this is temporary
                     IsAlive = true,
                     TimeLived = new DateTime(1, 1, 1)
                         .AddYears(age),
@@ -100,7 +105,6 @@ namespace ProjectMarworyn.Generators
                             FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
                             Prefix = pair.FPerson.Name.Prefix,
                             Suffix = pair.MPerson.Name.Suffix,
-                            Gender = Gender.Male
                         };
                     }
                     if (gender == Gender.Female)
@@ -110,7 +114,6 @@ namespace ProjectMarworyn.Generators
                             FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
                             Prefix = pair.MPerson.Name.Prefix,
                             Suffix = pair.FPerson.Name.Suffix,
-                            Gender = Gender.Female
                         };
                     }
 
