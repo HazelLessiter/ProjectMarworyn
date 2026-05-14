@@ -14,11 +14,13 @@
 ## [1.0.1] - 2nd May 2026
 
 ### Added
+
 -Added PolyForm Non Commercial Attribution license
 
 ## [1.0.0] - 14th March 2026
 
 ### Added
+
 -Life and Death of a Person is now triggered by the Heartbeat and SimulationClock not just a Generation loop
 -People are now defined as a Person instead of just a Name
 -Added PairingEngine
@@ -43,15 +45,18 @@
 -xUnit test project with mocks for all core services.
 
 ### Fixed
+
 -Fixed issue where AgeProcessor reset gender of all people to female
 -Incorrect guard logic in `GenerateChildren` that caused premature generation termination.
 -Seed word IDs corrected in `SeedWord.json`.
 -Null guard added to `SeedGenerator.GetThreeWords()`.
 
 ### Refactored
+
 -Improved exception handling in `FileManager` — `FileNotFoundException` and `JsonException` are now caught and rethrown with descriptive messages.
 
 ### Modified
+
 -Updated to .NET 10.
 -Unit tests updated to cover new seed and dice generator behaviour.
 -`AGENTS.md` updated with model-naming guidance to avoid false errors.
