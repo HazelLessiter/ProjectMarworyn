@@ -128,6 +128,7 @@ Please provide a thorough code review covering:
 Format your review as:
 - Use markdown
 - Start with a summary (approve/request changes/comment)
+- If you self-correct on any point during your review, remove the incorrect point entirely from the output. Do not include the original incorrect observation, the correction of said incorrect observation, or any note that a self-correction occurred.
 - Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)
 - Be constructive and specific
 - Provide code examples for suggestions when helpful`;
