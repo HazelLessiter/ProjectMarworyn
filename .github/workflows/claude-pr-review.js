@@ -24,11 +24,16 @@ function fetchIssue(token, repo, number) {
 }
 
 async function fetchLinkedIssues(prBody, token, repo) {
-  const pattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
+  const patterns = [
+    /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi,
+    /issues\/(\d+)/gi
+  ];
   const numbers = new Set();
   let match;
-  while ((match = pattern.exec(prBody)) !== null) {
-    numbers.add(parseInt(match[1]));
+  for (const pattern of patterns) {
+    while ((match = pattern.exec(prBody)) !== null) {
+      numbers.add(parseInt(match[1]));
+    }
   }
   const issues = [];
   for (const number of numbers) {
