@@ -82,7 +82,7 @@ namespace ProjectMarworyn
                 //Death
                 currentGeneration = _deathEngine.ProcessDeaths(people,
                     currentGeneration,
-                    worldSeed);//TODO: Tuples are not ideal, fix
+                    worldSeed);
 
                 //Pair
                 (pairs, people) = _pairingEngine.GeneratePairs(currentGeneration.People,

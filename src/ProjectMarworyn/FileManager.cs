@@ -18,7 +18,7 @@ namespace ProjectMarworyn
         {
             try
             {
-                var file = File.ReadAllText(_appSettings.NameFilePath);
+                var file = File.ReadAllText(_appSettings.InitialPeopleFilePath);
 
                 var initialPeople = JsonConvert.DeserializeObject<List<InitialPerson>>(file);
 
@@ -26,12 +26,12 @@ namespace ProjectMarworyn
             }
             catch (FileNotFoundException ex)
             {
-                throw new FileNotFoundException($"Name file not found at path: {_appSettings.NameFilePath}",
+                throw new FileNotFoundException($"Name file not found at path: {_appSettings.InitialPeopleFilePath}",
                     ex);
             }
             catch (JsonException ex)
             {
-                throw new InvalidDataException($"Invalid JSON format in Name file: {_appSettings.NameFilePath}",
+                throw new InvalidDataException($"Invalid JSON format in Name file: {_appSettings.InitialPeopleFilePath}",
                     ex);
             }
         }
