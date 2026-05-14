@@ -4,8 +4,8 @@
 
 ## [1.0.2] - In Progress
 
-### Fixed
 - Fixed issue where no one could die
+- Claude PRs now apply to all branches, not just `main` and `Update/**`
 
 ## [1.0.1] - 2nd May 2026
 
