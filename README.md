@@ -92,8 +92,8 @@ Methods, properties, and variables should be self-documenting through clear, des
 - One class per file
 - File name must match class name exactly
 - Group related classes in folders (`Models/`, `Extensions/`, `Services/`, etc.)
-- Public methods before private methods
-- Methods ordered roughly by calling sequence — a method should appear close to the method that calls it
+- Public methods before private methods — this takes precedence over all other ordering
+- Within each visibility group, order methods roughly by calling sequence
 
 ### Architecture
 
