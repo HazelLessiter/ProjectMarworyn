@@ -31,3 +31,4 @@ Pathfinding/demand modelling
 
 World gen (seed based, already started)
 Blog documenting everything
+Cheese mode 🧀
