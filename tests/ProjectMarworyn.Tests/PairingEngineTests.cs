@@ -52,7 +52,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "Child1" },
                     Age = 10,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = false
                 },
                 new Person
@@ -60,7 +60,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "Child2" },
                     Age = 12,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = false
                 }
             };
@@ -82,7 +82,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "Jane" },
                 Age = 25,
-                Gender = Gender.Female,
+                Biosex = Biosex.Female,
                 HasPair = false
             };
             var malePerson = new Person
@@ -90,7 +90,7 @@ namespace ProjectMarworyn.Tests
                 Id = 2,
                 Name = new Name { FullName = "John" },
                 Age = 28,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 HasPair = false
             };
             var people = new List<Person> { femalePerson, malePerson };
@@ -112,7 +112,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "Jane", Prefix = "Jane", Suffix = "Doe" },
                 Age = 25,
-                Gender = Gender.Female,
+                Biosex = Biosex.Female,
                 HasPair = false
             };
             var malePerson = new Person
@@ -120,7 +120,7 @@ namespace ProjectMarworyn.Tests
                 Id = 2,
                 Name = new Name { FullName = "John", Prefix = "John", Suffix = "Smith" },
                 Age = 28,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 HasPair = false
             };
             var people = new List<Person> { femalePerson, malePerson };
@@ -142,7 +142,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "Jane" },
                     Age = 25,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = true
                 },
                 new Person
@@ -150,7 +150,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "John" },
                     Age = 28,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = true
                 }
             };
@@ -171,7 +171,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "Jane" },
                     Age = 25,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = false
                 },
                 new Person
@@ -179,7 +179,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "Alice" },
                     Age = 30,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = false
                 }
             };
@@ -200,7 +200,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "John" },
                     Age = 25,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = false
                 },
                 new Person
@@ -208,7 +208,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "Bob" },
                     Age = 30,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = false
                 }
             };
@@ -232,7 +232,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "Jane" },
                     Age = 18,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = false
                 },
                 new Person
@@ -240,7 +240,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "John" },
                     Age = 18,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = false
                 }
             };
@@ -261,7 +261,7 @@ namespace ProjectMarworyn.Tests
                     Id = 1,
                     Name = new Name { FullName = "Jane" },
                     Age = 17,
-                    Gender = Gender.Female,
+                    Biosex = Biosex.Female,
                     HasPair = false
                 },
                 new Person
@@ -269,7 +269,7 @@ namespace ProjectMarworyn.Tests
                     Id = 2,
                     Name = new Name { FullName = "John" },
                     Age = 17,
-                    Gender = Gender.Male,
+                    Biosex = Biosex.Male,
                     HasPair = false
                 }
             };
@@ -288,10 +288,10 @@ namespace ProjectMarworyn.Tests
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "F1" }, Age = 25, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 2, Name = new Name { FullName = "F2" }, Age = 26, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 3, Name = new Name { FullName = "F3" }, Age = 27, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 4, Name = new Name { FullName = "M1" }, Age = 28, Gender = Gender.Male, HasPair = false }
+                new Person { Id = 1, Name = new Name { FullName = "F1" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 2, Name = new Name { FullName = "F2" }, Age = 26, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 3, Name = new Name { FullName = "F3" }, Age = 27, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 4, Name = new Name { FullName = "M1" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
             };
             var pairs = new List<Pair>();
 
@@ -308,14 +308,14 @@ namespace ProjectMarworyn.Tests
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var existingPair = new Pair
             {
-                FPerson = new Person { Id = 1, Name = new Name { FullName = "Existing1" }, Age = 30, Gender = Gender.Female },
-                MPerson = new Person { Id = 2, Name = new Name { FullName = "Existing2" }, Age = 32, Gender = Gender.Male }
+                FPerson = new Person { Id = 1, Name = new Name { FullName = "Existing1" }, Age = 30, Biosex = Biosex.Female },
+                MPerson = new Person { Id = 2, Name = new Name { FullName = "Existing2" }, Age = 32, Biosex = Biosex.Male }
             };
             var pairs = new List<Pair> { existingPair };
             var people = new List<Person>
             {
-                new Person { Id = 3, Name = new Name { FullName = "Jane" }, Age = 25, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Gender = Gender.Male, HasPair = false }
+                new Person { Id = 3, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
             };
 
             var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
@@ -332,8 +332,8 @@ namespace ProjectMarworyn.Tests
             var pairingEngine = new PairingEngine(mockDiceGenerator, mockOutput);
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "Jane" }, Age = 25, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 2, Name = new Name { FullName = "John" }, Age = 28, Gender = Gender.Male, HasPair = false }
+                new Person { Id = 1, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 2, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
             };
             var pairs = new List<Pair>();
 
@@ -355,7 +355,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "Jane" },
                 Age = 25,
-                Gender = Gender.Female,
+                Biosex = Biosex.Female,
                 HasPair = false
             };
             var malePerson = new Person
@@ -363,7 +363,7 @@ namespace ProjectMarworyn.Tests
                 Id = 2,
                 Name = new Name { FullName = "John" },
                 Age = 28,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 HasPair = false
             };
             var people = new List<Person> { femalePerson, malePerson };
@@ -380,8 +380,8 @@ namespace ProjectMarworyn.Tests
         {
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "Jane" }, Age = 25, Gender = Gender.Female, HasPair = false },
-                new Person { Id = 2, Name = new Name { FullName = "John" }, Age = 28, Gender = Gender.Male, HasPair = false }
+                new Person { Id = 1, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
+                new Person { Id = 2, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
             };
             var pairs = new List<Pair>();
 

@@ -19,7 +19,7 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void ReadInitialPersonFile_WithValidFile_ReturnsNames()
         {
-            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Gender\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Gender\":1}]";
+            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Biosex\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Biosex\":1}]";
             var tempFile = CreateTempFile(json);
 
             var options = Options.Create(new AppSettings { InitialPeopleFilePath = tempFile });

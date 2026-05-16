@@ -25,13 +25,13 @@ namespace ProjectMarworyn
 
             //Note: I did some reading today regarding the perfomance of foreach, in some cases there can be a negative performance hit
             //I should take a closer look at O(n) vs O(1) to optimise my code
-            var singleFemaleAdults = people.Where(x => x.Gender == Gender.Female &&
-                    x.Age >= 18 &&
-                    x.HasPair == false);
+            var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
+                x.Age >= 18 &&
+                x.HasPair == false);
 
             foreach (var fPerson in singleFemaleAdults)
             {
-                var singleMaleAdults = people.Where(x => x.Gender == Gender.Male &&
+                var singleMaleAdults = people.Where(x => x.Biosex == Biosex.Male &&
                         x.Age >= 18 &&
                         x.HasPair == false)
                     .ToList();
@@ -42,7 +42,8 @@ namespace ProjectMarworyn
                     break;
                 }
 
-                var position = random.Next(0,
+                var position = _diceGenerator.Next(random,
+                    0,
                     mCount);
 
                 var mPerson = singleMaleAdults[position];

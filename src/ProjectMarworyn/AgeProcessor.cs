@@ -26,7 +26,7 @@ namespace ProjectMarworyn
                     Id = person.Id,
                     Name = person.Name,
                     Age = age,
-                    Gender = person.Gender,
+                    Biosex = person.Biosex,
                     IsAlive = person.IsAlive,
                     TimeFromLastChild = timeFromLastChild,
                     TimeLived = timeLived,

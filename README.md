@@ -154,12 +154,13 @@ ProjectMarworyn/
 │       ├── Models/
 │       │   ├── Enums/
 │       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
+│       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
 │       │   │   └── Gender.cs         # Female / Male enum
 │       │   ├── Generation.cs         # Iteration + person list
-│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Gender — maps from InitialPeople.json
+│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
 │       │   ├── Pair.cs               # Matched pair of individuals
-│       │   ├── Person.cs             # Individual with age, gender, name, and simulation state
+│       │   ├── Person.cs             # Individual with age, biosex, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
 │       ├── Services/
@@ -228,11 +229,11 @@ Deserialises into `InitialPerson`. Each entry defines one member of the starting
 
 ```json
 [
-  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Gender": 0 }
+  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0 }
 ]
 ```
 
-`Gender` values: `0` = Female, `1` = Male.
+`Biosex` values: `0` = Female, `1` = Male.
 
 ### Seed-word file format (`SeedWord.json`)
 

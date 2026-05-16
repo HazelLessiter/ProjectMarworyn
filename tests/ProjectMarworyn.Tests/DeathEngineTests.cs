@@ -72,8 +72,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Gender = Gender.Male, IsAlive = true };
-            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Gender = Gender.Female, IsAlive = false };
+            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Biosex = Biosex.Male, IsAlive = true };
+            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Biosex = Biosex.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
             var result = engine.ProcessDeaths(people,
@@ -127,8 +127,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_SurvivingPeopleStoredInGeneration()
         {
             var engine = CreateEngine(1.0);
-            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Gender = Gender.Female, IsAlive = true };
-            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Gender = Gender.Male, IsAlive = true };
+            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Biosex = Biosex.Female, IsAlive = true };
+            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Biosex = Biosex.Male, IsAlive = true };
             var people = new List<Person> { person1, person2 };
 
             var currentGeneration = engine.ProcessDeaths(people,
@@ -184,7 +184,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "John Smith" },
                 Age = 55,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 IsAlive = true
             };
 
@@ -305,7 +305,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "TestPerson" },
                 Age = age,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 IsAlive = isAlive
             };
         }
