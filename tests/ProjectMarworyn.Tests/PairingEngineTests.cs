@@ -1,3 +1,5 @@
+using NSubstitute;
+using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
@@ -7,14 +9,14 @@ namespace ProjectMarworyn.Tests
     public class PairingEngineTests
     {
         private readonly PairingEngine _pairingEngine;
-        private readonly MockDiceGenerator _mockDiceGenerator;
         private readonly MockOutputService _mockOutputService;
 
         public PairingEngineTests()
         {
-            _mockDiceGenerator = new MockDiceGenerator();
             _mockOutputService = new MockOutputService();
-            _pairingEngine = new PairingEngine(_mockDiceGenerator, _mockOutputService);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
         }
 
         [Fact]
@@ -72,7 +74,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WithOneAdultFemaleAndOneAdultMale_CreatesOnePair()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var femalePerson = new Person
             {
@@ -101,7 +104,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WithOneAdultFemaleAndOneAdultMale_PairContainsCorrectPeople()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var femalePerson = new Person
             {
@@ -218,7 +222,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WithExactly18YearOlds_CreatesPairs()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var people = new List<Person>
             {
@@ -278,7 +283,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WithMoreFemalesThanMales_CreatesLimitedPairs()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var people = new List<Person>
             {
@@ -297,7 +303,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WithExistingPairs_AddsToExistingList()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var existingPair = new Pair
             {
@@ -319,7 +326,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_WritesToConsole()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var mockOutput = new MockOutputService();
             var pairingEngine = new PairingEngine(mockDiceGenerator, mockOutput);
             var people = new List<Person>
@@ -339,7 +347,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void GeneratePairs_MarksPersonsAsHavingPair()
         {
-            var mockDiceGenerator = new MockDiceGenerator(42);
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
             var femalePerson = new Person
             {
@@ -383,4 +392,3 @@ namespace ProjectMarworyn.Tests
         }
     }
 }
-
