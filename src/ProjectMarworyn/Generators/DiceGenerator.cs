@@ -6,5 +6,10 @@
         {
             return new Random(worldSeed);
         }
+
+        public double NextDouble(Random random)
+        {
+            return random.NextDouble();
+        }
     }
 }

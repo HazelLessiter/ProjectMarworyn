@@ -1,3 +1,5 @@
+using NSubstitute;
+using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
@@ -11,26 +13,6 @@ namespace ProjectMarworyn.Tests
         public DeathEngineTests()
         {
             _mockOutputService = new MockOutputService();
-        }
-
-        private static Person CreatePerson(int age, bool isAlive = true) =>
-            new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "TestPerson" },
-                Age = age,
-                Gender = Gender.Male,
-                IsAlive = isAlive
-            };
-
-        private static Generation CreateGeneration(int iteration = 1) =>
-            new Generation { Iteration = iteration, People = new List<Person>() };
-
-        private DeathEngine CreateEngine(double nextDoubleValue)
-        {
-            var mockDiceGenerator = new MockDiceGenerator(new ControlledRandom(nextDoubleValue));
-            return new DeathEngine(_mockOutputService,
-                mockDiceGenerator);
         }
 
         [Fact]
@@ -314,6 +296,31 @@ namespace ProjectMarworyn.Tests
                 0);
 
             Assert.Single(result.People);
+        }
+
+        private static Person CreatePerson(int age, bool isAlive = true)
+        {
+            return new Person
+            {
+                Id = 1,
+                Name = new Name { FullName = "TestPerson" },
+                Age = age,
+                Gender = Gender.Male,
+                IsAlive = isAlive
+            };
+        }
+
+        private static Generation CreateGeneration(int iteration = 1)
+        {
+            return new Generation { Iteration = iteration, People = new List<Person>() };
+        }
+
+        private DeathEngine CreateEngine(double nextDoubleValue)
+        {
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
+            return new DeathEngine(_mockOutputService,
+                mockDiceGenerator);
         }
     }
 }

@@ -17,10 +17,6 @@ namespace ProjectMarworyn.Tests
             _seedGenerator = new SeedGenerator(_mockFileManager, _mockOutputService);
         }
 
-        private static List<SeedWord> MakeSeedWords(int count) => Enumerable.Range(1, count)
-            .Select(i => new SeedWord { Id = i, Word = $"Word{i}" })
-            .ToList();
-
         [Fact]
         public void GetThreeWords_ReturnsNonNullList()
         {
@@ -250,6 +246,13 @@ namespace ProjectMarworyn.Tests
             var seedB = _seedGenerator.CreateWorldSeed(seedWordsB);
 
             Assert.NotEqual(seedA, seedB);
+        }
+
+        private static List<SeedWord> MakeSeedWords(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new SeedWord { Id = i, Word = $"Word{i}" })
+                .ToList();
         }
     }
 }

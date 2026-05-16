@@ -7,14 +7,6 @@ namespace ProjectMarworyn.Tests
     {
         private readonly List<string> _tempFiles = [];
 
-        private string CreateTempFile(string content)
-        {
-            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-            File.WriteAllText(tempFile, content);
-            _tempFiles.Add(tempFile);
-            return tempFile;
-        }
-
         public void Dispose()
         {
             foreach (var file in _tempFiles)
@@ -64,6 +56,14 @@ namespace ProjectMarworyn.Tests
             var ex = Assert.Throws<InvalidDataException>(() => fileManager.ReadInitialPersonFile());
 
             Assert.Contains(tempFile, ex.Message);
+        }
+
+        private string CreateTempFile(string content)
+        {
+            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            File.WriteAllText(tempFile, content);
+            _tempFiles.Add(tempFile);
+            return tempFile;
         }
     }
 }

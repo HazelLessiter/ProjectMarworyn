@@ -1,3 +1,4 @@
+using NSubstitute;
 using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
@@ -8,14 +9,14 @@ namespace ProjectMarworyn.Tests
     public class PersonGeneratorTests
     {
         private readonly PersonGenerator _personGenerator;
-        private readonly MockDiceGenerator _mockDiceGenerator;
         private readonly MockOutputService _mockOutputService;
 
         public PersonGeneratorTests()
         {
-            _mockDiceGenerator = new MockDiceGenerator();
             _mockOutputService = new MockOutputService();
-            _personGenerator = new PersonGenerator(_mockDiceGenerator,
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _personGenerator = new PersonGenerator(mockDiceGenerator,
                 _mockOutputService);
         }
 

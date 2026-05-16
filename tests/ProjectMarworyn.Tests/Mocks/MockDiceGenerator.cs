@@ -6,15 +6,19 @@ namespace ProjectMarworyn.Tests.Mocks
     {
         private readonly Random _random;
 
-        public MockDiceGenerator(Random? random = null)
+        public MockDiceGenerator(int seed = 0)
         {
-            _random = random ??
-                new Random(0);
+            _random = new Random(seed);
         }
 
         public Random Create(int worldSeed)
         {
             return _random;
+        }
+
+        public double NextDouble(Random random)
+        {
+            return random.NextDouble();
         }
     }
 }
