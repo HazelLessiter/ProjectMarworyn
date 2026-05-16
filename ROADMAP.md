@@ -82,7 +82,7 @@ Hooks into existing death system
 Enables feuds, vendettas, family conflicts across generations
 Connects to dynasty system naturally
 
-##£ Scale constraint — For now
+### Scale constraint — For now
 
 No kingdoms, no empires
 Camera stays close — every person matters
