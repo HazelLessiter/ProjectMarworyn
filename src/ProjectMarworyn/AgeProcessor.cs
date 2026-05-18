@@ -1,9 +1,17 @@
 ﻿using ProjectMarworyn.Models;
+using ProjectMarworyn.Services;
 
 namespace ProjectMarworyn
 {
     internal class AgeProcessor : IAgeProcessor
     {
+        private readonly IConsoleService _consoleService;
+
+        public AgeProcessor(IConsoleService consoleService)
+        {
+            _consoleService = consoleService;
+        }
+
         public List<Person> Age(List<Person> people)
         {
             var agedPeople = new List<Person>();
@@ -21,20 +29,11 @@ namespace ProjectMarworyn
                     timeLived);
                 var timeFromLastChild = GetTimeFromLastChild(person);
 
-                var agedPerson = new Person
-                {
-                    Id = person.Id,
-                    Name = person.Name,
-                    Age = age,
-                    Biosex = person.Biosex,
-                    IsAlive = person.IsAlive,
-                    TimeFromLastChild = timeFromLastChild,
-                    TimeLived = timeLived,
-                    WillHaveChildren = person.WillHaveChildren,
-                    HasPair = person.HasPair
-                };
+                person.Age = age;
+                person.TimeFromLastChild = timeFromLastChild;
+                person.TimeLived = timeLived;
 
-                agedPeople.Add(agedPerson);
+                agedPeople.Add(person);
             }
 
             return agedPeople;
@@ -57,19 +56,20 @@ namespace ProjectMarworyn
             if (timeLived.Year > person.TimeLived.Year)
             {
                 age += 1;
+                Console.ForegroundColor = ConsoleColor.White;
+                _consoleService.WriteLine($"{person.Name.FullName} is now {age} years old.");
             }
 
             return age;
         }
 
-        private int GetTimeFromLastChild(Person person)
+        private DateTime GetTimeFromLastChild(Person person)
         {
             var timeFromLastChild = person.TimeFromLastChild;
 
-            if (person.WillHaveChildren == true &&
-                timeFromLastChild < 2)
+            if (person.WillHaveChildren == true)
             {
-                timeFromLastChild += 1;
+                timeFromLastChild = timeFromLastChild.AddDays(1);
             }
 
             return timeFromLastChild;

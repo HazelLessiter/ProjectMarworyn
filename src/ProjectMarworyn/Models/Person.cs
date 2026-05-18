@@ -12,7 +12,7 @@ namespace ProjectMarworyn.Models
         public bool WillHaveChildren { get; set; }
         public bool IsAlive { get; set; }
         public DateTime TimeLived { get; set; }
-        public int TimeFromLastChild { get; set; }
+        public DateTime TimeFromLastChild { get; set; }
         public bool HasPair { get; set; }
     }
 }

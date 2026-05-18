@@ -28,6 +28,14 @@ namespace ProjectMarworyn.Generators
                 var age = dice.Next(0,
                     80);
 
+                var year = 1;
+                var month = _diceGenerator.Next(dice,
+                    1,
+                    12);
+                var day = _diceGenerator.Next(dice,
+                    1,
+                    29);
+
                 var person = new Person()
                 {
                     Id = id,
@@ -47,10 +55,12 @@ namespace ProjectMarworyn.Generators
                         },
                     Age = age,
                     IsAlive = true,
-                    TimeLived = new DateTime(1, 1, 1)
+                    TimeLived = new DateTime(year,
+                            month,
+                            day)
                         .AddYears(age),
                     WillHaveChildren = CalcWillHaveChildren(dice),
-                    TimeFromLastChild = 2,//This is set to 2 to allow people to have children in the first iteration, lastChildThreshold could be a const instead?
+                    TimeFromLastChild = new DateTime(year, month, day),//This is set to 2 to allow people to have children in the first iteration, lastChildThreshold could be a const instead?
                     HasPair = false
                 };
 
@@ -75,8 +85,8 @@ namespace ProjectMarworyn.Generators
                     x.MPerson.Age >= 18 &&
                     x.FPerson.WillHaveChildren &&
                     x.MPerson.WillHaveChildren &&
-                    x.FPerson.TimeFromLastChild >= 2 &&
-                    x.MPerson.TimeFromLastChild >= 2)
+                    x.FPerson.TimeFromLastChild.Year >= 3 &&
+                    x.MPerson.TimeFromLastChild.Year >= 3)
                 .ToList();
             var dice = _diceGenerator.Create(worldSeed);
             var children = new List<Person>();
@@ -87,13 +97,19 @@ namespace ProjectMarworyn.Generators
                 var childChance = dice.Next(1,
                     101);
 
-                if (childChance < 15)
+                if (childChance < 40)
                 {
                     var biosex = RandomBiosex(dice);
+                    var gender = Gender.Female;
+
+                    if (biosex == Biosex.Intersex)
+                        gender = RandomGender(dice);
+                    else
+                        gender = (Gender)biosex;
 
                     var name = new Name();
 
-                    if (biosex == Biosex.Male)
+                    if (gender == Gender.Male)
                     {
                         name = new Name
                         {
@@ -102,7 +118,7 @@ namespace ProjectMarworyn.Generators
                             Suffix = pair.MPerson.Name.Suffix,
                         };
                     }
-                    if (biosex == Biosex.Female)
+                    if (gender == Gender.Female)
                     {
                         name = new Name
                         {
@@ -119,21 +135,16 @@ namespace ProjectMarworyn.Generators
                         Age = 0,
                         IsAlive = true,
                         Biosex = biosex,
-                        Gender = biosex
-                            switch
-                            {
-                                Biosex.Female => Gender.Female,
-                                Biosex.Male => Gender.Male,
-                                _ => (Gender)RandomGender(dice)
-                            },
+                        Gender = gender,
                         Name = name,
                         HasPair = false,
-                        TimeFromLastChild = 0,
+                        TimeFromLastChild = new DateTime(1, 1, 1),
                         TimeLived = new DateTime(1, 1, 1),
                         WillHaveChildren = CalcWillHaveChildren(dice)
                     };
 
                     children.Add(person);
+                    Console.ForegroundColor = ConsoleColor.Green;
                     _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
                 }
 
@@ -145,7 +156,7 @@ namespace ProjectMarworyn.Generators
 
             foreach (var person in peopleToUpdate)
             {
-                person.TimeFromLastChild = 0;
+                person.TimeFromLastChild = new DateTime(1, 1, 1);
                 people.Add(person);
             }
 
@@ -192,7 +203,7 @@ namespace ProjectMarworyn.Generators
             var willHaveChildrenModifier = _diceGenerator.Next(random,
                 1,
                 101);
-            var willHaveChildren = willHaveChildrenModifier >= 14;
+            var willHaveChildren = willHaveChildrenModifier >= 7;
 
             return willHaveChildren;
         }

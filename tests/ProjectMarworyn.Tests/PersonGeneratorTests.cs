@@ -187,7 +187,7 @@ namespace ProjectMarworyn.Tests
             var result = _personGenerator.Initialise(initialPeople,
                 0);
 
-            Assert.Equal(2, result[0].TimeFromLastChild);
+            Assert.Equal(2, result[0].TimeFromLastChild.Year);
         }
 
         [Fact]
@@ -274,7 +274,7 @@ namespace ProjectMarworyn.Tests
             return new PersonGenerator(mockDiceGenerator, _mockOutputService);
         }
 
-        private static Pair CreateFertilePair()
+        private Pair CreateFertilePair()
         {
             return new Pair
             {
@@ -286,7 +286,7 @@ namespace ProjectMarworyn.Tests
                     Biosex = Biosex.Female,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = 2
+                    TimeFromLastChild = new DateTime(2, 1, 1)
                 },
                 MPerson = new Person
                 {
@@ -296,7 +296,7 @@ namespace ProjectMarworyn.Tests
                     Biosex = Biosex.Male,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = 2
+                    TimeFromLastChild = new DateTime(2, 1, 1)
                 }
             };
         }

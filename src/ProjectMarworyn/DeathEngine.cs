@@ -55,6 +55,7 @@ namespace ProjectMarworyn
                 {
                     person.IsAlive = false;
                     death = true;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}");
                 }
                 else

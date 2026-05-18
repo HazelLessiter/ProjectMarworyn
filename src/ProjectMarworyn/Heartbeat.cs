@@ -49,8 +49,6 @@ namespace ProjectMarworyn
             _simulationClock.TickCount += 1;
             _simulationClock.SimulationTime = _simulationClock.SimulationTime.AddDays(1);//TODO: Make configurable based on simulation speed setting
             _simulationClock.ElapsedTime = _simulationClock.SimulationTime - _simulationClock.StartTime;
-
-            _consoleService.WriteLine($"[SimulationClock] Day {_simulationClock.TickCount}");
         }
 
         public void Reset()
