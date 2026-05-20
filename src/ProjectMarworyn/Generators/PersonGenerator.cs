@@ -35,6 +35,9 @@ namespace ProjectMarworyn.Generators
                 var day = _diceGenerator.Next(dice,
                     1,
                     29);
+                var yearFromLastChild = _diceGenerator.Next(dice,
+                    1,
+                    4);
 
                 var person = new Person()
                 {
@@ -60,7 +63,9 @@ namespace ProjectMarworyn.Generators
                             day)
                         .AddYears(age),
                     WillHaveChildren = CalcWillHaveChildren(dice),
-                    TimeFromLastChild = new DateTime(year, month, day),//This is set to 2 to allow people to have children in the first iteration, lastChildThreshold could be a const instead?
+                    TimeFromLastChild = new DateTime(yearFromLastChild,
+                        month,
+                        day),
                     HasPair = false
                 };
 
