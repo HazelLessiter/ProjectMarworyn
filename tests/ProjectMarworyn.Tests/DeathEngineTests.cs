@@ -8,11 +8,11 @@ namespace ProjectMarworyn.Tests
 {
     public class DeathEngineTests
     {
-        private readonly MockOutputService _mockOutputService;
+        private readonly MockConsoleService _mockOutputService;
 
         public DeathEngineTests()
         {
-            _mockOutputService = new MockOutputService();
+            _mockOutputService = new MockConsoleService();
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace ProjectMarworyn.Tests
                 0);
 
             Assert.Empty(result.People);
-            Assert.Empty(_mockOutputService.Messages);
+            Assert.Empty(_mockOutputService.Lines);
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.NotEmpty(_mockOutputService.Messages);
+            Assert.NotEmpty(_mockOutputService.Lines);
         }
 
         [Fact]
@@ -172,7 +172,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Empty(_mockOutputService.Messages);
+            Assert.Empty(_mockOutputService.Lines);
         }
 
         [Fact]
@@ -192,9 +192,9 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Single(_mockOutputService.Messages);
-            Assert.Contains("John Smith", _mockOutputService.Messages[0]);
-            Assert.Contains("55", _mockOutputService.Messages[0]);
+            Assert.Single(_mockOutputService.Lines);
+            Assert.Contains("John Smith", _mockOutputService.Lines[0]);
+            Assert.Contains("55", _mockOutputService.Lines[0]);
         }
 
         // Verifies the exact death probability thresholds for all 11 age brackets.

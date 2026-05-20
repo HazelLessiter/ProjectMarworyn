@@ -9,11 +9,11 @@ namespace ProjectMarworyn.Tests
     public class PairingEngineTests
     {
         private readonly PairingEngine _pairingEngine;
-        private readonly MockOutputService _mockOutputService;
+        private readonly MockConsoleService _mockOutputService;
 
         public PairingEngineTests()
         {
-            _mockOutputService = new MockOutputService();
+            _mockOutputService = new MockConsoleService();
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             _pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
@@ -328,7 +328,7 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var mockOutput = new MockOutputService();
+            var mockOutput = new MockConsoleService();
             var pairingEngine = new PairingEngine(mockDiceGenerator, mockOutput);
             var people = new List<Person>
             {
@@ -339,9 +339,9 @@ namespace ProjectMarworyn.Tests
 
             pairingEngine.GeneratePairs(people, pairs, 0);
 
-            Assert.Single(mockOutput.Messages);
-            Assert.Contains("Jane", mockOutput.Messages[0]);
-            Assert.Contains("John", mockOutput.Messages[0]);
+            Assert.Single(mockOutput.Lines);
+            Assert.Contains("Jane", mockOutput.Lines[0]);
+            Assert.Contains("John", mockOutput.Lines[0]);
         }
 
         [Fact]

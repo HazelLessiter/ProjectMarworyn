@@ -16,8 +16,10 @@ namespace ProjectMarworyn.Services
             _appSettings = appSettings.Value;
         }
 
-        public void WriteLine(string message)
+        public void WriteLine(string message,
+            ConsoleColor colour)
         {
+            Console.ForegroundColor = colour;
             Console.WriteLine($"Day {_simulationClock.TickCount}: {message}");
         }
 

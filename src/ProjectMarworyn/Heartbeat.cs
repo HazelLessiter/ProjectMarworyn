@@ -21,7 +21,8 @@ namespace ProjectMarworyn
             {
                 _simulationClock.StartTime = new DateTime(1, 1, 1);
                 _simulationClock.IsRunning = true;
-                _consoleService.WriteLine($"[SimulationClock] Started at {_simulationClock.StartTime:yyyy-MM-dd}");
+                _consoleService.WriteLine($"[SimulationClock] Started at {_simulationClock.StartTime:yyyy-MM-dd}",
+                    ConsoleColor.White);
 
                 _simulationClock.SimulationTime = _simulationClock.StartTime;
             }
@@ -32,7 +33,8 @@ namespace ProjectMarworyn
             if (_simulationClock.IsRunning)
             {
                 _simulationClock.IsRunning = false;
-                _consoleService.WriteLine($"[SimulationClock] Stopped at day {_simulationClock.TickCount}");
+                _consoleService.WriteLine($"[SimulationClock] Stopped at day {_simulationClock.TickCount}",
+                    ConsoleColor.White);
 
                 _simulationClock.EndTime = _simulationClock.SimulationTime;
             }
@@ -42,7 +44,8 @@ namespace ProjectMarworyn
         {
             if (!_simulationClock.IsRunning)
             {
-                _consoleService.WriteLine("[SimulationClock] Warning: Tick called while clock is not running");
+                _consoleService.WriteLine("[SimulationClock] Warning: Tick called while clock is not running",
+                    ConsoleColor.White);
                 return;
             }
 
@@ -55,7 +58,8 @@ namespace ProjectMarworyn
         {
             _simulationClock.TickCount = 0;
             _simulationClock.IsRunning = false;
-            _consoleService.WriteLine("[SimulationClock] Reset");
+            _consoleService.WriteLine("[SimulationClock] Reset",
+                ConsoleColor.White);
             _simulationClock.StartTime = new DateTime(1, 1, 1);
             _simulationClock.SimulationTime = _simulationClock.StartTime;
         }

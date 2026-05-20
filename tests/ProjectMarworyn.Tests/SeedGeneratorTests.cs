@@ -7,13 +7,13 @@ namespace ProjectMarworyn.Tests
     public class SeedGeneratorTests
     {
         private readonly MockFileManager _mockFileManager;
-        private readonly MockOutputService _mockOutputService;
+        private readonly MockConsoleService _mockOutputService;
         private readonly SeedGenerator _seedGenerator;
 
         public SeedGeneratorTests()
         {
             _mockFileManager = new MockFileManager();
-            _mockOutputService = new MockOutputService();
+            _mockOutputService = new MockConsoleService();
             _seedGenerator = new SeedGenerator(_mockFileManager, _mockOutputService);
         }
 
@@ -155,7 +155,7 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void CreateWorldSeed_WritesToConsole()
         {
-            var mockOutput = new MockOutputService();
+            var mockOutput = new MockConsoleService();
             var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
             var seedWords = new List<SeedWord>
             {
@@ -166,13 +166,13 @@ namespace ProjectMarworyn.Tests
 
             seedGenerator.CreateWorldSeed(seedWords);
 
-            Assert.Single(mockOutput.Messages);
+            Assert.Single(mockOutput.Lines);
         }
 
         [Fact]
         public void CreateWorldSeed_ConsoleMessageContainsWords()
         {
-            var mockOutput = new MockOutputService();
+            var mockOutput = new MockConsoleService();
             var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
             var seedWords = new List<SeedWord>
             {
@@ -183,7 +183,7 @@ namespace ProjectMarworyn.Tests
 
             seedGenerator.CreateWorldSeed(seedWords);
 
-            Assert.Contains("OAK-WREN-MOSS", mockOutput.Messages[0]);
+            Assert.Contains("OAK-WREN-MOSS", mockOutput.Lines[0]);
         }
 
         [Fact]

@@ -58,6 +58,7 @@ namespace ProjectMarworyn.Generators
             }
 
             _consoleService.WriteLine($"World seed created: {threeWordSeed}");
+
             return worldSeed;
         }
     }

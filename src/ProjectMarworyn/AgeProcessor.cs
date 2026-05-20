@@ -56,8 +56,8 @@ namespace ProjectMarworyn
             if (timeLived.Year > person.TimeLived.Year)
             {
                 age += 1;
-                Console.ForegroundColor = ConsoleColor.White;
-                _consoleService.WriteLine($"{person.Name.FullName} is now {age} years old.");
+                _consoleService.WriteLine($"{person.Name.FullName} is now {age} years old.",
+                    ConsoleColor.White);
             }
 
             return age;

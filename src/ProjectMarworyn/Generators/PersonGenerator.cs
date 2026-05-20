@@ -144,8 +144,8 @@ namespace ProjectMarworyn.Generators
                     };
 
                     children.Add(person);
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
+                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}",
+                        ConsoleColor.Green);
                 }
 
                 peopleToUpdate.Add(pair.FPerson);

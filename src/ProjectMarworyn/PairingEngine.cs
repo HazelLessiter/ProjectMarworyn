@@ -54,8 +54,8 @@ namespace ProjectMarworyn
                     MPerson = mPerson
                 });
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                _consoleService.WriteLine($"Pair: {fPerson.Name.FullName} + {mPerson.Name.FullName}");
+                _consoleService.WriteLine($"Pair: {fPerson.Name.FullName} + {mPerson.Name.FullName}",
+                    ConsoleColor.Cyan);
 
                 fPerson.HasPair = true;
                 mPerson.HasPair = true;

@@ -9,11 +9,11 @@ namespace ProjectMarworyn.Tests
     public class PersonGeneratorTests
     {
         private readonly PersonGenerator _personGenerator;
-        private readonly MockOutputService _mockOutputService;
+        private readonly MockConsoleService _mockOutputService;
 
         public PersonGeneratorTests()
         {
-            _mockOutputService = new MockOutputService();
+            _mockOutputService = new MockConsoleService();
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             _personGenerator = new PersonGenerator(mockDiceGenerator,
