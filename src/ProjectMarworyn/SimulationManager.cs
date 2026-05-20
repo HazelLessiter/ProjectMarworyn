@@ -71,16 +71,18 @@ namespace ProjectMarworyn
                 if (currentTime.Day == 01 &&
                     currentTime.Month == 01)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    _consoleService.WriteLine($"Happy new year!");
-                    _consoleService.WriteLine($"Number of people: {people.Count}");
-                    _consoleService.WriteLine($"Number of children: {people.Count(x => x.Age < 18)}");
+                    _consoleService.WriteLine($"Happy new year!",
+                        ConsoleColor.DarkMagenta);
+                    _consoleService.WriteLine($"Number of people: {people.Count}",
+                        ConsoleColor.DarkMagenta);
+                    _consoleService.WriteLine($"Number of children: {people.Count(x => x.Age < 18)}",
+                        ConsoleColor.DarkMagenta);
 
                     if (currentTime.Year % 20 == 0)
                     {
                         currentGeneration.Iteration += 1;
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}");
+                        _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}",
+                            ConsoleColor.DarkMagenta);
                     }
                 }
 
