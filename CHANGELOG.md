@@ -2,7 +2,7 @@
 
 ---
 
-## [1.0.2] - In Progress
+## [1.1.0] - In Progress
 
 -Fixed issue where no one could die
 -Claude PRs now apply to all branches, not just `main` and `Update/**`
@@ -10,12 +10,14 @@
 -Name.json is now InitialPeople.json
 +As a side effect of the above: DeathEngine tuple has been removed
 -AIs are now prohibited from git push or git commit
+-Added Intersex people - They currently don't pair
+-Seperated gender and biosex - Children are now generated from biosex pairs
 
 ## [1.0.1] - 2nd May 2026
 
 ### Added
 
--Added PolyForm Non Commercial Attribution license
+-Added PolyForm Non-Commercial Attribution licence
 
 ## [1.0.0] - 14th March 2026
 

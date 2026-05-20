@@ -7,14 +7,6 @@ namespace ProjectMarworyn.Tests
     {
         private readonly List<string> _tempFiles = [];
 
-        private string CreateTempFile(string content)
-        {
-            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-            File.WriteAllText(tempFile, content);
-            _tempFiles.Add(tempFile);
-            return tempFile;
-        }
-
         public void Dispose()
         {
             foreach (var file in _tempFiles)
@@ -27,7 +19,7 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void ReadInitialPersonFile_WithValidFile_ReturnsNames()
         {
-            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Gender\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Gender\":1}]";
+            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Biosex\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Biosex\":1}]";
             var tempFile = CreateTempFile(json);
 
             var options = Options.Create(new AppSettings { InitialPeopleFilePath = tempFile });
@@ -64,6 +56,14 @@ namespace ProjectMarworyn.Tests
             var ex = Assert.Throws<InvalidDataException>(() => fileManager.ReadInitialPersonFile());
 
             Assert.Contains(tempFile, ex.Message);
+        }
+
+        private string CreateTempFile(string content)
+        {
+            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            File.WriteAllText(tempFile, content);
+            _tempFiles.Add(tempFile);
+            return tempFile;
         }
     }
 }

@@ -23,14 +23,13 @@ This project is licensed under the PolyForm Noncommercial License 1.0.0 - see th
 | Dependency injection | `Microsoft.Extensions.Hosting` / `Microsoft.Extensions.DependencyInjection` |
 | Configuration | `IOptions<AppSettings>` + `Appsettings.json` |
 | JSON deserialisation | `Newtonsoft.Json` |
-| Testing | xUnit + coverlet |
+| Testing | xUnit + NSubstitute + coverlet |
 
 ## Code Standards
 
 ### General
 
 - **Namespace:** All classes use the `ProjectMarworyn` namespace
-- **Access modifiers:** Use `internal` for application classes
 - **Nullable reference types:** Disabled (`<Nullable>disable</Nullable>`)
 - **Async/await:** Use async/await throughout
 - **var:** Prefer `var` for local variable declarations
@@ -93,6 +92,8 @@ Methods, properties, and variables should be self-documenting through clear, des
 - One class per file
 - File name must match class name exactly
 - Group related classes in folders (`Models/`, `Extensions/`, `Services/`, etc.)
+- Public methods before private methods — this takes precedence over all other ordering
+- Within each visibility group, order methods roughly by calling sequence
 
 ### Architecture
 
@@ -153,23 +154,30 @@ ProjectMarworyn/
 │       ├── Models/
 │       │   ├── Enums/
 │       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
+│       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
 │       │   │   └── Gender.cs         # Female / Male enum
 │       │   ├── Generation.cs         # Iteration + person list
-│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Gender — maps from InitialPeople.json
+│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
 │       │   ├── Pair.cs               # Matched pair of individuals
-│       │   ├── Person.cs             # Individual with age, gender, name, and simulation state
+│       │   ├── Person.cs             # Individual with age, biosex, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
 │       ├── Services/
 │       │   ├── IConsoleService.cs
 │       │   └── ConsoleService.cs     # Console output wrapper
 │       ├── AgeProcessor.cs           # Advances person age each tick
+│       ├── IAgeProcessor.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
+│       ├── IDeathEngine.cs
 │       ├── FileManager.cs            # Reads InitialPeople.json & SeedWord.json
+│       ├── IFileManager.cs
 │       ├── GenerationManager.cs      # Manages generation state and extinction checks
+│       ├── IGenerationManager.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock
+│       ├── IHeartbeat.cs
 │       ├── PairingEngine.cs          # Pairs eligible individuals each generation
+│       ├── IPairingEngine.cs
 │       ├── SimulationManager.cs      # Orchestrates the simulation loop
 │       └── Program.cs                # Host setup and startup
 └── tests/
@@ -221,11 +229,11 @@ Deserialises into `InitialPerson`. Each entry defines one member of the starting
 
 ```json
 [
-  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Gender": 0 }
+  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0 }
 ]
 ```
 
-`Gender` values: `0` = Female, `1` = Male.
+`Biosex` values: `0` = Female, `1` = Male.
 
 ### Seed-word file format (`SeedWord.json`)
 
@@ -290,7 +298,7 @@ A unit is a discrete **unit of behaviour**, not necessarily a single method or c
 
 ### Framework
 
-xUnit
+xUnit + NSubstitute
 
 ### Naming Convention
 

@@ -19,14 +19,25 @@ namespace ProjectMarworyn.Generators
         public List<Person> Initialise(List<InitialPerson> initialPeople,
             int worldSeed)
         {
-            var random = _diceGenerator.Create(worldSeed);
+            var dice = _diceGenerator.Create(worldSeed);
 
             var id = 0;
             var people = new List<Person>();
             foreach (var initialPerson in initialPeople)
             {
-                var age = random.Next(0,
+                var age = dice.Next(0,
                     80);
+
+                var year = 1;
+                var month = _diceGenerator.Next(dice,
+                    1,
+                    12);
+                var day = _diceGenerator.Next(dice,
+                    1,
+                    29);
+                var yearFromLastChild = _diceGenerator.Next(dice,
+                    1,
+                    4);
 
                 var person = new Person()
                 {
@@ -37,13 +48,24 @@ namespace ProjectMarworyn.Generators
                         Prefix = initialPerson.Prefix,
                         Suffix = initialPerson.Suffix
                     },
-                    Gender = initialPerson.Gender,
+                    Biosex = initialPerson.Biosex,
+                    Gender = initialPerson.Biosex
+                        switch
+                        {
+                            Biosex.Female => Gender.Female,
+                            Biosex.Male => Gender.Male,
+                            _ => (Gender)RandomGender(dice)
+                        },
                     Age = age,
                     IsAlive = true,
-                    TimeLived = new DateTime(1, 1, 1)
+                    TimeLived = new DateTime(year,
+                            month,
+                            day)
                         .AddYears(age),
-                    WillHaveChildren = CalcWillHaveChildren(random),
-                    TimeFromLastChild = 2,//This is set to 2 to allow people to have children in the first iteration, lastChildThreshold could be a const instead?
+                    WillHaveChildren = CalcWillHaveChildren(dice),
+                    TimeFromLastChild = new DateTime(yearFromLastChild,
+                        month,
+                        day),
                     HasPair = false
                 };
 
@@ -68,33 +90,27 @@ namespace ProjectMarworyn.Generators
                     x.MPerson.Age >= 18 &&
                     x.FPerson.WillHaveChildren &&
                     x.MPerson.WillHaveChildren &&
-                    x.FPerson.TimeFromLastChild >= 2 &&
-                    x.MPerson.TimeFromLastChild >= 2)
+                    x.FPerson.TimeFromLastChild.Year >= 3 &&
+                    x.MPerson.TimeFromLastChild.Year >= 3)
                 .ToList();
-            var random = _diceGenerator.Create(worldSeed);
+            var dice = _diceGenerator.Create(worldSeed);
             var children = new List<Person>();
             List<Person> peopleToUpdate = new List<Person>();
 
             foreach (var pair in aliveFurtilePairs)
             {
-                var childChance = random.Next(1,
+                var childChance = dice.Next(1,
                     101);
 
-                if (childChance < 15)
+                if (childChance < 40)
                 {
-                    var gender = new Gender();
+                    var biosex = RandomBiosex(dice);
+                    var gender = Gender.Female;
 
-                    switch (random.Next(0, 2))
-                    {
-                        case 0:
-                            gender = Gender.Female;
-                            break;
-                        case 1:
-                            gender = Gender.Male;
-                            break;
-                        default:
-                            throw new InvalidOperationException("Error randomising gender");
-                    }
+                    if (biosex == Biosex.Intersex)
+                        gender = RandomGender(dice);
+                    else
+                        gender = (Gender)biosex;
 
                     var name = new Name();
 
@@ -123,16 +139,18 @@ namespace ProjectMarworyn.Generators
                         Id = personId,
                         Age = 0,
                         IsAlive = true,
+                        Biosex = biosex,
                         Gender = gender,
                         Name = name,
                         HasPair = false,
-                        TimeFromLastChild = 0,
+                        TimeFromLastChild = new DateTime(1, 1, 1),
                         TimeLived = new DateTime(1, 1, 1),
-                        WillHaveChildren = CalcWillHaveChildren(random)
+                        WillHaveChildren = CalcWillHaveChildren(dice)
                     };
 
                     children.Add(person);
-                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
+                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}",
+                        ConsoleColor.Green);
                 }
 
                 peopleToUpdate.Add(pair.FPerson);
@@ -143,17 +161,55 @@ namespace ProjectMarworyn.Generators
 
             foreach (var person in peopleToUpdate)
             {
-                person.TimeFromLastChild = 0;
+                person.TimeFromLastChild = new DateTime(1, 1, 1);
                 people.Add(person);
             }
 
             return (children, people);
         }
 
+        private Gender RandomGender(Random random)
+        {
+            var gender = new Gender();
+
+            switch (random.Next(0, 2))
+            {
+                case 0:
+                    gender = Gender.Female;
+                    break;
+                case 1:
+                    gender = Gender.Male;
+                    break;
+                default:
+                    throw new InvalidOperationException("Error randomising gender");
+            }
+
+            return gender;
+        }
+
+        private Biosex RandomBiosex(Random dice)
+        {
+            var femaleChance = (int)BiosexModifier.Female / 100.0;
+            var maleChance = (int)BiosexModifier.Male / 100.0;
+
+            var diceRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            if (diceRoll <= femaleChance)
+                return Biosex.Female;
+
+            if (diceRoll <= femaleChance + maleChance)
+                return Biosex.Male;
+
+            return Biosex.Intersex;
+        }
+
         private bool CalcWillHaveChildren(Random random)
         {
-            var willHaveChildrenModifier = random.Next(1, 101);
-            var willHaveChildren = willHaveChildrenModifier >= 14;
+            var willHaveChildrenModifier = _diceGenerator.Next(random,
+                1,
+                101);
+            var willHaveChildren = willHaveChildrenModifier >= 7;
+
             return willHaveChildren;
         }
     }

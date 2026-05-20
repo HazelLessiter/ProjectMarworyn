@@ -1,3 +1,5 @@
+using NSubstitute;
+using ProjectMarworyn.Generators;
 using ProjectMarworyn.Models;
 using ProjectMarworyn.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
@@ -6,31 +8,11 @@ namespace ProjectMarworyn.Tests
 {
     public class DeathEngineTests
     {
-        private readonly MockOutputService _mockOutputService;
+        private readonly MockConsoleService _mockOutputService;
 
         public DeathEngineTests()
         {
-            _mockOutputService = new MockOutputService();
-        }
-
-        private static Person CreatePerson(int age, bool isAlive = true) =>
-            new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "TestPerson" },
-                Age = age,
-                Gender = Gender.Male,
-                IsAlive = isAlive
-            };
-
-        private static Generation CreateGeneration(int iteration = 1) =>
-            new Generation { Iteration = iteration, People = new List<Person>() };
-
-        private DeathEngine CreateEngine(double nextDoubleValue)
-        {
-            var mockDiceGenerator = new MockDiceGenerator(new ControlledRandom(nextDoubleValue));
-            return new DeathEngine(_mockOutputService,
-                mockDiceGenerator);
+            _mockOutputService = new MockConsoleService();
         }
 
         [Fact]
@@ -83,15 +65,15 @@ namespace ProjectMarworyn.Tests
                 0);
 
             Assert.Empty(result.People);
-            Assert.Empty(_mockOutputService.Messages);
+            Assert.Empty(_mockOutputService.Lines);
         }
 
         [Fact]
         public void ProcessDeaths_MixedAliveAndDeadPeople_OnlyProcessesAlivePeople()
         {
             var engine = CreateEngine(1.0);
-            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Gender = Gender.Male, IsAlive = true };
-            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Gender = Gender.Female, IsAlive = false };
+            var alivePerson = new Person { Id = 1, Name = new Name { FullName = "Alive" }, Age = 30, Biosex = Biosex.Male, IsAlive = true };
+            var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Biosex = Biosex.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
             var result = engine.ProcessDeaths(people,
@@ -145,8 +127,8 @@ namespace ProjectMarworyn.Tests
         public void ProcessDeaths_SurvivingPeopleStoredInGeneration()
         {
             var engine = CreateEngine(1.0);
-            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Gender = Gender.Female, IsAlive = true };
-            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Gender = Gender.Male, IsAlive = true };
+            var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Biosex = Biosex.Female, IsAlive = true };
+            var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Biosex = Biosex.Male, IsAlive = true };
             var people = new List<Person> { person1, person2 };
 
             var currentGeneration = engine.ProcessDeaths(people,
@@ -178,7 +160,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.NotEmpty(_mockOutputService.Messages);
+            Assert.NotEmpty(_mockOutputService.Lines);
         }
 
         [Fact]
@@ -190,7 +172,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Empty(_mockOutputService.Messages);
+            Assert.Empty(_mockOutputService.Lines);
         }
 
         [Fact]
@@ -202,7 +184,7 @@ namespace ProjectMarworyn.Tests
                 Id = 1,
                 Name = new Name { FullName = "John Smith" },
                 Age = 55,
-                Gender = Gender.Male,
+                Biosex = Biosex.Male,
                 IsAlive = true
             };
 
@@ -210,9 +192,9 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Single(_mockOutputService.Messages);
-            Assert.Contains("John Smith", _mockOutputService.Messages[0]);
-            Assert.Contains("55", _mockOutputService.Messages[0]);
+            Assert.Single(_mockOutputService.Lines);
+            Assert.Contains("John Smith", _mockOutputService.Lines[0]);
+            Assert.Contains("55", _mockOutputService.Lines[0]);
         }
 
         // Verifies the exact death probability thresholds for all 11 age brackets.
@@ -314,6 +296,31 @@ namespace ProjectMarworyn.Tests
                 0);
 
             Assert.Single(result.People);
+        }
+
+        private static Person CreatePerson(int age, bool isAlive = true)
+        {
+            return new Person
+            {
+                Id = 1,
+                Name = new Name { FullName = "TestPerson" },
+                Age = age,
+                Biosex = Biosex.Male,
+                IsAlive = isAlive
+            };
+        }
+
+        private static Generation CreateGeneration(int iteration = 1)
+        {
+            return new Generation { Iteration = iteration, People = new List<Person>() };
+        }
+
+        private DeathEngine CreateEngine(double nextDoubleValue)
+        {
+            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
+            return new DeathEngine(_mockOutputService,
+                mockDiceGenerator);
         }
     }
 }

@@ -51,11 +51,12 @@ namespace ProjectMarworyn
 
                 deathChance = (int)deathModifier / 100.0;
 
-                if (random.NextDouble() * 100 <= deathChance)
+                if (_diceGenerator.NextDouble(random) * 100 <= deathChance)
                 {
                     person.IsAlive = false;
                     death = true;
-                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}");
+                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}",
+                        ConsoleColor.Red);
                 }
                 else
                 {

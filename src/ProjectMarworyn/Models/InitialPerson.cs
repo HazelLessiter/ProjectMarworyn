@@ -7,6 +7,6 @@ namespace ProjectMarworyn.Models
         public string FullName { get; set; }
         public string Suffix { get; set; }
         public string Prefix { get; set; }
-        public Gender Gender { get; set; }
+        public Biosex Biosex { get; set; }
     }
 }

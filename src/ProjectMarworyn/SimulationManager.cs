@@ -58,7 +58,6 @@ namespace ProjectMarworyn
                 _heartbeat.Tick();
 
                 //Extinction
-                _consoleService.WriteLine($"Current population: {people.Count}");
                 if (_generationManager.CheckForExtinction(people))
                 {
                     _consoleService.WriteLine("The population has gone extinct. Less than 2 people remain");
@@ -68,11 +67,23 @@ namespace ProjectMarworyn
                 }
 
                 //Generation
-                _consoleService.WriteLine($"Current Generation: {currentGeneration.Iteration}");
-                if (_heartbeat.GetCurrentTime().Year % 20 == 0)
+                var currentTime = _heartbeat.GetCurrentTime();
+                if (currentTime.Day == 01 &&
+                    currentTime.Month == 01)
                 {
-                    currentGeneration.Iteration += 1;
-                    _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}");
+                    _consoleService.WriteLine($"Happy new year!",
+                        ConsoleColor.DarkMagenta);
+                    _consoleService.WriteLine($"Number of people: {people.Count}",
+                        ConsoleColor.DarkMagenta);
+                    _consoleService.WriteLine($"Number of children: {people.Count(x => x.Age < 18)}",
+                        ConsoleColor.DarkMagenta);
+
+                    if (currentTime.Year % 20 == 0)
+                    {
+                        currentGeneration.Iteration += 1;
+                        _consoleService.WriteLine($"New Generation: {currentGeneration.Iteration}",
+                            ConsoleColor.DarkMagenta);
+                    }
                 }
 
                 //Age
