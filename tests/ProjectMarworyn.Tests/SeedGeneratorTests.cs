@@ -1,5 +1,5 @@
-using ProjectMarworyn.Generators;
-using ProjectMarworyn.Models;
+using ProjectMarworyn.Core.Generators;
+using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests

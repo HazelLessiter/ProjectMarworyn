@@ -1,5 +1,5 @@
-using ProjectMarworyn.Models;
-using ProjectMarworyn.Services;
+using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Services;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
@@ -48,11 +48,12 @@ namespace ProjectMarworyn.Tests
                 TimeFromLastChild = new DateTime(1, 1, 1),
                 WillHaveChildren = false
             };
+            var originalTimeLived = person.TimeLived;
             var people = new List<Person> { person };
 
             var result = _ageProcessor.Age(people);
 
-            Assert.Equal(person.TimeLived.AddDays(1), result[0].TimeLived);
+            Assert.Equal(originalTimeLived.AddDays(1), result[0].TimeLived);
         }
 
         [Fact]

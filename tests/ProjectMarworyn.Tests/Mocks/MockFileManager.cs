@@ -1,4 +1,4 @@
-using ProjectMarworyn.Models;
+using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Tests.Mocks
 {

@@ -1,7 +1,7 @@
 using NSubstitute;
-using ProjectMarworyn.Generators;
-using ProjectMarworyn.Models;
-using ProjectMarworyn.Models.Enums;
+using ProjectMarworyn.Core.Generators;
+using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
@@ -16,6 +16,10 @@ namespace ProjectMarworyn.Tests
             _mockOutputService = new MockConsoleService();
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
             _personGenerator = new PersonGenerator(mockDiceGenerator,
                 _mockOutputService);
         }
@@ -286,7 +290,7 @@ namespace ProjectMarworyn.Tests
                     Biosex = Biosex.Female,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = new DateTime(2, 1, 1)
+                    TimeFromLastChild = new DateTime(3, 1, 1)
                 },
                 MPerson = new Person
                 {
@@ -296,7 +300,7 @@ namespace ProjectMarworyn.Tests
                     Biosex = Biosex.Male,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = new DateTime(2, 1, 1)
+                    TimeFromLastChild = new DateTime(3, 1, 1)
                 }
             };
         }

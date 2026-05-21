@@ -1,4 +1,4 @@
-using ProjectMarworyn.Services;
+using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Tests.Mocks
 {

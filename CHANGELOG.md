@@ -2,7 +2,11 @@
 
 ---
 
-## [1.1.0] - In Progress
+## [2.0.0]
+
+-Added Monogame
+
+## [1.1.0]
 
 -Fixed issue where no one could die
 -Claude PRs now apply to all branches, not just `main` and `Update/**`

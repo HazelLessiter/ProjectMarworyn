@@ -1,7 +1,7 @@
 using NSubstitute;
-using ProjectMarworyn.Generators;
-using ProjectMarworyn.Models;
-using ProjectMarworyn.Models.Enums;
+using ProjectMarworyn.Core.Generators;
+using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
@@ -202,28 +202,28 @@ namespace ProjectMarworyn.Tests
         // Threshold (NextDouble boundary) = (int)deathModifier / 10000
         // Test values use a 10% margin either side of each threshold.
         [Theory]
-        [InlineData(5,   0.0009,  true)]  // Zero   (0-9,   modifier  10): threshold 0.001
-        [InlineData(5,   0.0011,  false)]
-        [InlineData(15,  0.00009, true)]  // Ten    (10-19, modifier   1): threshold 0.0001
-        [InlineData(15,  0.00011, false)]
-        [InlineData(25,  0.00018, true)]  // Twenty (20-29, modifier   2): threshold 0.0002
-        [InlineData(25,  0.00022, false)]
-        [InlineData(35,  0.00045, true)]  // Thirty (30-39, modifier   5): threshold 0.0005
-        [InlineData(35,  0.00055, false)]
-        [InlineData(45,  0.0009,  true)]  // Fourty (40-49, modifier  10): threshold 0.001
-        [InlineData(45,  0.0011,  false)]
-        [InlineData(55,  0.00135, true)]  // Fifty  (50-59, modifier  15): threshold 0.0015
-        [InlineData(55,  0.00165, false)]
-        [InlineData(65,  0.0018,  true)]  // Sixty  (60-69, modifier  20): threshold 0.002
-        [InlineData(65,  0.0022,  false)]
-        [InlineData(75,  0.00225, true)]  // Seventy(70-79, modifier  25): threshold 0.0025
-        [InlineData(75,  0.00275, false)]
-        [InlineData(85,  0.0045,  true)]  // Eighty (80-89, modifier  50): threshold 0.005
-        [InlineData(85,  0.0055,  false)]
-        [InlineData(95,  0.009,   true)]  // Ninety (90-99, modifier 100): threshold 0.01
-        [InlineData(95,  0.011,   false)]
-        [InlineData(105, 0.0225,  true)]  // Hundred(100+,  modifier 250): threshold 0.025
-        [InlineData(105, 0.0275,  false)]
+        [InlineData(5,   0.0054,  true)]  // Zero   (0-9,   modifier  60): threshold 0.006
+        [InlineData(5,   0.0066,  false)]
+        [InlineData(15,  0.0009,  true)]  // Ten    (10-19, modifier  10): threshold 0.001
+        [InlineData(15,  0.0011,  false)]
+        [InlineData(25,  0.0018,  true)]  // Twenty (20-29, modifier  20): threshold 0.002
+        [InlineData(25,  0.0022,  false)]
+        [InlineData(35,  0.0027,  true)]  // Thirty (30-39, modifier  30): threshold 0.003
+        [InlineData(35,  0.0033,  false)]
+        [InlineData(45,  0.0072,  true)]  // Fourty (40-49, modifier  80): threshold 0.008
+        [InlineData(45,  0.0088,  false)]
+        [InlineData(55,  0.0081,  true)]  // Fifty  (50-59, modifier  90): threshold 0.009
+        [InlineData(55,  0.0099,  false)]
+        [InlineData(65,  0.009,   true)]  // Sixty  (60-69, modifier 100): threshold 0.01
+        [InlineData(65,  0.011,   false)]
+        [InlineData(75,  0.0135,  true)]  // Seventy(70-79, modifier 150): threshold 0.015
+        [InlineData(75,  0.0165,  false)]
+        [InlineData(85,  0.034,   true)]  // Eighty (80-89, modifier 375): threshold 0.0375
+        [InlineData(85,  0.041,   false)]
+        [InlineData(95,  0.047,   true)]  // Ninety (90-99, modifier 525): threshold 0.0525
+        [InlineData(95,  0.058,   false)]
+        [InlineData(105, 0.135,   true)]  // Hundred(100+,  modifier 1500): threshold 0.15
+        [InlineData(105, 0.165,   false)]
         public void ProcessDeaths_DeathProbabilityThreshold_CorrectlyDeterminesOutcome(int age,
             double nextDoubleValue,
             bool expectsDeath)
@@ -245,16 +245,16 @@ namespace ProjectMarworyn.Tests
         // for each side, proving the boundary is wired correctly.
         // The 9→10 boundary is an exception: infant mortality means 0-9 has a higher modifier than 10-19.
         [Theory]
-        [InlineData(9,  10,  0.0005,  true,  false)]  // Zero→Ten:      age 9 dies, age 10 survives
-        [InlineData(19, 20,  0.00015, false, true)]   // Ten→Twenty:    age 19 survives, age 20 dies
-        [InlineData(29, 30,  0.00035, false, true)]   // Twenty→Thirty
-        [InlineData(39, 40,  0.00075, false, true)]   // Thirty→Fourty
-        [InlineData(49, 50,  0.00125, false, true)]   // Fourty→Fifty
-        [InlineData(59, 60,  0.00175, false, true)]   // Fifty→Sixty
-        [InlineData(69, 70,  0.00225, false, true)]   // Sixty→Seventy
-        [InlineData(79, 80,  0.00375, false, true)]   // Seventy→Eighty
-        [InlineData(89, 90,  0.0075,  false, true)]   // Eighty→Ninety
-        [InlineData(99, 100, 0.0175,  false, true)]   // Ninety→Hundred
+        [InlineData(9,  10,  0.003,  true,  false)]  // Zero(60)→Ten(10):       threshold 0.006 vs 0.001, value between
+        [InlineData(19, 20,  0.0015, false, true)]   // Ten(10)→Twenty(20):     threshold 0.001 vs 0.002
+        [InlineData(29, 30,  0.0025, false, true)]   // Twenty(20)→Thirty(30):  threshold 0.002 vs 0.003
+        [InlineData(39, 40,  0.005,  false, true)]   // Thirty(30)→Fourty(80):  threshold 0.003 vs 0.008
+        [InlineData(49, 50,  0.0085, false, true)]   // Fourty(80)→Fifty(90):   threshold 0.008 vs 0.009
+        [InlineData(59, 60,  0.0095, false, true)]   // Fifty(90)→Sixty(100):   threshold 0.009 vs 0.01
+        [InlineData(69, 70,  0.0125, false, true)]   // Sixty(100)→Seventy(150):threshold 0.01  vs 0.015
+        [InlineData(79, 80,  0.025,  false, true)]   // Seventy(150)→Eighty(375):threshold 0.015 vs 0.0375
+        [InlineData(89, 90,  0.045,  false, true)]   // Eighty(375)→Ninety(525):threshold 0.0375 vs 0.0525
+        [InlineData(99, 100, 0.1,    false, true)]   // Ninety(525)→Hundred(1500):threshold 0.0525 vs 0.15
         public void ProcessDeaths_AgeBoundaryTransition_CorrectModifierApplied(int lowerAge,
             int upperAge,
             double nextDoubleValue,
@@ -283,13 +283,13 @@ namespace ProjectMarworyn.Tests
         }
 
         // Guards the bug fix: old code used random.Next(0, 101) (integer) against deathChance (decimal).
-        // With ControlledRandom returning 0.0055, the old integer path computes
-        // Next(0,101) = (int)(0.0055 * 101) = 0, so 0 <= 0.5 wrongly triggers death.
-        // The correct float path gives 0.0055 * 100 = 0.55 > 0.5, correctly giving survival.
+        // The mock returns 0 for Next(0,101), so the old path 0 <= 3.75 wrongly triggers death
+        // for the Eighty bracket (modifier 375, deathChance 3.75, threshold 0.0375).
+        // The correct float path gives 0.04 * 100 = 4.0 > 3.75, correctly giving survival.
         [Fact]
         public void ProcessDeaths_BugFix_FloatComparisonPreventsSpuriousDeath()
         {
-            var engine = CreateEngine(0.0055);
+            var engine = CreateEngine(0.04);
 
             var result = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
                 CreateGeneration(),

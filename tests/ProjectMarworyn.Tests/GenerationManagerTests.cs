@@ -1,5 +1,5 @@
-﻿using ProjectMarworyn.Models;
-using ProjectMarworyn.Models.Enums;
+using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.Tests
 {

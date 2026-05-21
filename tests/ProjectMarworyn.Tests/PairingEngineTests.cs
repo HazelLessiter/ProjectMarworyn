@@ -1,7 +1,7 @@
 using NSubstitute;
-using ProjectMarworyn.Generators;
-using ProjectMarworyn.Models;
-using ProjectMarworyn.Models.Enums;
+using ProjectMarworyn.Core.Generators;
+using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
