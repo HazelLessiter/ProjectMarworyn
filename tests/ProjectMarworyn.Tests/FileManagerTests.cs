@@ -7,14 +7,6 @@ namespace ProjectMarworyn.Tests
     {
         private readonly List<string> _tempFiles = [];
 
-        private string CreateTempFile(string content)
-        {
-            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-            File.WriteAllText(tempFile, content);
-            _tempFiles.Add(tempFile);
-            return tempFile;
-        }
-
         public void Dispose()
         {
             foreach (var file in _tempFiles)
@@ -25,15 +17,15 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void ReadNameFile_WithValidFile_ReturnsNames()
+        public void ReadInitialPersonFile_WithValidFile_ReturnsNames()
         {
-            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Gender\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Gender\":1}]";
+            var json = "[{\"FullName\":\"JaneDoe\",\"Prefix\":\"Jane\",\"Suffix\":\"Doe\",\"Biosex\":0},{\"FullName\":\"JohnSmith\",\"Prefix\":\"John\",\"Suffix\":\"Smith\",\"Biosex\":1}]";
             var tempFile = CreateTempFile(json);
 
-            var options = Options.Create(new AppSettings { NameFilePath = tempFile });
+            var options = Options.Create(new AppSettings { InitialPeopleFilePath = tempFile });
             var fileManager = new FileManager(options);
 
-            var result = fileManager.ReadNameFile();
+            var result = fileManager.ReadInitialPersonFile();
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
@@ -41,29 +33,37 @@ namespace ProjectMarworyn.Tests
         }
 
         [Fact]
-        public void ReadNameFile_FileNotFound_ThrowsFileNotFoundException()
+        public void ReadInitialPersonFile_FileNotFound_ThrowsFileNotFoundException()
         {
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
 
-            var options = Options.Create(new AppSettings { NameFilePath = path });
+            var options = Options.Create(new AppSettings { InitialPeopleFilePath = path });
             var fileManager = new FileManager(options);
 
-            var ex = Assert.Throws<FileNotFoundException>(() => fileManager.ReadNameFile());
+            var ex = Assert.Throws<FileNotFoundException>(() => fileManager.ReadInitialPersonFile());
 
             Assert.Contains(path, ex.Message);
         }
 
         [Fact]
-        public void ReadNameFile_InvalidJson_ThrowsInvalidDataException()
+        public void ReadInitialPersonFile_InvalidJson_ThrowsInvalidDataException()
         {
             var tempFile = CreateTempFile("this is not valid json");
 
-            var options = Options.Create(new AppSettings { NameFilePath = tempFile });
+            var options = Options.Create(new AppSettings { InitialPeopleFilePath = tempFile });
             var fileManager = new FileManager(options);
 
-            var ex = Assert.Throws<InvalidDataException>(() => fileManager.ReadNameFile());
+            var ex = Assert.Throws<InvalidDataException>(() => fileManager.ReadInitialPersonFile());
 
             Assert.Contains(tempFile, ex.Message);
+        }
+
+        private string CreateTempFile(string content)
+        {
+            var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            File.WriteAllText(tempFile, content);
+            _tempFiles.Add(tempFile);
+            return tempFile;
         }
     }
 }

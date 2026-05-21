@@ -6,7 +6,8 @@ namespace ProjectMarworyn.Tests.Mocks
     {
         public List<string> Lines { get; } = new List<string>();
 
-        public void WriteLine(string message)
+        public void WriteLine(string message,
+            ConsoleColor colour)
         {
             Lines.Add(message);
         }

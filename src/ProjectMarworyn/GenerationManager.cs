@@ -4,12 +4,12 @@ namespace ProjectMarworyn
 {
     internal class GenerationManager : IGenerationManager
     {
-        public Generation Initialise(List<Name> names)
+        public Generation Initialise(List<Person> people)
         {
             return new Generation()
             {
                 Iteration = 0,
-                Names = names
+                People = people
             };
         }
 

@@ -14,24 +14,24 @@ namespace ProjectMarworyn
             _appSettings = appSettings.Value;
         }
 
-        public List<Name> ReadNameFile()
+        public List<InitialPerson> ReadInitialPersonFile()
         {
             try
             {
-                var file = File.ReadAllText(_appSettings.NameFilePath);
+                var file = File.ReadAllText(_appSettings.InitialPeopleFilePath);
 
-                var names = JsonConvert.DeserializeObject<List<Name>>(file);
+                var initialPeople = JsonConvert.DeserializeObject<List<InitialPerson>>(file);
 
-                return names;
+                return initialPeople;
             }
             catch (FileNotFoundException ex)
             {
-                throw new FileNotFoundException($"Name file not found at path: {_appSettings.NameFilePath}",
+                throw new FileNotFoundException($"Name file not found at path: {_appSettings.InitialPeopleFilePath}",
                     ex);
             }
             catch (JsonException ex)
             {
-                throw new InvalidDataException($"Invalid JSON format in Name file: {_appSettings.NameFilePath}",
+                throw new InvalidDataException($"Invalid JSON format in Name file: {_appSettings.InitialPeopleFilePath}",
                     ex);
             }
         }

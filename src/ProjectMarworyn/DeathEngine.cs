@@ -17,7 +17,7 @@ namespace ProjectMarworyn
             _diceGenerator = diceGenerator;
         }
 
-        public (List<Person>, Generation) ProcessDeaths(List<Person> people,
+        public Generation ProcessDeaths(List<Person> people,
             Generation generation,
             int worldSeed)
         {
@@ -45,17 +45,18 @@ namespace ProjectMarworyn
                     <= 69 => DeathModifier.Sixty,
                     <= 79 => DeathModifier.Seventy,
                     <= 89 => DeathModifier.Eighty,
-                    <= 99 => DeathModifier.Ninthy,
+                    <= 99 => DeathModifier.Ninety,
                     _ => DeathModifier.Hundred
                 };
 
                 deathChance = (int)deathModifier / 100.0;
 
-                if (random.Next(0, 101) <= deathChance)
+                if (_diceGenerator.NextDouble(random) * 100 <= deathChance)
                 {
                     person.IsAlive = false;
                     death = true;
-                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}");
+                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}",
+                        ConsoleColor.Red);
                 }
                 else
                 {
@@ -69,10 +70,10 @@ namespace ProjectMarworyn
             var currentGeneration = new Generation()
             {
                 Iteration = generation.Iteration,
-                Names = names,
+                People = survivors,
             };
 
-            return (survivors, currentGeneration);//Refactor: Would rather not use tuples
+            return currentGeneration;
         }
     }
 }
