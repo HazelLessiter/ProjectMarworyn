@@ -4,7 +4,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core.Generators
 {
-    public class PersonGenerator : IPersonGenerator
+    internal class PersonGenerator : IPersonGenerator
     {
         private readonly IDiceGenerator _diceGenerator;
         private readonly IConsoleService _consoleService;

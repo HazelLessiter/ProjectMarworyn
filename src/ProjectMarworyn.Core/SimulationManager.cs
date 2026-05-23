@@ -4,7 +4,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    public class SimulationManager
+    internal class SimulationManager
     {
         private readonly IFileManager _fileManager;
         private readonly IGenerationManager _generationManager;

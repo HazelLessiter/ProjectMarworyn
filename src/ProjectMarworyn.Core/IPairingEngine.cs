@@ -2,7 +2,7 @@ using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Core
 {
-    public interface IPairingEngine
+    internal interface IPairingEngine
     {
         (List<Pair>, List<Person>) GeneratePairs(List<Person> people, List<Pair> pairs, int worldSeed);
     }

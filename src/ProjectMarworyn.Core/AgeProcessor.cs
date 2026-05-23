@@ -3,7 +3,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    public class AgeProcessor : IAgeProcessor
+    internal class AgeProcessor : IAgeProcessor
     {
         private readonly IConsoleService _consoleService;
 

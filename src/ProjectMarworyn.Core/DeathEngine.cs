@@ -5,7 +5,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    public class DeathEngine : IDeathEngine
+    internal class DeathEngine : IDeathEngine
     {
         private readonly IConsoleService _consoleService;
         private readonly IDiceGenerator _diceGenerator;

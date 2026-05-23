@@ -2,7 +2,7 @@ using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.Core.Models
 {
-    public class Person
+    internal class Person
     {
         public int Id { get; set; }
         public Name Name { get; set; }

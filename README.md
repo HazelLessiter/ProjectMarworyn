@@ -6,6 +6,10 @@ A population simulation console application inspired by games such as Dwarf Fort
 
 This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE.md](LICENSE.md) file for details.
 
+### Fonts
+
+This project utilises the unmodified Pixeloid font by GGBotNet. It can be found here: https://ggbot.itch.io/pixeloid-font See [License.txt](src/ProjectMarworyn/Content/Fonts/Pixeloid_Font_1_0/License.txt) for details.
+
 ## Features
 
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.

@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Extensions;
+using System.DirectoryServices.ActiveDirectory;
 
 namespace ProjectMarworyn
 {
@@ -10,6 +12,7 @@ namespace ProjectMarworyn
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private SpriteFont _spriteFont;
 
         public Simulation()
         {
@@ -23,11 +26,14 @@ namespace ProjectMarworyn
             // Create service collection
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddSingleton<SpriteBatch>();
             serviceCollection.AddCoreServices();
 
             // Build the provider
             var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            //var simulationManager = serviceProvider.GetService<SimulationManager>();
+
+            //simulationManager.Start();
 
             base.Initialize();
         }
@@ -35,6 +41,8 @@ namespace ProjectMarworyn
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _spriteFont = Content.Load<SpriteFont>("SpriteFont");
 
             // TODO: use this.Content to load your game content here
         }
@@ -56,7 +64,16 @@ namespace ProjectMarworyn
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            _spriteBatch.Begin();
+
+            _spriteBatch.DrawString(_spriteFont,
+                "Hello world",
+                 Vector2.UnitX,
+                Color.White);
+            _spriteBatch.End();
+
             // TODO: Add your drawing code here
+            //SamplerState.PointClamp - Used for pixel based fonts
 
             base.Draw(gameTime);
         }

@@ -2,7 +2,7 @@ using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Core
 {
-    public class GenerationManager : IGenerationManager
+    internal class GenerationManager : IGenerationManager
     {
         public Generation Initialise(List<Person> people)
         {
