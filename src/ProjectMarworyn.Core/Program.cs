@@ -6,7 +6,7 @@ using ProjectMarworyn.Core.Configuration;
 
 namespace ProjectMarworyn.Core
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {

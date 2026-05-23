@@ -7,7 +7,7 @@ namespace ProjectMarworyn.Core.Extensions
 {
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddServices(this IServiceCollection services)
+        public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
             services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<IAgeProcessor, AgeProcessor>();

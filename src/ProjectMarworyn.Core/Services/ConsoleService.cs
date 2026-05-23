@@ -4,7 +4,7 @@ using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Core.Services
 {
-    internal class ConsoleService : IConsoleService
+    public class ConsoleService : IConsoleService
     {
         private readonly SimulationClock _simulationClock;
         private readonly AppSettings _appSettings;

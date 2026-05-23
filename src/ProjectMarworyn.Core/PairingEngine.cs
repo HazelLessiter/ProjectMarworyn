@@ -5,7 +5,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    internal class PairingEngine : IPairingEngine
+    public class PairingEngine : IPairingEngine
     {
         private readonly IDiceGenerator _diceGenerator;
         private readonly IConsoleService _consoleService;

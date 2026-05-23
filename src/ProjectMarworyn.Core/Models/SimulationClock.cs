@@ -1,6 +1,6 @@
 namespace ProjectMarworyn.Core.Models
 {
-    internal class SimulationClock
+    public class SimulationClock
     {
         public long TickCount { get; set; }
         public bool IsRunning { get; set; }

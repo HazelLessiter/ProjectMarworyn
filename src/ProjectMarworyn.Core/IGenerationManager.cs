@@ -2,7 +2,7 @@ using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Core
 {
-    internal interface IGenerationManager
+    public interface IGenerationManager
     {
         Generation Initialise(List<Person> people);
         bool CheckForExtinction(List<Person> people);

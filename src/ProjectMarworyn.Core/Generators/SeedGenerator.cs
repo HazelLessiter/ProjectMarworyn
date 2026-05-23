@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProjectMarworyn.Core.Generators
 {
-    internal class SeedGenerator : ISeedGenerator
+    public class SeedGenerator : ISeedGenerator
     {
         private readonly IFileManager _fileManager;
         private readonly IConsoleService _consoleService;

@@ -1,6 +1,6 @@
 namespace ProjectMarworyn.Core.Services
 {
-    internal interface IConsoleService
+    public interface IConsoleService
     {
         void WriteLine(string message, ConsoleColor colour = ConsoleColor.White);
         void Delay();

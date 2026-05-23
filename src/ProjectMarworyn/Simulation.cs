@@ -1,15 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ProjectMarworyn.Core.Extensions;
 
 namespace ProjectMarworyn
 {
-    public class Game1 : Game
+    public class Simulation : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        public Game1()
+        public Simulation()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -18,7 +20,14 @@ namespace ProjectMarworyn
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            // Create service collection
+            var serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddSingleton<SpriteBatch>();
+            serviceCollection.AddCoreServices();
+
+            // Build the provider
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
             base.Initialize();
         }
@@ -32,8 +41,11 @@ namespace ProjectMarworyn
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 Exit();
+            }
 
             // TODO: Add your update logic here
 

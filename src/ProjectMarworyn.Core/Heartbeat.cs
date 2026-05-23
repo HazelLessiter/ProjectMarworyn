@@ -3,7 +3,7 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    internal class Heartbeat : IHeartbeat
+    public class Heartbeat : IHeartbeat
     {
         private readonly IConsoleService _consoleService;
         private SimulationClock _simulationClock;

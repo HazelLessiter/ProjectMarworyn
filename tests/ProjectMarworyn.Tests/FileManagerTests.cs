@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Configuration;
 
 namespace ProjectMarworyn.Tests

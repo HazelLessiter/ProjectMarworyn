@@ -4,17 +4,17 @@ using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
-    internal class SimulationManager
+    public class SimulationManager
     {
-        public IFileManager _fileManager;
-        public IGenerationManager _generationManager;
-        public IConsoleService _consoleService;
-        public ISeedGenerator _seedGenerator;
-        public IHeartbeat _heartbeat;
-        public IPersonGenerator _personGenerator;
-        public IAgeProcessor _ageProcessor;
-        public IDeathEngine _deathEngine;
-        public IPairingEngine _pairingEngine;
+        private readonly IFileManager _fileManager;
+        private readonly IGenerationManager _generationManager;
+        private readonly IConsoleService _consoleService;
+        private readonly ISeedGenerator _seedGenerator;
+        private readonly IHeartbeat _heartbeat;
+        private readonly IPersonGenerator _personGenerator;
+        private readonly IAgeProcessor _ageProcessor;
+        private readonly IDeathEngine _deathEngine;
+        private readonly IPairingEngine _pairingEngine;
 
         public SimulationManager(IFileManager fileManager,
             IGenerationManager generationManager,

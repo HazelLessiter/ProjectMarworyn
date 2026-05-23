@@ -1,6 +1,6 @@
 namespace ProjectMarworyn.Core.Generators
 {
-    internal class DiceGenerator : IDiceGenerator
+    public class DiceGenerator : IDiceGenerator
     {
         public Random Create(int worldSeed)
         {

@@ -1,6 +1,6 @@
 namespace ProjectMarworyn.Core
 {
-    internal interface IHeartbeat
+    public interface IHeartbeat
     {
         void Start();
         void Stop();

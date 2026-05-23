@@ -1,2 +1,14 @@
-﻿using var game = new ProjectMarworyn.Game1();
-game.Run();
+﻿using System;
+
+namespace ProjectMarworyn
+{
+    internal static class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            using var game = new Simulation();
+            game.Run();
+        }
+    }
+}

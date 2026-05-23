@@ -5,7 +5,7 @@ using ProjectMarworyn.Core.Configuration;
 
 namespace ProjectMarworyn.Core
 {
-    internal class FileManager : IFileManager
+    public class FileManager : IFileManager
     {
         private readonly AppSettings _appSettings;
 
