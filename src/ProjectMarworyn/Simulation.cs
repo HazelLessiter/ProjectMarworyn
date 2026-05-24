@@ -2,9 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Extensions;
-using System.DirectoryServices.ActiveDirectory;
 
 namespace ProjectMarworyn
 {
