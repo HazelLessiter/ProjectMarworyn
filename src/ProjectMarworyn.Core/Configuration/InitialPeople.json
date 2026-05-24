@@ -108,7 +108,7 @@
   { "FullName": "Lars", "Prefix": "Lar", "Suffix": "s", "Biosex": 1},
   { "FullName": "Freja", "Prefix": "Fre", "Suffix": "ja", "Biosex": 0},
   { "FullName": "Erik", "Prefix": "Er", "Suffix": "ik", "Biosex": 1},
-  { "FullName": "Sofie", "Prefix": "Er", "Suffix": "ik", "Biosex": 1},
+  { "FullName": "Sofie", "Prefix": "Sof", "Suffix": "ie", "Biosex": 0},
   { "FullName": "Hedda", "Prefix": "Hed", "Suffix": "da", "Biosex": 0},
   { "FullName": "Björn", "Prefix": "Bjö", "Suffix": "rn", "Biosex": 1},
   { "FullName": "Chaima", "Prefix": "Chai", "Suffix": "ma", "Biosex": 0},

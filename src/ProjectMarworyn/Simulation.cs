@@ -2,7 +2,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Extensions;
+using ProjectMarworyn.Core.Managers;
+using System;
 
 namespace ProjectMarworyn
 {
@@ -11,6 +15,10 @@ namespace ProjectMarworyn
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private SpriteFont _spriteFont;
+        private TimeSpan _accumulator;
+        private TimeSpan _dayDuration;
+        private AppSettings _appSettings;
+        private ISimulationManager _simulationManager;
 
         public Simulation()
         {
@@ -25,15 +33,16 @@ namespace ProjectMarworyn
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.AddCoreServices();
+            serviceCollection.ConfigureOptions(new AppSettings());
 
-            // Build the provider
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            //var simulationManager = serviceProvider.GetService<SimulationManager>();
-
-            //simulationManager.Start();
+            _appSettings = serviceProvider.GetService<AppSettings>();
+            _simulationManager = serviceProvider.GetService<ISimulationManager>();
 
             base.Initialize();
+
+            _simulationManager.Start();
         }
 
         protected override void LoadContent()
@@ -51,6 +60,12 @@ namespace ProjectMarworyn
                 Exit();
             }
 
+            _accumulator += gameTime.ElapsedGameTime;
+            if (_accumulator >= _appSettings.DayDuration)
+            {
+                _accumulator -= _appSettings.DayDuration;
+                _simulationManager.ProgressDay();
+            }
 
             base.Update(gameTime);
         }

@@ -1,6 +1,6 @@
 using ProjectMarworyn.Core.Models;
 
-namespace ProjectMarworyn.Core
+namespace ProjectMarworyn.Core.Managers
 {
     internal interface IGenerationManager
     {
