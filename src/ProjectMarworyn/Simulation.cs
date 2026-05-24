@@ -43,8 +43,6 @@ namespace ProjectMarworyn
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _spriteFont = Content.Load<SpriteFont>("SpriteFont");
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -55,7 +53,6 @@ namespace ProjectMarworyn
                 Exit();
             }
 
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
@@ -72,8 +69,7 @@ namespace ProjectMarworyn
                 Color.White);
             _spriteBatch.End();
 
-            // TODO: Add your drawing code here
-            //SamplerState.PointClamp - Used for pixel based fonts
+            //TODO: SamplerState.PointClamp - Used for pixel based fonts
 
             base.Draw(gameTime);
         }
