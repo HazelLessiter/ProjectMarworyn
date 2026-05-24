@@ -68,7 +68,7 @@ namespace ProjectMarworyn
 
             _spriteBatch.DrawString(_spriteFont,
                 "Hello world",
-                 Vector2.UnitX,
+                Vector2.UnitX,
                 Color.White);
             _spriteBatch.End();
 
