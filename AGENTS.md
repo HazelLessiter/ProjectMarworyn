@@ -25,6 +25,9 @@ Do not invent formatting rules that are not explicitly documented in README.md o
 - **Whitespace between control flow keywords and parentheses** — there is no project standard governing whether a space appears between `foreach`, `for`, `while`, `if`, `using`, etc. and their opening parenthesis. Do not flag this in any direction.
 - **Single-parameter method calls** — the multi-parameter formatting standard applies only when a call has two or more parameters. A call with one argument on a single line is correct by definition and must not be mentioned.
 - **Citing compliant code** — if code follows the project standard, do not mention it at all — not as a positive, not as context for a nearby violation, and not as an example of what the standard looks like. Only mention code that actually violates a rule.
+- **Property access chained onto a method argument is not a parameter** — in a call like `GenerateChildren(pairs, _worldSeed, _people.MaxBy(x => x.Id).Id, _people)`, the `.Id` at the end of `_people.MaxBy(x => x.Id).Id` is a property access on the result of an expression; it is part of the third argument, not a fourth parameter. Do not count it as a separate parameter or flag it as a formatting issue.
+- **Return tuple formatting** — `return (a, b);` is a return statement, not a method call. The multi-parameter formatting standard applies to method calls only. A return tuple may be written on one line or multiple lines; neither is a violation. Do not mention it.
+- **"Not flagging, just noting"** — phrases like "not flagging as a violation, just noting" or "this is fine as-is, but could be simplified" are prohibited. If something is not a violation, it must not appear in the review at all. There is no category of "optional observation about correct code."
 
 ---
 
