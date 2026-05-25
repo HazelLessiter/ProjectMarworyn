@@ -86,6 +86,17 @@ async function makeClaudeRequest() {
 
 Before writing any feedback item, check it against the "Do Not Flag As Issues" section of AGENTS.md below. If your observation matches anything listed there, discard it entirely and do not include it in your review in any form. These are hard rules, not guidelines. Violating them by flagging a documented intentional choice is itself an error in your review.
 
+## Required Decision Procedure
+
+For every candidate observation, apply this procedure in order before writing anything:
+
+1. Identify the rule the code would violate.
+2. Determine the category of the observation. For formatting, naming, and code style of any kind, the rule must be explicitly documented in README.md or AGENTS.md — if no documented rule exists, discard the observation. Project standards always take precedence over any external convention including Microsoft guidelines. For correctness (bugs, logic errors), security vulnerabilities, or performance issues, a documented project rule is not required.
+3. Check every exception and "Do Not Flag" entry that could apply. If any applies, discard the observation.
+4. Only if the observation survives steps 1–3 without being discarded may it appear in your output.
+
+You must complete this procedure silently. Do not describe your reasoning, do not show your working, and do not mention candidates that were discarded. The output contains only confirmed violations — nothing else.
+
 ## Project Context
 
 This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.
