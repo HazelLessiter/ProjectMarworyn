@@ -105,7 +105,7 @@
   { "id": 103, "word": "Potato" },
   { "id": 104, "word": "Cloud" },
   { "id": 105, "word": "Sky" },
-  { "id": 106, "word": "Artic Skua" },
+  { "id": 106, "word": "Arctic Skua" },
   { "id": 107, "word": "Renovation" },
   { "id": 108, "word": "Innovation" },
   { "id": 109, "word": "Evolution" },
@@ -127,6 +127,6 @@
   { "id": 125, "word": "Unicorn" },
   { "id": 126, "word": "Aquatic Warbler" },
   { "id": 127, "word": "Warbler" },
-  { "id": 128, "word": "Artic Tern" },
+  { "id": 128, "word": "Arctic Tern" },
   { "id": 129, "word": "Avocet" }
 ]

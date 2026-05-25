@@ -1,7 +1,7 @@
 using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Models;
 
-namespace ProjectMarworyn.Tests.Mocks
+namespace ProjectMarworyn.UnitTests.Mocks
 {
     internal class MockFileManager : IFileManager
     {

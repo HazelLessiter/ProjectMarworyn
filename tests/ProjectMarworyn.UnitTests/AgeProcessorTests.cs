@@ -1,7 +1,7 @@
 using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Models;
 
-namespace ProjectMarworyn.Tests
+namespace ProjectMarworyn.UnitTests
 {
     public class AgeProcessorTests
     {

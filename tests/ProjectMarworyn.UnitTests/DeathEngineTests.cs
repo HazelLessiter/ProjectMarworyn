@@ -4,7 +4,7 @@ using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
 
-namespace ProjectMarworyn.Tests
+namespace ProjectMarworyn.UnitTests
 {
     public class DeathEngineTests
     {

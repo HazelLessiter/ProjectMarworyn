@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Configuration;
 
-namespace ProjectMarworyn.Tests
+namespace ProjectMarworyn.UnitTests
 {
     public class FileManagerTests : IDisposable
     {

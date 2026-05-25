@@ -6,13 +6,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{28A73E7F-9849-4C38-B44D-3BE5C0408EC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectMarworyn.Tests", "tests\ProjectMarworyn.Tests\ProjectMarworyn.Tests.csproj", "{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A175BC1-BF95-4E4A-8739-CA5A6A22B4D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectMarworyn.Core", "src\ProjectMarworyn.Core\ProjectMarworyn.Core.csproj", "{468CC386-BECC-3172-783F-2D3719B1DA8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectMarworyn", "src\ProjectMarworyn\ProjectMarworyn.csproj", "{1D0EE5ED-095C-40EB-B554-06450EBE1FBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectMarworyn.IntegrationTests", "tests\ProjectMarworyn.IntegrationTests\ProjectMarworyn.IntegrationTests.csproj", "{19401CB7-EB54-42F4-820E-1DDCC5C613EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectMarworyn.UnitTests", "tests\ProjectMarworyn.UnitTests\ProjectMarworyn.UnitTests.csproj", "{43B1D24B-B226-4618-C1B1-07342B92317D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +22,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{468CC386-BECC-3172-783F-2D3719B1DA8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{468CC386-BECC-3172-783F-2D3719B1DA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{468CC386-BECC-3172-783F-2D3719B1DA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,14 +30,23 @@ Global
 		{1D0EE5ED-095C-40EB-B554-06450EBE1FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D0EE5ED-095C-40EB-B554-06450EBE1FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D0EE5ED-095C-40EB-B554-06450EBE1FBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19401CB7-EB54-42F4-820E-1DDCC5C613EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19401CB7-EB54-42F4-820E-1DDCC5C613EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19401CB7-EB54-42F4-820E-1DDCC5C613EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19401CB7-EB54-42F4-820E-1DDCC5C613EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43B1D24B-B226-4618-C1B1-07342B92317D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B1D24B-B226-4618-C1B1-07342B92317D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B1D24B-B226-4618-C1B1-07342B92317D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B1D24B-B226-4618-C1B1-07342B92317D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{17FF1DD1-ADB9-463B-8CAB-0DFCA17F9E4D} = {28A73E7F-9849-4C38-B44D-3BE5C0408EC4}
 		{468CC386-BECC-3172-783F-2D3719B1DA8C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{1D0EE5ED-095C-40EB-B554-06450EBE1FBB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{19401CB7-EB54-42F4-820E-1DDCC5C613EF} = {28A73E7F-9849-4C38-B44D-3BE5C0408EC4}
+		{43B1D24B-B226-4618-C1B1-07342B92317D} = {28A73E7F-9849-4C38-B44D-3BE5C0408EC4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {764F5D71-94EB-4C9A-BA55-7A8188C8F03A}

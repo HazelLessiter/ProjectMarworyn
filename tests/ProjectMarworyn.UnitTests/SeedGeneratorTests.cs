@@ -1,8 +1,8 @@
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Tests.Mocks;
+using ProjectMarworyn.UnitTests.Mocks;
 
-namespace ProjectMarworyn.Tests
+namespace ProjectMarworyn.UnitTests
 {
     public class SeedGeneratorTests
     {

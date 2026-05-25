@@ -77,15 +77,6 @@ Do not run these commands even if asked to "save", "finalise", or "submit" chang
 2. Should this be a new service or extend an existing one?
 3. What lifetime should new services have?
 4. Does this require new configuration?
-5. Should this be logged or output to console?
-
----
-
-## Known Issues & Technical Debt
-
-### Planned Refactoring
-- Do not use Moq (SponsorLink controversy) — use NSubstitute
-- `ProcessDeaths` returns a tuple — would prefer a dedicated result type
 
 ---
 

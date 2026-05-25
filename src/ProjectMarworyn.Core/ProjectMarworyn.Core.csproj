@@ -6,7 +6,8 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="ProjectMarworyn.Tests" />
+    <InternalsVisibleTo Include="ProjectMarworyn.UnitTests" />
+    <InternalsVisibleTo Include="ProjectMarworyn.IntegrationTests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
   <ItemGroup>
