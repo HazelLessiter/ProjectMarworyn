@@ -3,17 +3,16 @@ using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class DeathEngineTests
     {
-        private readonly MockConsoleService _mockOutputService;
+        private readonly GameState _gameState;
 
         public DeathEngineTests()
         {
-            _mockOutputService = new MockConsoleService();
+            _gameState = new GameState();
         }
 
         [Fact]
@@ -66,7 +65,7 @@ namespace ProjectMarworyn.Tests
                 0);
 
             Assert.Empty(result.People);
-            Assert.Empty(_mockOutputService.Lines);
+            Assert.Empty(_gameState.Text);
         }
 
         [Fact]
@@ -161,7 +160,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.NotEmpty(_mockOutputService.Lines);
+            Assert.NotEmpty(_gameState.Text);
         }
 
         [Fact]
@@ -173,7 +172,7 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Empty(_mockOutputService.Lines);
+            Assert.Empty(_gameState.Text);
         }
 
         [Fact]
@@ -193,9 +192,9 @@ namespace ProjectMarworyn.Tests
                 CreateGeneration(),
                 0);
 
-            Assert.Single(_mockOutputService.Lines);
-            Assert.Contains("John Smith", _mockOutputService.Lines[0]);
-            Assert.Contains("55", _mockOutputService.Lines[0]);
+            Assert.Single(_gameState.Text);
+            Assert.Contains("John Smith", _gameState.Text[0]);
+            Assert.Contains("55", _gameState.Text[0]);
         }
 
         // Verifies the exact death probability thresholds for all 11 age brackets.
@@ -320,8 +319,7 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
-            return new DeathEngine(_mockOutputService,
-                mockDiceGenerator);
+            return new DeathEngine(mockDiceGenerator, _gameState);
         }
     }
 }

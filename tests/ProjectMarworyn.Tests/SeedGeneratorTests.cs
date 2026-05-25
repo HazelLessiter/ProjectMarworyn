@@ -7,14 +7,14 @@ namespace ProjectMarworyn.Tests
     public class SeedGeneratorTests
     {
         private readonly MockFileManager _mockFileManager;
-        private readonly MockConsoleService _mockOutputService;
+        private readonly GameState _gameState;
         private readonly SeedGenerator _seedGenerator;
 
         public SeedGeneratorTests()
         {
             _mockFileManager = new MockFileManager();
-            _mockOutputService = new MockConsoleService();
-            _seedGenerator = new SeedGenerator(_mockFileManager, _mockOutputService);
+            _gameState = new GameState();
+            _seedGenerator = new SeedGenerator(_mockFileManager, _gameState);
         }
 
         [Fact]
@@ -155,8 +155,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void CreateWorldSeed_WritesToConsole()
         {
-            var mockOutput = new MockConsoleService();
-            var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
+            var gameState = new GameState();
+            var seedGenerator = new SeedGenerator(_mockFileManager, gameState);
             var seedWords = new List<SeedWord>
             {
                 new SeedWord { Id = 1, Word = "Oak" },
@@ -166,14 +166,14 @@ namespace ProjectMarworyn.Tests
 
             seedGenerator.CreateWorldSeed(seedWords);
 
-            Assert.Single(mockOutput.Lines);
+            Assert.Single(gameState.Text);
         }
 
         [Fact]
         public void CreateWorldSeed_ConsoleMessageContainsWords()
         {
-            var mockOutput = new MockConsoleService();
-            var seedGenerator = new SeedGenerator(_mockFileManager, mockOutput);
+            var gameState = new GameState();
+            var seedGenerator = new SeedGenerator(_mockFileManager, gameState);
             var seedWords = new List<SeedWord>
             {
                 new SeedWord { Id = 1, Word = "Oak" },
@@ -183,7 +183,7 @@ namespace ProjectMarworyn.Tests
 
             seedGenerator.CreateWorldSeed(seedWords);
 
-            Assert.Contains("OAK-WREN-MOSS", mockOutput.Lines[0]);
+            Assert.Contains("OAK-WREN-MOSS", gameState.Text[0]);
         }
 
         [Fact]

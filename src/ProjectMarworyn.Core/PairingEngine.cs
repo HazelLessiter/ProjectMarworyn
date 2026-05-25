@@ -1,20 +1,19 @@
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
     internal class PairingEngine : IPairingEngine
     {
         private readonly IDiceGenerator _diceGenerator;
-        private readonly IConsoleService _consoleService;
+        private GameState _gameState;
 
         public PairingEngine(IDiceGenerator diceGenerator,
-            IConsoleService consoleService)
+            GameState gameState)
         {
             _diceGenerator = diceGenerator;
-            _consoleService = consoleService;
+            _gameState = gameState;
         }
 
         public (List<Pair>, List<Person>) GeneratePairs(List<Person> people,
@@ -48,14 +47,14 @@ namespace ProjectMarworyn.Core
 
                 var mPerson = singleMaleAdults[position];
 
-                pairs.Add(new Pair()
+                var pair = new Pair()
                 {
                     FPerson = fPerson,
                     MPerson = mPerson
-                });
+                };
+                pairs.Add(pair);
 
-                _consoleService.WriteLine($"Pair: {fPerson.Name.FullName} + {mPerson.Name.FullName}",
-                    ConsoleColor.Cyan);
+                _gameState.Text.Add($"Pair: {fPerson.Name.FullName} + {mPerson.Name.FullName}");
 
                 fPerson.HasPair = true;
                 mPerson.HasPair = true;

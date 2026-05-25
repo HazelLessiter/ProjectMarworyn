@@ -3,21 +3,20 @@ using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class PairingEngineTests
     {
         private readonly PairingEngine _pairingEngine;
-        private readonly MockConsoleService _mockOutputService;
+        private readonly GameState _gameState;
 
         public PairingEngineTests()
         {
-            _mockOutputService = new MockConsoleService();
+            _gameState = new GameState();
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            _pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            _pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
         }
 
         [Fact]
@@ -77,14 +76,15 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var femalePerson = new Person
             {
                 Id = 1,
                 Name = new Name { FullName = "Jane" },
                 Age = 25,
                 Biosex = Biosex.Female,
-                HasPair = false
+                HasPair = false,
+                IsAlive = true
             };
             var malePerson = new Person
             {
@@ -92,7 +92,8 @@ namespace ProjectMarworyn.Tests
                 Name = new Name { FullName = "John" },
                 Age = 28,
                 Biosex = Biosex.Male,
-                HasPair = false
+                HasPair = false,
+                IsAlive = true
             };
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
@@ -107,14 +108,15 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var femalePerson = new Person
             {
                 Id = 1,
                 Name = new Name { FullName = "Jane", Prefix = "Jane", Suffix = "Doe" },
                 Age = 25,
                 Biosex = Biosex.Female,
-                HasPair = false
+                HasPair = false,
+                IsAlive = true
             };
             var malePerson = new Person
             {
@@ -122,7 +124,8 @@ namespace ProjectMarworyn.Tests
                 Name = new Name { FullName = "John", Prefix = "John", Suffix = "Smith" },
                 Age = 28,
                 Biosex = Biosex.Male,
-                HasPair = false
+                HasPair = false,
+                IsAlive = true
             };
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
@@ -225,7 +228,7 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var people = new List<Person>
             {
                 new Person
@@ -234,7 +237,8 @@ namespace ProjectMarworyn.Tests
                     Name = new Name { FullName = "Jane" },
                     Age = 18,
                     Biosex = Biosex.Female,
-                    HasPair = false
+                    HasPair = false,
+                    IsAlive = true
                 },
                 new Person
                 {
@@ -242,7 +246,8 @@ namespace ProjectMarworyn.Tests
                     Name = new Name { FullName = "John" },
                     Age = 18,
                     Biosex = Biosex.Male,
-                    HasPair = false
+                    HasPair = false,
+                    IsAlive = true
                 }
             };
             var pairs = new List<Pair>();
@@ -286,13 +291,13 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var people = new List<Person>
             {
-                new Person { Id = 1, Name = new Name { FullName = "F1" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
-                new Person { Id = 2, Name = new Name { FullName = "F2" }, Age = 26, Biosex = Biosex.Female, HasPair = false },
-                new Person { Id = 3, Name = new Name { FullName = "F3" }, Age = 27, Biosex = Biosex.Female, HasPair = false },
-                new Person { Id = 4, Name = new Name { FullName = "M1" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
+                new Person { Id = 1, Name = new Name { FullName = "F1" }, Age = 25, Biosex = Biosex.Female, HasPair = false, IsAlive = true },
+                new Person { Id = 2, Name = new Name { FullName = "F2" }, Age = 26, Biosex = Biosex.Female, HasPair = false, IsAlive = true },
+                new Person { Id = 3, Name = new Name { FullName = "F3" }, Age = 27, Biosex = Biosex.Female, HasPair = false, IsAlive = true },
+                new Person { Id = 4, Name = new Name { FullName = "M1" }, Age = 28, Biosex = Biosex.Male, HasPair = false, IsAlive = true }
             };
             var pairs = new List<Pair>();
 
@@ -306,17 +311,17 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var existingPair = new Pair
             {
-                FPerson = new Person { Id = 1, Name = new Name { FullName = "Existing1" }, Age = 30, Biosex = Biosex.Female },
-                MPerson = new Person { Id = 2, Name = new Name { FullName = "Existing2" }, Age = 32, Biosex = Biosex.Male }
+                FPerson = new Person { Id = 1, Name = new Name { FullName = "Existing1" }, Age = 30, Biosex = Biosex.Female, IsAlive = true },
+                MPerson = new Person { Id = 2, Name = new Name { FullName = "Existing2" }, Age = 32, Biosex = Biosex.Male, IsAlive = true }
             };
             var pairs = new List<Pair> { existingPair };
             var people = new List<Person>
             {
-                new Person { Id = 3, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
-                new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false }
+                new Person { Id = 3, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false, IsAlive = true },
+                new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false, IsAlive = true }
             };
 
             var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
@@ -329,8 +334,8 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var mockOutput = new MockConsoleService();
-            var pairingEngine = new PairingEngine(mockDiceGenerator, mockOutput);
+            var gameState = new GameState();
+            var pairingEngine = new PairingEngine(mockDiceGenerator, gameState);
             var people = new List<Person>
             {
                 new Person { Id = 1, Name = new Name { FullName = "Jane" }, Age = 25, Biosex = Biosex.Female, HasPair = false },
@@ -340,9 +345,9 @@ namespace ProjectMarworyn.Tests
 
             pairingEngine.GeneratePairs(people, pairs, 0);
 
-            Assert.Single(mockOutput.Lines);
-            Assert.Contains("Jane", mockOutput.Lines[0]);
-            Assert.Contains("John", mockOutput.Lines[0]);
+            Assert.Single(gameState.Text);
+            Assert.Contains("Jane", gameState.Text[0]);
+            Assert.Contains("John", gameState.Text[0]);
         }
 
         [Fact]
@@ -350,7 +355,7 @@ namespace ProjectMarworyn.Tests
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            var pairingEngine = new PairingEngine(mockDiceGenerator, _mockOutputService);
+            var pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
             var femalePerson = new Person
             {
                 Id = 1,

@@ -1,19 +1,18 @@
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core.Generators
 {
     internal class PersonGenerator : IPersonGenerator
     {
         private readonly IDiceGenerator _diceGenerator;
-        private readonly IConsoleService _consoleService;
+        private GameState _gameState;
 
         public PersonGenerator(IDiceGenerator diceGenerator,
-            IConsoleService consoleService)
+            GameState gameState)
         {
             _diceGenerator = diceGenerator;
-            _consoleService = consoleService;
+            _gameState = gameState;
         }
 
         public List<Person> Initialise(List<InitialPerson> initialPeople,
@@ -149,8 +148,7 @@ namespace ProjectMarworyn.Core.Generators
                     };
 
                     children.Add(person);
-                    _consoleService.WriteLine($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}",
-                        ConsoleColor.Green);
+                    _gameState.Text.Add($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
                 }
 
                 peopleToUpdate.Add(pair.FPerson);

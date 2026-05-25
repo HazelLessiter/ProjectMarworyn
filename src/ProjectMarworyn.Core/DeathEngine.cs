@@ -1,20 +1,19 @@
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
     internal class DeathEngine : IDeathEngine
     {
-        private readonly IConsoleService _consoleService;
         private readonly IDiceGenerator _diceGenerator;
+        private GameState _gameState;
 
-        public DeathEngine(IConsoleService consoleService,
-            IDiceGenerator diceGenerator)
+        public DeathEngine(IDiceGenerator diceGenerator,
+            GameState gameState)
         {
-            _consoleService = consoleService;
             _diceGenerator = diceGenerator;
+            _gameState = gameState;
         }
 
         public Generation ProcessDeaths(List<Person> people,
@@ -25,7 +24,6 @@ namespace ProjectMarworyn.Core
             var deathModifier = DeathModifier.Zero;
             var survivors = new List<Person>();
             var names = new List<Name>();
-            bool death = false;
             var random = _diceGenerator.Create(worldSeed);
 
             foreach (var person in people.Where(x => x.IsAlive == true))
@@ -54,16 +52,13 @@ namespace ProjectMarworyn.Core
                 if (_diceGenerator.NextDouble(random) * 100 <= deathChance)
                 {
                     person.IsAlive = false;
-                    death = true;
-                    _consoleService.WriteLine($"{person.Name.FullName} has died at age {person.Age}",
-                        ConsoleColor.Red);
+                    _gameState.Text.Add($"{person.Name.FullName} has died at age {person.Age}");
                 }
                 else
                 {
                     person.IsAlive = true;
                     survivors.Add(person);
                     names.Add(person.Name);
-                    death = false;
                 }
             }
 

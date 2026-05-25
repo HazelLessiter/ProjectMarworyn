@@ -1,19 +1,15 @@
 using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Core.Services;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class AgeProcessorTests
     {
         private readonly AgeProcessor _ageProcessor;
-        private readonly IConsoleService _consoleService;
 
         public AgeProcessorTests()
         {
-            _consoleService = new MockConsoleService();
-            _ageProcessor = new AgeProcessor(_consoleService);
+            _ageProcessor = new AgeProcessor(new GameState());
         }
 
         [Fact]

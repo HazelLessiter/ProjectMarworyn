@@ -55,7 +55,11 @@ with.
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>
-        <End>&#126;</End>
+        <End>&#xD7FF;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>&#xE000;</Start>
+        <End>&#xFFFD;</End>
       </CharacterRegion>
     </CharacterRegions>
     <!--

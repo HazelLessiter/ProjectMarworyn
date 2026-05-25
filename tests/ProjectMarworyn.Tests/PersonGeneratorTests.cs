@@ -2,26 +2,24 @@ using NSubstitute;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class PersonGeneratorTests
     {
         private readonly PersonGenerator _personGenerator;
-        private readonly MockConsoleService _mockOutputService;
+        private readonly GameState _gameState;
 
         public PersonGeneratorTests()
         {
-            _mockOutputService = new MockConsoleService();
+            _gameState = new GameState();
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
-            _personGenerator = new PersonGenerator(mockDiceGenerator,
-                _mockOutputService);
+            _personGenerator = new PersonGenerator(mockDiceGenerator, _gameState);
         }
 
         [Fact]
@@ -275,7 +273,7 @@ namespace ProjectMarworyn.Tests
             mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(14)); // seed 14: childChance = 5
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
-            return new PersonGenerator(mockDiceGenerator, _mockOutputService);
+            return new PersonGenerator(mockDiceGenerator, _gameState);
         }
 
         private Pair CreateFertilePair()

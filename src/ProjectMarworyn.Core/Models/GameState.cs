@@ -2,10 +2,6 @@
 {
     public class GameState
     {
-        public bool Extinction {  get; set; }
-        public bool NewYear {  get; set; }
-        public int NumberOfPeople {  get; set; }
-        public int NumberOfChildren {  get; set; }
-        public bool NewGeneration {  get; set; }
+        public List<string> Text { get; set; } = new List<string>();
     }
 }

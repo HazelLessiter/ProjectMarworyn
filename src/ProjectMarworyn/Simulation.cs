@@ -1,11 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Extensions;
 using ProjectMarworyn.Core.Managers;
+using ProjectMarworyn.Core.Models;
 using System;
 
 namespace ProjectMarworyn
@@ -16,9 +19,9 @@ namespace ProjectMarworyn
         private SpriteBatch _spriteBatch;
         private SpriteFont _spriteFont;
         private TimeSpan _accumulator;
-        private TimeSpan _dayDuration;
         private AppSettings _appSettings;
         private ISimulationManager _simulationManager;
+        private GameState _gameState;
 
         public Simulation()
         {
@@ -33,11 +36,18 @@ namespace ProjectMarworyn
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.AddCoreServices();
-            serviceCollection.ConfigureOptions(new AppSettings());
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("Appsettings.json")
+                .Build();
+
+            serviceCollection.Configure<AppSettings>(configuration.GetSection("Configuration"));
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            _appSettings = serviceProvider.GetService<AppSettings>();
+            _appSettings = serviceProvider.GetService<IOptions<AppSettings>>().Value;
+            _gameState = serviceProvider.GetService<GameState>();
             _simulationManager = serviceProvider.GetService<ISimulationManager>();
 
             base.Initialize();
@@ -76,10 +86,18 @@ namespace ProjectMarworyn
 
             _spriteBatch.Begin();
 
-            _spriteBatch.DrawString(_spriteFont,
-                "Hello world",
-                Vector2.UnitX,
-                Color.White);
+            var position = 0;
+            foreach(var text in _gameState.Text)
+            {
+                var vector2 = new Vector2(0, position);
+
+                _spriteBatch.DrawString(_spriteFont,
+                    text,
+                    vector2,
+                    Color.White);
+
+                position += 15;
+            }
             _spriteBatch.End();
 
             //TODO: SamplerState.PointClamp - Used for pixel based fonts

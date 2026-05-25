@@ -1,15 +1,14 @@
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Core.Services;
 
 namespace ProjectMarworyn.Core
 {
     internal class AgeProcessor : IAgeProcessor
     {
-        private readonly IConsoleService _consoleService;
+        private GameState _gameState;
 
-        public AgeProcessor(IConsoleService consoleService)
+        public AgeProcessor(GameState gameState)
         {
-            _consoleService = consoleService;
+            _gameState = gameState;
         }
 
         public List<Person> Age(List<Person> people)
@@ -56,8 +55,7 @@ namespace ProjectMarworyn.Core
             if (timeLived.Year > person.TimeLived.Year)
             {
                 age += 1;
-                _consoleService.WriteLine($"{person.Name.FullName} is now {age} years old.",
-                    ConsoleColor.White);
+                _gameState.Text.Add($"{person.Name.FullName} is now {age} years old.");
             }
 
             return age;

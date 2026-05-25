@@ -1,5 +1,4 @@
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Core.Services;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,13 +7,13 @@ namespace ProjectMarworyn.Core.Generators
     public class SeedGenerator : ISeedGenerator
     {
         private readonly IFileManager _fileManager;
-        private readonly IConsoleService _consoleService;
+        private GameState _gameState;
 
         public SeedGenerator(IFileManager fileManager,
-            IConsoleService consoleService)
+            GameState gameState)
         {
             _fileManager = fileManager;
-            _consoleService = consoleService;
+            _gameState = gameState;
         }
 
         public List<SeedWord> GetThreeWords()
@@ -57,7 +56,7 @@ namespace ProjectMarworyn.Core.Generators
                     0);
             }
 
-            _consoleService.WriteLine($"World seed created: {threeWordSeed}");
+            _gameState.Text.Add($"World seed created: {threeWordSeed}");
 
             return worldSeed;
         }

@@ -1,29 +1,24 @@
 using ProjectMarworyn.Core;
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Tests.Mocks;
 
 namespace ProjectMarworyn.Tests
 {
     public class HeartbeatTests
     {
         private readonly Heartbeat _heartbeat;
-        private readonly MockConsoleService _mockConsoleService;
         private readonly SimulationClock _simulationClock;
 
         public HeartbeatTests()
         {
-            _mockConsoleService = new MockConsoleService();
             _simulationClock = new SimulationClock();
-            _heartbeat = new Heartbeat(_mockConsoleService, _simulationClock);
+            _heartbeat = new Heartbeat(_simulationClock);
         }
 
         [Fact]
         public void Constructor_InitializesSimulationClock_ZeroTickCount()
         {
-            var consoleService = new MockConsoleService();
             var clock = new SimulationClock();
-            var heartbeat = new Heartbeat(consoleService,
-                clock);
+            var heartbeat = new Heartbeat(clock);
 
             Assert.Equal(0, clock.TickCount);
         }
@@ -31,10 +26,8 @@ namespace ProjectMarworyn.Tests
         [Fact]
         public void Constructor_InitializesSimulationClock_IsRunningFalse()
         {
-            var consoleService = new MockConsoleService();
             var clock = new SimulationClock();
-            var heartbeat = new Heartbeat(consoleService,
-                clock);
+            var heartbeat = new Heartbeat(clock);
 
             Assert.False(clock.IsRunning);
         }
@@ -205,10 +198,8 @@ namespace ProjectMarworyn.Tests
         public void SimulationClock_IsSingleton_SharedAcrossServices()
         {
             var clock = new SimulationClock();
-            var heartbeat1 = new Heartbeat(_mockConsoleService,
-                clock);
-            var heartbeat2 = new Heartbeat(_mockConsoleService,
-                clock);
+            var heartbeat1 = new Heartbeat(clock);
+            var heartbeat2 = new Heartbeat(clock);
 
             heartbeat1.Start();
             heartbeat1.Tick();
