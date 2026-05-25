@@ -18,6 +18,16 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ---
 
+## Formatting Rules That Do Not Exist
+
+Do not invent formatting rules that are not explicitly documented in README.md or AGENTS.md. If a rule is not written down, it does not exist. Specific hallucinations to avoid:
+
+- **Whitespace between control flow keywords and parentheses** — there is no project standard governing whether a space appears between `foreach`, `for`, `while`, `if`, `using`, etc. and their opening parenthesis. Do not flag this in any direction.
+- **Single-parameter method calls** — the multi-parameter formatting standard applies only when a call has two or more parameters. A call with one argument on a single line is correct by definition and must not be mentioned.
+- **Citing compliant code** — if code follows the project standard, do not mention it at all — not as a positive, not as context for a nearby violation, and not as an example of what the standard looks like. Only mention code that actually violates a rule.
+
+---
+
 ## Do Not Flag As Issues
 
 - **No newline at end of file** — this project deliberately does NOT end files with a trailing newline. The `\ No newline at end of file` marker in a git diff confirms the file correctly follows this standard — it is not an error and must not be flagged or mentioned. Do not mention the absence of a trailing newline in your review at all, not even to confirm it is intentional. The only case worth flagging is the inverse: if a file ends with a blank line or trailing newline when it should not.

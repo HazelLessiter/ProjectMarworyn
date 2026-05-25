@@ -133,6 +133,7 @@ Format your review as:
 - Use markdown
 - Start with a summary (approve/request changes/comment)
 - If you self-correct on any point during your review, remove the incorrect point entirely from the output. Do not include the original incorrect observation, the correction of said incorrect observation, or any note that a self-correction occurred.
+- Do not raise a point in order to dismiss it. If after analysis a piece of code is correct, it must not appear in the review output at all — not flagged, not mentioned as context, not referenced as an example of the standard. Silence on correct code is the required output.
 - Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)
 - Be constructive and specific
 - Provide code examples for suggestions when helpful`;
