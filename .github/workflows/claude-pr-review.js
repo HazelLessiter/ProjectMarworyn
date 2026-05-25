@@ -138,7 +138,7 @@ Please provide a thorough code review covering:
 5. **Performance**: Any performance concerns?
 6. **Testing**: Should unit tests be added or updated?
 7. **Linked Issues**: If linked issues are provided, does this PR fully address them? Call out any gaps.
-8. **Positive Feedback**: What's done well?
+8. **Positive Feedback**: What's done well? Maximum four bullet points.
 
 Format your review as:
 - Use markdown
