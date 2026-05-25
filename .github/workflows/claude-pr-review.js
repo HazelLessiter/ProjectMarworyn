@@ -143,8 +143,14 @@ Please provide a thorough code review covering:
 Format your review as:
 - Use markdown
 - Start with a summary (approve/request changes/comment)
-- If you self-correct on any point during your review, remove the incorrect point entirely from the output. Do not include the original incorrect observation, the correction of said incorrect observation, or any note that a self-correction occurred.
-- Do not raise a point in order to dismiss it. If after analysis a piece of code is correct, it must not appear in the review output at all — not flagged, not mentioned as context, not referenced as an example of the standard. Silence on correct code is the required output.
+- Your response must contain only confirmed violations. Complete all analysis internally before writing a single word of output. Do not write up candidates that were discarded — your working is not part of the review.
+- The following output patterns are banned entirely:
+  - Showing a code snippet and then concluding it is fine, correct, or not a violation
+  - Using "However" or "But" to transition from correct code to other code
+  - Any sentence containing "this is fine", "this is correct", "no issue", "not a violation", "is compliant", or equivalent phrasing
+  - Noting that you checked something and found nothing wrong
+  - Phrases like "No formatting violations confirmed" or "The formatting throughout X is consistent"
+- If your analysis of a file or block yields zero confirmed violations, that file or block must not appear in your response at all.
 - Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)
 - Every review item's heading must accurately describe the content of that item. Do not write a heading about one topic and then discuss a different topic underneath it.
 - Be constructive and specific
