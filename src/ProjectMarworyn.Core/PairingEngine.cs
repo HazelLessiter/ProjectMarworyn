@@ -60,18 +60,9 @@ namespace ProjectMarworyn.Core
                 mPerson.HasPair = true;
             }
 
-            var alivePairs = pairs;
-            foreach (var pair in pairs)
-            {
-                if (pair.MPerson.IsAlive == false)
-                {
-                    alivePairs.Remove(pair);
-                }
-                if(pair.FPerson.IsAlive == false)
-                {
-                    alivePairs.Remove(pair);
-                }
-            }
+            var alivePairs = pairs.Where(x => x.FPerson.IsAlive &&
+                    x.MPerson.IsAlive)
+                .ToList();
 
             return (alivePairs,
                 people);

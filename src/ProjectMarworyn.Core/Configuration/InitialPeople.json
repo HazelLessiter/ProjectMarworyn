@@ -130,5 +130,7 @@
   { "FullName": "Tommaso", "Prefix": "Tom", "Suffix": "maso", "Biosex": 1},
   { "FullName": "Ginevra", "Prefix": "Gin", "Suffix": "evra", "Biosex": 0},
   { "FullName": "Aurora", "Prefix": "Au", "Suffix": "rora", "Biosex": 0},
-  { "FullName": "Gabriel", "Prefix": "Gab", "Suffix": "riel", "Biosex": 1}
+  { "FullName": "Gabriel", "Prefix": "Gab", "Suffix": "riel", "Biosex": 1},
+  { "FullName": "Wojciech", "Prefix": "Woj", "Suffix": "ciech", "Biosex": 1},
+  { "FullName": "Katarzyna", "Prefix": "Katar", "Suffix": "zyna", "Biosex": 0}
 ]
