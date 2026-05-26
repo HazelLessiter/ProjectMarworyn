@@ -161,8 +161,7 @@ Format your review as:
   const stream = client.messages.stream({
     model: 'claude-sonnet-4-6',
     max_tokens: 16000,
-    thinking: { type: 'adaptive' },
-    output_config: { effort: 'medium' },
+    thinking: { type: 'enabled', budget_tokens: 5000 },
     messages: [{ role: 'user', content: prompt }]
   });
 
