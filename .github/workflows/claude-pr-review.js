@@ -160,11 +160,13 @@ Format your review as:
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
+    max_tokens: 16000,
+    thinking: { type: 'adaptive' },
     messages: [{ role: 'user', content: prompt }]
   });
 
-  return message.content[0].text;
+  const textBlock = message.content.find(block => block.type === 'text');
+  return textBlock ? textBlock.text : '';
 }
 
 makeClaudeRequest()
