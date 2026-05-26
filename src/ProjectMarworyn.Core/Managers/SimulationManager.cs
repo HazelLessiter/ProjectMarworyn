@@ -17,6 +17,7 @@ namespace ProjectMarworyn.Core.Managers
         private List<Person> _people;
         private Generation _currentGeneration;
         private GameState _gameState;
+        private List<Pair> _pairs;
 
         public SimulationManager(IFileManager fileManager,
             IGenerationManager generationManager,
@@ -47,13 +48,13 @@ namespace ProjectMarworyn.Core.Managers
                 _worldSeed);
             _currentGeneration = _generationManager.Initialise(_people);
             _heartbeat.Start();
+            _pairs = new List<Pair>();
         }
 
         public void ProgressDay()
         {
             _heartbeat.Tick();
 
-            var pairs = new List<Pair>();
             _gameState.Text.Clear();
             var date = _heartbeat.GetCurrentTime();
             _gameState.Text.Add($"Date: {date.Day} {date.Month} {date.Year}");
@@ -91,12 +92,12 @@ namespace ProjectMarworyn.Core.Managers
                 _worldSeed);
 
             //Pair
-            (pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
-                pairs,
+            (_pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
+                _pairs,
                 _worldSeed);
 
             //Generate Children
-            (var children, _people) = _personGenerator.GenerateChildren(pairs,
+            (var children, _people) = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
                 _people);
