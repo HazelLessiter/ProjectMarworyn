@@ -158,12 +158,14 @@ Format your review as:
 
   const client = new Anthropic();
 
-  const message = await client.messages.create({
+  const stream = client.messages.stream({
     model: 'claude-sonnet-4-6',
     max_tokens: 32000,
     thinking: { type: 'adaptive' },
     messages: [{ role: 'user', content: prompt }]
   });
+
+  const message = await stream.finalMessage();
 
   console.log('Response blocks:', message.content.map(b => `${b.type}(${b.type === 'text' ? b.text.length : b.thinking?.length ?? 0} chars)`).join(', '));
 
