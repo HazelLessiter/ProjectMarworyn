@@ -167,10 +167,6 @@ Format your review as:
 
   const message = await stream.finalMessage();
 
-  console.log('Stop reason:', message.stop_reason);
-  console.log('Output tokens:', message.usage?.output_tokens);
-  console.log('Response blocks:', message.content.map(b => `${b.type}(${b.type === 'text' ? b.text.length : b.thinking?.length ?? 0} chars)`).join(', '));
-
   const textBlock = message.content.find(block => block.type === 'text');
   return textBlock ? textBlock.text : '';
 }
