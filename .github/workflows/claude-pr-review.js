@@ -99,7 +99,7 @@ You must complete this procedure silently. Do not describe your reasoning, do no
 
 ## Project Context
 
-This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.
+This is a .NET 10 MonoGame population simulation. Please review the code with the project's standards in mind.
 
 ### Project Standards (from README.md):
 \`\`\`
