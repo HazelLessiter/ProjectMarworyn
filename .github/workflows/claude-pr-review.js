@@ -168,16 +168,7 @@ Format your review as:
 
   const message = await stream.finalMessage();
 
-  console.log('Stop reason:', message.stop_reason);
-  console.log('Usage:', JSON.stringify(message.usage));
-  console.log('Response blocks:', message.content.map(b => `${b.type}(${b.type === 'text' ? b.text.length : b.thinking?.length ?? 0} chars)`).join(', '));
-
   const textBlock = message.content.find(block => block.type === 'text');
-  if (textBlock) {
-    console.log('Text preview:', textBlock.text.slice(0, 200));
-  } else {
-    console.log('No text block found in response');
-  }
   return textBlock ? textBlock.text : '';
 }
 
