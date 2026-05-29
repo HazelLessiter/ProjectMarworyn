@@ -1,26 +1,32 @@
 ﻿# ProjectMarworyn
 
-A population simulation console application inspired by games such as Dwarf Fortress, Banished, Stardew Valley, and Crusader Kings 2. Starting from a seeded initial population, the simulation runs generation-by-generation — pairing individuals, producing children with blended names, and continuing until the population falls below two people.
+A population simulation game built with MonoGame, inspired by games such as Dwarf Fortress, Banished, Stardew Valley, and Crusader Kings 2. Starting from a seeded initial population, the simulation runs day-by-day — pairing individuals, producing children with blended names, and continuing until the population falls below two people.
 
 ## License
 
 This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE.md](LICENSE.md) file for details.
 
+### Fonts
+
+This project utilises the unmodified Pixeloid font by GGBotNet. It can be found here: https://ggbot.itch.io/pixeloid-font See [License.txt](src/ProjectMarworyn/Content/Fonts/Pixeloid_Font_1_0/License.txt) for details.
+
 ## Features
 
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.
 - **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes.
-- **Generational loop** — each generation pairs individuals, produces 0–3 children per pair, and passes the survivors to the next generation.
+- **Day-based simulation** — the simulation ticks forward one real-time interval per in-world day, with pairing and births evaluated each new year and generations advancing every 20 years.
 - **Simulation clock** — a universal heartbeat system tracks simulation time independently from real-world time, with each tick advancing the simulation by one day.
-- **Configurable delay** — a millisecond delay between console outputs keeps the simulation readable.
+- **Graphical output** — simulation events are rendered in a MonoGame window using a pixel sprite font.
+- **Multinational initial population** — starting names drawn from Irish, Scottish, Portuguese, Spanish, French, Belgian, Dutch, Danish, Swedish, Norwegian, Icelandic, Greenlandic, Faroese, Finnish, German, Swiss, Italian, and other traditions.
 
 ## Tech Stack
 
 | Concern | Technology |
 |---|---|
 | Runtime | .NET 10 |
-| Application type | C# Console Application |
-| Dependency injection | `Microsoft.Extensions.Hosting` / `Microsoft.Extensions.DependencyInjection` |
+| Application type | MonoGame (WindowsDX) |
+| Game framework | `MonoGame.Framework.WindowsDX` 3.8 |
+| Dependency injection | `Microsoft.Extensions.DependencyInjection` |
 | Configuration | `IOptions<AppSettings>` + `Appsettings.json` |
 | JSON deserialisation | `Newtonsoft.Json` |
 | Testing | xUnit + NSubstitute + coverlet |
@@ -137,13 +143,21 @@ For AI agent-specific instructions, see [AGENTS.md](AGENTS.md).
 ```
 ProjectMarworyn/
 ├── src/
-│   └── ProjectMarworyn/
+│   ├── ProjectMarworyn/              # MonoGame application (WinExe)
+│   │   ├── Content/
+│   │   │   ├── Fonts/Pixeloid_Font_1_0/  # Pixeloid TrueType fonts
+│   │   │   ├── Images/Button.png
+│   │   │   ├── Content.mgcb          # MonoGame content pipeline manifest
+│   │   │   └── SpriteFont.spritefont # Sprite font definition
+│   │   ├── Program.cs                # Entry point — creates and runs Simulation
+│   │   └── Simulation.cs             # MonoGame Game class; owns the update/draw loop
+│   └── ProjectMarworyn.Core/         # Class library — all simulation logic
 │       ├── Configuration/
 │       │   ├── AppSettings.cs        # Strongly-typed settings
-│       │   ├── InitialPeople.json             # Initial population data (deserialises to InitialPerson)
+│       │   ├── InitialPeople.json    # Initial population data (deserialises to InitialPerson)
 │       │   └── SeedWord.json         # Word pool for world seed generation
 │       ├── Extensions/
-│       │   └── ServiceExtensions.cs  # DI registrations
+│       │   └── ServiceExtensions.cs  # DI registrations (AddCoreServices)
 │       ├── Generators/
 │       │   ├── DiceGenerator.cs      # Seeded Random factory
 │       │   ├── IDiceGenerator.cs
@@ -151,11 +165,18 @@ ProjectMarworyn/
 │       │   ├── IPersonGenerator.cs
 │       │   ├── SeedGenerator.cs      # World seed creation
 │       │   └── ISeedGenerator.cs
+│       ├── Managers/
+│       │   ├── GenerationManager.cs  # Manages generation state and extinction checks
+│       │   ├── IGenerationManager.cs
+│       │   ├── SimulationManager.cs  # Orchestrates the day-by-day simulation loop
+│       │   └── ISimulationManager.cs
 │       ├── Models/
 │       │   ├── Enums/
-│       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
 │       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
+│       │   │   ├── BiosexModifier.cs
+│       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
 │       │   │   └── Gender.cs         # Female / Male enum
+│       │   ├── GameState.cs          # Shared state — text lines rendered each frame
 │       │   ├── Generation.cs         # Iteration + person list
 │       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
@@ -163,25 +184,19 @@ ProjectMarworyn/
 │       │   ├── Person.cs             # Individual with age, biosex, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
-│       ├── Services/
-│       │   ├── IConsoleService.cs
-│       │   └── ConsoleService.cs     # Console output wrapper
 │       ├── AgeProcessor.cs           # Advances person age each tick
 │       ├── IAgeProcessor.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
 │       ├── IDeathEngine.cs
 │       ├── FileManager.cs            # Reads InitialPeople.json & SeedWord.json
 │       ├── IFileManager.cs
-│       ├── GenerationManager.cs      # Manages generation state and extinction checks
-│       ├── IGenerationManager.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock
 │       ├── IHeartbeat.cs
 │       ├── PairingEngine.cs          # Pairs eligible individuals each generation
-│       ├── IPairingEngine.cs
-│       ├── SimulationManager.cs      # Orchestrates the simulation loop
-│       └── Program.cs                # Host setup and startup
+│       └── IPairingEngine.cs
 └── tests/
-    └── ProjectMarworyn.Tests/        # xUnit test project
+    ├── ProjectMarworyn.UnitTests/    # xUnit unit test project
+    └── ProjectMarworyn.IntegrationTests/  # xUnit integration test project
 ```
 
 ## Getting Started
@@ -189,6 +204,7 @@ ProjectMarworyn/
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- Windows (MonoGame WindowsDX target)
 
 ### Running the application
 
@@ -196,6 +212,8 @@ ProjectMarworyn/
 cd src/ProjectMarworyn
 dotnet run
 ```
+
+The first build restores the MonoGame content pipeline tools automatically — this may take a moment on a fresh clone.
 
 ### Running the tests
 
@@ -205,12 +223,13 @@ dotnet test
 
 ## Configuration
 
-Settings are read from `src/ProjectMarworyn/Appsettings.json` under the `Configuration` section.
+Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Configuration` section.
 
 ```json
 {
   "Configuration": {
     "Delay": 500,
+    "DayDuration": "00:00:00.500",
     "InitialPeopleFilePath": "Configuration/InitialPeople.json",
     "SeedWordFilePath": "Configuration/SeedWord.json"
   }
@@ -219,7 +238,8 @@ Settings are read from `src/ProjectMarworyn/Appsettings.json` under the `Configu
 
 | Setting | Description |
 |---|---|
-| `Delay` | Milliseconds to pause between console outputs |
+| `Delay` | Legacy delay value (milliseconds) |
+| `DayDuration` | Real-time duration of one in-world day (TimeSpan format, e.g. `"00:00:00.500"` for 500 ms) |
 | `InitialPeopleFilePath` | Relative path to the initial population JSON file |
 | `SeedWordFilePath` | Relative path to the seed-word pool JSON file |
 
@@ -249,13 +269,13 @@ Three words are chosen at random and combined (e.g. `ACORN-BIRCH-BROOK`) then SH
 
 1. **Load** — the initial population is read from `InitialPeople.json` and each entry is created as a `Person` with a randomly assigned age.
 2. **Seed** — three words are drawn randomly from `SeedWord.json` and hashed to produce the world seed.
-3. **Loop** — while more than one person remains:
+3. **Loop** — the MonoGame update loop calls `SimulationManager.ProgressDay()` once per `DayDuration` interval:
    - The simulation clock ticks, advancing in-world time by one day.
    - Ages are updated and death is evaluated for each person based on their age bracket.
-   - Eligible individuals are paired using the seeded random number generator.
-   - Each pair may produce a child. A child's name is a blend of both parents' prefixes and suffixes, and their gender is assigned at birth.
-   - Survivors are passed into the next iteration.
-4. **End** — when fewer than two individuals remain the simulation reports extinction and exits.
+   - Each day, the simulation checks for eligible pairs and potential births. Children receive a blended name built from both parents' prefixes and suffixes.
+   - On 1 January each year, population statistics are logged to the screen. Every 20 years the generation counter increments.
+   - The current date, population count, and events are written to `GameState.Text` and rendered to the window each frame.
+4. **End** — when fewer than two individuals remain, extinction is declared and the clock stops.
 
 ## Simulation Clock Architecture
 
@@ -295,6 +315,13 @@ Project Marworyn follows a pragmatic, behaviour-focused testing approach. Tests 
 ### What is a "Unit"
 
 A unit is a discrete **unit of behaviour**, not necessarily a single method or class. A unit test may cover a single method, a complex calculation, or a chain of methods. A **unit of behaviour** refers to whatever represents a coherent, testable isolated piece of behaviour. Crucially a **unit of behaviour** is divorced from a **unit of implementation**.
+
+### Test projects
+
+| Project | Purpose |
+|---|---|
+| `ProjectMarworyn.UnitTests` | Unit tests for individual behaviours |
+| `ProjectMarworyn.IntegrationTests` | End-to-end tests covering the full simulation pipeline, seed generation, and population flow |
 
 ### Framework
 
