@@ -2,7 +2,7 @@ namespace ProjectMarworyn.Core.Models.Enums
 {
     internal enum DeathModifier//100 = 1%
     {
-        Zero = 60,
+        Zero = 40,
         Ten = 10,
         Twenty = 20,
         Thirty = 30,

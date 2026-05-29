@@ -24,8 +24,8 @@ namespace ProjectMarworyn.Core.Generators
             var people = new List<Person>();
             foreach (var initialPerson in initialPeople)
             {
-                var age = dice.Next(0,
-                    80);
+                var age = dice.Next(18,
+                    40);
 
                 var year = 1;
                 var month = _diceGenerator.Next(dice,
