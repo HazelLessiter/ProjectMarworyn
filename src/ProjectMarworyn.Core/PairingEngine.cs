@@ -18,10 +18,9 @@ namespace ProjectMarworyn.Core
 
         public (List<Pair>, List<Person>) GeneratePairs(List<Person> people,
             List<Pair> pairs,
-            int worldSeed)
+            int worldSeed,
+            Random dice)
         {
-            var random = _diceGenerator.Create(worldSeed);
-
             //Note: I did some reading today regarding the perfomance of foreach, in some cases there can be a negative performance hit
             //I should take a closer look at O(n) vs O(1) to optimise my code
             var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
@@ -41,7 +40,7 @@ namespace ProjectMarworyn.Core
                     break;
                 }
 
-                var position = _diceGenerator.Next(random,
+                var position = _diceGenerator.Next(dice,
                     0,
                     mCount);
 

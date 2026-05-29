@@ -16,10 +16,9 @@ namespace ProjectMarworyn.Core.Generators
         }
 
         public List<Person> Initialise(List<InitialPerson> initialPeople,
-            int worldSeed)
+            int worldSeed,
+            Random dice)
         {
-            var dice = _diceGenerator.Create(worldSeed);
-
             var id = 0;
             var people = new List<Person>();
             foreach (var initialPerson in initialPeople)
@@ -79,7 +78,8 @@ namespace ProjectMarworyn.Core.Generators
         public (List<Person>, List<Person>) GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
-            List<Person> people)
+            List<Person> people,
+            Random dice)
         {
             //For each pair
             var aliveFurtilePairs = pairs.Where(x => x.FPerson.IsAlive &&
@@ -92,7 +92,7 @@ namespace ProjectMarworyn.Core.Generators
                     x.FPerson.TimeFromLastChild.Year >= 3 &&
                     x.MPerson.TimeFromLastChild.Year >= 3)
                 .ToList();
-            var dice = _diceGenerator.Create(worldSeed);
+
             var children = new List<Person>();
             List<Person> peopleToUpdate = new List<Person>();
 

@@ -18,20 +18,18 @@ namespace ProjectMarworyn.Core
 
         public Generation ProcessDeaths(List<Person> people,
             Generation generation,
-            int worldSeed)
+            int worldSeed,
+            Random dice)
         {
             var deathChance = 0.0;
             var deathModifier = DeathModifier.Zero;
             var survivors = new List<Person>();
             var names = new List<Name>();
-            var random = _diceGenerator.Create(worldSeed);
 
             foreach (var person in people.Where(x => x.IsAlive == true))
             {
                 var age = person.Age;
 
-                //Note: Switch expressions were introduced in C# 8
-                //I should attempt to use some of the newer features in C# post .NET 5
                 deathModifier = age switch
                 {
                     <= 9 => DeathModifier.Zero,
@@ -49,7 +47,7 @@ namespace ProjectMarworyn.Core
 
                 deathChance = (int)deathModifier / 100.0;
 
-                if (_diceGenerator.NextDouble(random) * 100 <= deathChance)
+                if (_diceGenerator.NextDouble(dice) * 100 <= deathChance)
                 {
                     person.IsAlive = false;
                     _gameState.Text.Add($"{person.Name.FullName} has died at age {person.Age}");
