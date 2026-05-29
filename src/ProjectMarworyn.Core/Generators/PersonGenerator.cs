@@ -133,7 +133,7 @@ namespace ProjectMarworyn.Core.Generators
                     }
 
                     personId++;
-                    var person = new Person()
+                    var child = new Person()
                     {
                         Id = personId,
                         Age = 0,
@@ -147,14 +147,15 @@ namespace ProjectMarworyn.Core.Generators
                         WillHaveChildren = CalcWillHaveChildren(dice)
                     };
 
-                    children.Add(person);
-                    _gameState.Text.Add($"Child {person.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
-                }
+                    children.Add(child);
+                    _gameState.Text.Add($"Child {child.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
 
-                peopleToUpdate.Add(pair.FPerson);
-                peopleToUpdate.Add(pair.MPerson);
-                people.Remove(pair.FPerson);
-                people.Remove(pair.MPerson);
+                    peopleToUpdate.Add(pair.FPerson);
+                    peopleToUpdate.Add(pair.MPerson);
+
+                    people.Remove(pair.FPerson);
+                    people.Remove(pair.MPerson);
+                }
             }
 
             foreach (var person in peopleToUpdate)
