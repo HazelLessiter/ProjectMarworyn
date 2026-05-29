@@ -4,21 +4,24 @@
 
 ## WARNING - SUBJECT TO CHANGE!!!
 
-## Era 1 — Console/ASCII
+## Fixes
 
 Fix current issues (17-21)
 Issue 15 (gender/sexuality overhaul)
 Save/load world seed and game state
 Farming, food, shelter resources
 Death types (starvation, exposure etc)
-ASCII visualisation
 Basic settings/config
 
 ## Era 2 — MonoGame
 
 Grid system
 City builder mechanics
-4 build variants + 4 colours per building
+4 build variants + 4 colours per building variants
+-House
+-Farm
+-Garden
+-Wheat mill
 Proper main menu, settings UI
 
 ### Genetics system
@@ -39,6 +42,16 @@ Name.json may need expanding beyond Welsh-inspired names to reflect this
 Skin tone as heritable genetic trait, not an assignment
 Honest modelling produces natural diversity across generations
 Cannot start everyone the same — document this as a design principle
+
+### Farming
+-Perfect oppatunity for crop variety
++Wheat
++Rye
++Barely
++Potatoes
++More crop variety = more fun
++Nutrition system - Forces players to diversify crops
+	-This isn't Minecraft. Villagers can't just survive off wheat
 
 ## Era 3 — Trains
 
@@ -85,6 +98,6 @@ Connects to dynasty system naturally
 ### Scale constraint — For now
 
 No kingdoms, no empires
-Camera stays close — every person matters
+Every person matters
 Viable population target: 200+
-Below 200 collapse is already emergent in the simulation
+Below 200 collapse is just maths. This has been researched by NASA scientists.

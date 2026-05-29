@@ -86,9 +86,20 @@ async function makeClaudeRequest() {
 
 Before writing any feedback item, check it against the "Do Not Flag As Issues" section of AGENTS.md below. If your observation matches anything listed there, discard it entirely and do not include it in your review in any form. These are hard rules, not guidelines. Violating them by flagging a documented intentional choice is itself an error in your review.
 
+## Required Decision Procedure
+
+For every candidate observation, apply this procedure in order before writing anything:
+
+1. Identify the rule the code would violate.
+2. Determine the category of the observation. For formatting, naming, and code style of any kind, the rule must be explicitly documented in README.md or AGENTS.md — if no documented rule exists, discard the observation. Project standards always take precedence over any external convention including Microsoft guidelines. For correctness (bugs, logic errors), security vulnerabilities, or performance issues, a documented project rule is not required.
+3. Check every exception and "Do Not Flag" entry that could apply. If any applies, discard the observation.
+4. Only if the observation survives steps 1–3 without being discarded may it appear in your output.
+
+You must complete this procedure silently. Do not describe your reasoning, do not show your working, and do not mention candidates that were discarded. The output contains only confirmed violations — nothing else.
+
 ## Project Context
 
-This is a .NET 10 console application for population simulation. Please review the code with the project's standards in mind.
+This is a .NET 10 MonoGame population simulation. Please review the code with the project's standards in mind.
 
 ### Project Standards (from README.md):
 \`\`\`
@@ -127,25 +138,37 @@ Please provide a thorough code review covering:
 5. **Performance**: Any performance concerns?
 6. **Testing**: Should unit tests be added or updated?
 7. **Linked Issues**: If linked issues are provided, does this PR fully address them? Call out any gaps.
-8. **Positive Feedback**: What's done well?
+8. **Positive Feedback**: What's done well? Maximum four bullet points.
 
 Format your review as:
 - Use markdown
 - Start with a summary (approve/request changes/comment)
-- If you self-correct on any point during your review, remove the incorrect point entirely from the output. Do not include the original incorrect observation, the correction of said incorrect observation, or any note that a self-correction occurred.
+- Your response must contain only confirmed violations. Complete all analysis internally before writing a single word of output. Do not write up candidates that were discarded — your working is not part of the review.
+- The following output patterns are banned entirely:
+  - Showing a code snippet and then concluding it is fine, correct, or not a violation
+  - Using "However" or "But" to transition from correct code to other code
+  - Any sentence containing "this is fine", "this is correct", "no issue", "not a violation", "is compliant", or equivalent phrasing
+  - Noting that you checked something and found nothing wrong
+  - Phrases like "No formatting violations confirmed" or "The formatting throughout X is consistent"
+- If your analysis of a file or block yields zero confirmed violations, that file or block must not appear in your response at all.
 - Use emoji to categorize feedback (🎯 for critical, ⚠️ for suggestions, ✅ for positives)
+- Every review item's heading must accurately describe the content of that item. Do not write a heading about one topic and then discuss a different topic underneath it.
 - Be constructive and specific
 - Provide code examples for suggestions when helpful`;
 
   const client = new Anthropic();
 
-  const message = await client.messages.create({
+  const stream = client.messages.stream({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
+    max_tokens: 16000,
+    thinking: { type: 'enabled', budget_tokens: 5000 },
     messages: [{ role: 'user', content: prompt }]
   });
 
-  return message.content[0].text;
+  const message = await stream.finalMessage();
+
+  const textBlock = message.content.find(block => block.type === 'text');
+  return textBlock ? textBlock.text : '';
 }
 
 makeClaudeRequest()
