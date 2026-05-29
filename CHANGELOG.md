@@ -5,6 +5,15 @@
 ## [2.0.0]
 
 -Added Monogame
+-Fixed unit tests
+-Fixed issue where dead pairs would accumulate forever
+-Added GameState
+-Added core simulation loop
+-Fixed bug where there was an enumeration on a new Pair list instead of using the existing Pair list
+-Added Irish, Scottish, Portugese, Spanish, French, Belgium, Dutch, Denmark, Swedish, Norweign, Icelandic, Greenland, Foreoese, Finnish, German, Swiss, Adorra, Monoco, Polish, Czech and Italian InitialNames
+-Added integration tests
+-Fixed issue where pairs weren’t persisted
+-Fixed bug where parent's timeFromLastChild cooldown would be reset even on unsuccessful child generation attempt
 
 ## [1.1.0]
 
