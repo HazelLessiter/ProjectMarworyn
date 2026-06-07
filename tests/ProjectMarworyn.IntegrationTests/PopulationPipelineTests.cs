@@ -65,13 +65,21 @@ public class PopulationPipelineTests
     [Fact]
     public void AgeAndDeathPipeline_LargePopulation_SurvivorsAreSubsetOfInput()
     {
+        var worldSeed = 42;
         var people = Enumerable.Range(0, 50)
             .Select(i => CreatePerson(i, age: 30))
             .ToList();
         var generation = _generationManager.Initialise(people);
 
         var aged = _ageProcessor.Age(people);
-        var result = _deathEngine.ProcessDeaths(aged, generation, worldSeed: 42);
+
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var result = _deathEngine.ProcessDeaths(aged,
+            generation,
+            worldSeed,
+            dice);
 
         Assert.NotNull(result.People);
         Assert.True(result.People.Count <= aged.Count);
@@ -80,12 +88,19 @@ public class PopulationPipelineTests
     [Fact]
     public void DeathEngine_VeryOldPopulation_HighMortalityOverTime()
     {
+        var worldSeed = 42;
         var people = Enumerable.Range(0, 100)
             .Select(i => CreatePerson(i, age: 100))
             .ToList();
         var generation = _generationManager.Initialise(people);
 
-        var result = _deathEngine.ProcessDeaths(people, generation, worldSeed: 42);
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var result = _deathEngine.ProcessDeaths(people,
+            generation,
+            worldSeed,
+            dice);
 
         Assert.True(result.People.Count < people.Count);
     }
@@ -93,6 +108,7 @@ public class PopulationPipelineTests
     [Fact]
     public void PairingEngine_EligibleAdultsOfBothSexes_PairsAreCreated()
     {
+        var worldSeed = 42;
         var people = new List<Person>
         {
             CreatePerson(1, biosex: Biosex.Female, age: 25),
@@ -101,7 +117,13 @@ public class PopulationPipelineTests
             CreatePerson(4, biosex: Biosex.Male, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people, new List<Pair>(), worldSeed: 42);
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+            new List<Pair>(),
+            worldSeed,
+            dice);
 
         Assert.NotEmpty(pairs);
     }
@@ -109,13 +131,20 @@ public class PopulationPipelineTests
     [Fact]
     public void PairingEngine_NoMales_NoPairsCreated()
     {
+        var worldSeed = 42;
         var people = new List<Person>
         {
             CreatePerson(1, biosex: Biosex.Female, age: 25),
             CreatePerson(2, biosex: Biosex.Female, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people, new List<Pair>(), worldSeed: 42);
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+            new List<Pair>(),
+            worldSeed,
+            dice);
 
         Assert.Empty(pairs);
     }
@@ -123,13 +152,20 @@ public class PopulationPipelineTests
     [Fact]
     public void PairingEngine_UnderagePeople_NoPairsCreated()
     {
+        var worldSeed = 42;
         var people = new List<Person>
         {
             CreatePerson(1, biosex: Biosex.Female, age: 16),
             CreatePerson(2, biosex: Biosex.Male, age: 17),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people, new List<Pair>(), worldSeed: 42);
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+            new List<Pair>(),
+            worldSeed,
+            dice);
 
         Assert.Empty(pairs);
     }
@@ -137,6 +173,7 @@ public class PopulationPipelineTests
     [Fact]
     public void PairingAndChildGeneration_ManyFertilePairs_ChildrenAreProduced()
     {
+        var worldSeed = 1;
         var people = Enumerable.Range(0, 20)
             .SelectMany(i => new[]
             {
@@ -145,8 +182,18 @@ public class PopulationPipelineTests
             })
             .ToList();
 
-        var (pairs, updatedPeople) = _pairingEngine.GeneratePairs(people, new List<Pair>(), worldSeed: 1);
-        var (children, _) = _personGenerator.GenerateChildren(pairs, worldSeed: 1, personId: people.Max(p => p.Id), people: updatedPeople);
+        var dice = _diceGenerator.Create(worldSeed,
+            new DateTime(1, 1, 1));
+
+        var (pairs, updatedPeople) = _pairingEngine.GeneratePairs(people,
+            new List<Pair>(),
+            worldSeed,
+            dice);
+        var (children, _) = _personGenerator.GenerateChildren(pairs,
+            worldSeed,
+            people.Max(p => p.Id),
+            updatedPeople,
+            dice);
 
         Assert.NotNull(children);
         Assert.NotEmpty(children);

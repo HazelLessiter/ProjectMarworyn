@@ -13,6 +13,7 @@ namespace ProjectMarworyn.Core.Managers
         private readonly IAgeProcessor _ageProcessor;
         private readonly IDeathEngine _deathEngine;
         private readonly IPairingEngine _pairingEngine;
+        private readonly IDiceGenerator _diceGenerator;
         private int _worldSeed;
         private List<Person> _people;
         private Generation _currentGeneration;
@@ -27,6 +28,7 @@ namespace ProjectMarworyn.Core.Managers
             IAgeProcessor ageProcessor,
             IDeathEngine deathEngine,
             IPairingEngine pairingEngine,
+            IDiceGenerator diceGenerator,
             GameState gameState)
         {
             _fileManager = fileManager;
@@ -37,15 +39,21 @@ namespace ProjectMarworyn.Core.Managers
             _ageProcessor = ageProcessor;
             _deathEngine = deathEngine;
             _pairingEngine = pairingEngine;
+            _diceGenerator = diceGenerator;
             _gameState = gameState;
         }
 
         public void Start()
         {
             _worldSeed = _seedGenerator.CreateWorldSeed(_seedGenerator.GetThreeWords());
+            var dice = _diceGenerator.Create(_worldSeed,
+                new DateTime(1, 1, 1));
             var initialPeople = _fileManager.ReadInitialPersonFile();
+
             _people = _personGenerator.Initialise(initialPeople,
-                _worldSeed);
+                _worldSeed,
+                dice);
+
             _currentGeneration = _generationManager.Initialise(_people);
             _heartbeat.Start();
             _pairs = new List<Pair>();
@@ -58,6 +66,9 @@ namespace ProjectMarworyn.Core.Managers
             _gameState.Text.Clear();
             var date = _heartbeat.GetCurrentTime();
             _gameState.Text.Add($"Date: {date.Day} {date.Month} {date.Year}");
+
+            var dice = _diceGenerator.Create(_worldSeed,
+                date);
 
             //Extinction
             if (_generationManager.CheckForExtinction(_people))
@@ -89,18 +100,21 @@ namespace ProjectMarworyn.Core.Managers
             //Death
             _currentGeneration = _deathEngine.ProcessDeaths(_people,
                 _currentGeneration,
-                _worldSeed);
+                _worldSeed,
+                dice);
 
             //Pair
             (_pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
                 _pairs,
-                _worldSeed);
+                _worldSeed,
+                dice);
 
             //Generate Children
             (var children, _people) = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
-                _people);
+                _people,
+                dice);
 
             _people = _people.Concat(children)
                 .ToList();
