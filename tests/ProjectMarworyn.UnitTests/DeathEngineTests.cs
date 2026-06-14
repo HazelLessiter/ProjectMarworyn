@@ -9,10 +9,15 @@ namespace ProjectMarworyn.UnitTests
     public class DeathEngineTests
     {
         private readonly GameState _gameState;
+        private readonly IDiceGenerator _diceGenerator;
+        private Random _dice;
 
         public DeathEngineTests()
         {
             _gameState = new GameState();
+            _diceGenerator = new DiceGenerator();
+            _dice = _diceGenerator.Create(0,
+                new DateTime(1, 1, 1));
         }
 
         [Fact]
@@ -22,7 +27,8 @@ namespace ProjectMarworyn.UnitTests
 
             var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Empty(currentGeneration.People);
         }
@@ -34,7 +40,8 @@ namespace ProjectMarworyn.UnitTests
 
             var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(5),
-                0);
+                0,
+                _dice);
 
             Assert.Equal(5, currentGeneration.Iteration);
         }
@@ -46,7 +53,8 @@ namespace ProjectMarworyn.UnitTests
 
             var currentGeneration = engine.ProcessDeaths(new List<Person>(),
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.NotNull(currentGeneration);
             Assert.NotNull(currentGeneration.People);
@@ -62,7 +70,8 @@ namespace ProjectMarworyn.UnitTests
 
             var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Empty(result.People);
             Assert.Empty(_gameState.Text);
@@ -78,7 +87,8 @@ namespace ProjectMarworyn.UnitTests
 
             var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Single(result.People);
             Assert.Contains(alivePerson, result.People);
@@ -92,7 +102,8 @@ namespace ProjectMarworyn.UnitTests
 
             engine.ProcessDeaths(new List<Person> { person },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.False(person.IsAlive);
         }
@@ -105,7 +116,8 @@ namespace ProjectMarworyn.UnitTests
 
             engine.ProcessDeaths(new List<Person> { person },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.True(person.IsAlive);
         }
@@ -118,7 +130,8 @@ namespace ProjectMarworyn.UnitTests
 
             var result = engine.ProcessDeaths(people,
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.All(result.People, person => Assert.True(person.IsAlive));
         }
@@ -133,7 +146,8 @@ namespace ProjectMarworyn.UnitTests
 
             var currentGeneration = engine.ProcessDeaths(people,
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Equal(2, currentGeneration.People.Count);
             Assert.All(currentGeneration.People, person => Assert.True(person.IsAlive));
@@ -144,9 +158,13 @@ namespace ProjectMarworyn.UnitTests
         {
             var engine = CreateEngine(1.0);
 
-            var currentGeneration = engine.ProcessDeaths(new List<Person> { CreatePerson(20) },
+            var currentGeneration = engine.ProcessDeaths(new List<Person>
+                {
+                    CreatePerson(20)
+                },
                 CreateGeneration(7),
-                0);
+                0,
+                _dice);
 
             Assert.Equal(7, currentGeneration.Iteration);
         }
@@ -158,7 +176,8 @@ namespace ProjectMarworyn.UnitTests
 
             engine.ProcessDeaths(new List<Person> { CreatePerson(50) },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.NotEmpty(_gameState.Text);
         }
@@ -170,7 +189,8 @@ namespace ProjectMarworyn.UnitTests
 
             engine.ProcessDeaths(new List<Person> { CreatePerson(30) },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Empty(_gameState.Text);
         }
@@ -190,7 +210,8 @@ namespace ProjectMarworyn.UnitTests
 
             engine.ProcessDeaths(new List<Person> { person },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Single(_gameState.Text);
             Assert.Contains("John Smith", _gameState.Text[0]);
@@ -232,7 +253,8 @@ namespace ProjectMarworyn.UnitTests
 
             var result = engine.ProcessDeaths(new List<Person> { CreatePerson(age) },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             if (expectsDeath)
                 Assert.Empty(result.People);
@@ -266,10 +288,12 @@ namespace ProjectMarworyn.UnitTests
 
             var lowerSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
                 generation,
-                0).People;
+                0,
+                _dice).People;
             var upperSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
                 generation,
-                0).People;
+                0,
+                _dice).People;
 
             if (lowerDies)
                 Assert.Empty(lowerSurvivors);
@@ -293,7 +317,8 @@ namespace ProjectMarworyn.UnitTests
 
             var result = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
                 CreateGeneration(),
-                0);
+                0,
+                _dice);
 
             Assert.Single(result.People);
         }

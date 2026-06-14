@@ -10,13 +10,15 @@ namespace ProjectMarworyn.UnitTests
     {
         private readonly PairingEngine _pairingEngine;
         private readonly GameState _gameState;
+        private IDiceGenerator _mockDiceGenerator;
 
         public PairingEngineTests()
         {
             _gameState = new GameState();
-            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            _pairingEngine = new PairingEngine(mockDiceGenerator, _gameState);
+            _mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            _mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _pairingEngine = new PairingEngine(_mockDiceGenerator,
+                _gameState);
         }
 
         [Fact]
@@ -25,7 +27,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person>();
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -36,7 +44,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person>();
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.NotNull(resultPairs);
             Assert.NotNull(resultPeople);
@@ -66,7 +80,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -98,7 +118,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Single(resultPairs);
         }
@@ -130,7 +156,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Equal("Jane", resultPairs[0].FPerson.Name.FullName);
             Assert.Equal("John", resultPairs[0].MPerson.Name.FullName);
@@ -160,7 +192,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -189,7 +227,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -218,7 +262,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -252,7 +302,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Single(resultPairs);
         }
@@ -281,7 +337,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Empty(resultPairs);
         }
@@ -301,7 +363,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Single(resultPairs);
         }
@@ -324,7 +392,13 @@ namespace ProjectMarworyn.UnitTests
                 new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false, IsAlive = true }
             };
 
-            var (resultPairs, resultPeople) = pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Equal(2, resultPairs.Count);
         }
@@ -343,7 +417,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.Single(gameState.Text);
             Assert.Contains("Jane", gameState.Text[0]);
@@ -375,7 +455,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
 
-            pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.True(femalePerson.HasPair);
             Assert.True(malePerson.HasPair);
@@ -391,7 +477,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people, pairs, 0);
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
+            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+                pairs,
+                0,
+                dice);
 
             Assert.NotNull(resultPeople);
             Assert.Equal(people, resultPeople);

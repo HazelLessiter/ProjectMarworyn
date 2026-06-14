@@ -9,17 +9,19 @@ namespace ProjectMarworyn.UnitTests
     {
         private readonly PersonGenerator _personGenerator;
         private readonly GameState _gameState;
+        private IDiceGenerator _mockDiceGenerator;
 
         public PersonGeneratorTests()
         {
             _gameState = new GameState();
-            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
-            _personGenerator = new PersonGenerator(mockDiceGenerator, _gameState);
+            _mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            _mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
+            _personGenerator = new PersonGenerator(_mockDiceGenerator,
+                _gameState);
         }
 
         [Fact]
@@ -27,8 +29,12 @@ namespace ProjectMarworyn.UnitTests
         {
             var initialPeople = new List<InitialPerson>();
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Empty(result);
         }
@@ -38,8 +44,12 @@ namespace ProjectMarworyn.UnitTests
         {
             var initialPeople = new List<InitialPerson>();
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.NotNull(result);
         }
@@ -52,8 +62,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "TestName", Prefix = "Test", Suffix = "Name", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Single(result);
         }
@@ -68,8 +82,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Name3", Prefix = "N", Suffix = "3", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal(3, result.Count);
         }
@@ -84,8 +102,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Name3", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal(0, result[0].Id);
             Assert.Equal(1, result[1].Id);
@@ -100,8 +122,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "TestName", Prefix = "Test", Suffix = "Name", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal("TestName", result[0].Name.FullName);
             Assert.Equal("Test", result[0].Name.Prefix);
@@ -116,8 +142,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "TestName", Biosex = Biosex.Male }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal(Biosex.Male, result[0].Biosex);
         }
@@ -130,8 +160,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Intersex }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal(Biosex.Intersex, result[0].Biosex);
         }
@@ -144,8 +178,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Intersex }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.True(result[0].Gender == Gender.Female || result[0].Gender == Gender.Male);
         }
@@ -158,8 +196,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.True(result[0].IsAlive);
         }
@@ -172,8 +214,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.False(result[0].HasPair);
         }
@@ -186,8 +232,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.Equal(2, result[0].TimeFromLastChild.Year);
         }
@@ -200,8 +250,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             Assert.InRange(result[0].Age, 0, 79);
         }
@@ -214,8 +268,12 @@ namespace ProjectMarworyn.UnitTests
                 new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
             };
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var result = _personGenerator.Initialise(initialPeople,
-                0);
+                0,
+                dice);
 
             var expectedTimeLived = new DateTime(1, 1, 1).AddYears(result[0].Age);
             Assert.Equal(expectedTimeLived, result[0].TimeLived);
@@ -237,10 +295,14 @@ namespace ProjectMarworyn.UnitTests
             var generator = CreateGeneratorWithNextDouble(nextDoubleValue);
             var pair = CreateFertilePair();
 
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var (children, _) = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson });
+                new List<Person> { pair.FPerson, pair.MPerson },
+                dice);
 
             Assert.Single(children);
             Assert.Equal(expectedBiosex, children[0].Biosex);
@@ -258,10 +320,37 @@ namespace ProjectMarworyn.UnitTests
             var pair1 = CreateFertilePair();
             var pair2 = CreateFertilePair();
 
+
+            var dice = _mockDiceGenerator.Create(0,
+                new DateTime(1, 1, 1));
+
             var (lowerChildren, _) = CreateGeneratorWithNextDouble(lowerValue)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson });
+                .GenerateChildren(new List<Pair>
+                    {
+                        pair1
+                    },
+                    0,
+                    0,
+                    new List<Person>
+                    {
+                        pair1.FPerson,
+                        pair1.MPerson
+                    },
+                    dice);
+
             var (upperChildren, _) = CreateGeneratorWithNextDouble(upperValue)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson });
+                .GenerateChildren(new List<Pair>
+                    {
+                        pair2
+                    },
+                    0,
+                    0,
+                    new List<Person>
+                    {
+                        pair2.FPerson,
+                        pair2.MPerson
+                    },
+                    dice);
 
             Assert.Equal(lowerExpected, lowerChildren[0].Biosex);
             Assert.Equal(upperExpected, upperChildren[0].Biosex);
