@@ -6,7 +6,7 @@ namespace ProjectMarworyn.Core.Generators
             DateTime currentTime)
         {
             //Positional encoding avoids collisions between different dates (e.g. Day=1,Month=12 and Day=12,Month=1 previously summed to the same value)
-            var datePart = (currentTime.Year * 10000) + (currentTime.Month * 100) + currentTime.Day;
+            var datePart = (currentTime.Year * 100) + (currentTime.Month * 10) + currentTime.Day;
             var seed = worldSeed + datePart;
 
             return new Random(seed);
