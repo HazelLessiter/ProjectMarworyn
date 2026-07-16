@@ -273,7 +273,26 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
         }
 
-        private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue)
+        [Fact]
+        public void GenerateChildren_WithCustomFertilityCooldownYears_ExcludesPairBelowConfiguredThreshold()
+        {
+            // Same nextDoubleValue as the passing Female case above, but the pair's TimeFromLastChild.Year (3)
+            // is below this generator's configured threshold (5), so the pair must be excluded regardless of the dice roll
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                fertilityCooldownYears: 5);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result.Children);
+        }
+
+        private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue,
+            int fertilityCooldownYears = 3)
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(14)); // seed 14: childChance = 5
@@ -281,7 +300,7 @@ namespace ProjectMarworyn.UnitTests
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
             return new PersonGenerator(mockDiceGenerator,
                 _gameState,
-                Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
+                Options.Create(new AppSettings { FertilityCooldownYears = fertilityCooldownYears }));
         }
 
         private Pair CreateFertilePair()

@@ -219,6 +219,29 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
+        public void Age_WithCustomFertilityCooldownYears_RespectsConfiguredThreshold()
+        {
+            // Same Year=3 input as the test above, but a higher configured threshold means it has NOT reached cooldown yet and should increment
+            var ageProcessor = new AgeProcessor(new GameState(),
+                Options.Create(new AppSettings { FertilityCooldownYears = 5 }));
+            var person = new Person
+            {
+                Id = 1,
+                Name = new Name { FullName = "Test" },
+                Age = 25,
+                IsAlive = true,
+                TimeLived = new DateTime(1, 6, 15),
+                TimeFromLastChild = new DateTime(3, 1, 1),
+                WillHaveChildren = true
+            };
+            var people = new List<Person> { person };
+
+            var result = ageProcessor.Age(people);
+
+            Assert.Equal(new DateTime(3, 1, 2), result[0].TimeFromLastChild);
+        }
+
+        [Fact]
         public void Age_PersonWillHaveChildFalse_DoesNotIncrementTimeFromLastChild()
         {
             var person = new Person
