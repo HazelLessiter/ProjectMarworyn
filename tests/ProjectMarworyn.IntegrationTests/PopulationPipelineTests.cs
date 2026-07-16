@@ -193,7 +193,7 @@ public class PopulationPipelineTests
             worldSeed,
             people.Max(p => p.Id),
             updatedPeople,
-            dice);
+            new DateTime(1, 1, 1));
 
         Assert.NotNull(children);
         Assert.NotEmpty(children);

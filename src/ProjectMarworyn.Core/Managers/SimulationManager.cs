@@ -46,13 +46,10 @@ namespace ProjectMarworyn.Core.Managers
         public void Start()
         {
             _worldSeed = _seedGenerator.CreateWorldSeed(_seedGenerator.GetThreeWords());
-            var dice = _diceGenerator.Create(_worldSeed,
-                new DateTime(1, 1, 1));
             var initialPeople = _fileManager.ReadInitialPersonFile();
 
             _people = _personGenerator.Initialise(initialPeople,
-                _worldSeed,
-                dice);
+                _worldSeed);
 
             _currentGeneration = _generationManager.Initialise(_people);
             _heartbeat.Start();
@@ -114,7 +111,7 @@ namespace ProjectMarworyn.Core.Managers
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
                 _people,
-                dice);
+                date);
 
             _people = _people.Concat(children)
                 .ToList();
