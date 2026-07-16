@@ -9,17 +9,18 @@ namespace ProjectMarworyn.UnitTests
     {
         private readonly PersonGenerator _personGenerator;
         private readonly GameState _gameState;
+        private IDiceGenerator _mockDiceGenerator;
 
         public PersonGeneratorTests()
         {
             _gameState = new GameState();
-            var mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
-            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
-            _personGenerator = new PersonGenerator(mockDiceGenerator, _gameState);
+            _mockDiceGenerator = Substitute.For<IDiceGenerator>();
+            _mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
+            _personGenerator = new PersonGenerator(_mockDiceGenerator,_gameState);
         }
 
         [Fact]
@@ -240,7 +241,8 @@ namespace ProjectMarworyn.UnitTests
             var (children, _) = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson });
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
 
             Assert.Single(children);
             Assert.Equal(expectedBiosex, children[0].Biosex);
@@ -259,9 +261,9 @@ namespace ProjectMarworyn.UnitTests
             var pair2 = CreateFertilePair();
 
             var (lowerChildren, _) = CreateGeneratorWithNextDouble(lowerValue)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson });
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson }, new DateTime(1, 1, 1));
             var (upperChildren, _) = CreateGeneratorWithNextDouble(upperValue)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson });
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson }, new DateTime(1, 1, 1));
 
             Assert.Equal(lowerExpected, lowerChildren[0].Biosex);
             Assert.Equal(upperExpected, upperChildren[0].Biosex);
@@ -270,7 +272,7 @@ namespace ProjectMarworyn.UnitTests
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue)
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(14)); // seed 14: childChance = 5
+            mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(14)); // seed 14: childChance = 5
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
             return new PersonGenerator(mockDiceGenerator, _gameState);

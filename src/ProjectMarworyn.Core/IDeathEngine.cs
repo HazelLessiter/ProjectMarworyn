@@ -4,6 +4,6 @@ namespace ProjectMarworyn.Core
 {
     internal interface IDeathEngine
     {
-        Generation ProcessDeaths(List<Person> people, Generation generation, int worldSeed);
+        Generation ProcessDeaths(List<Person> people, Generation generation, int worldSeed, DateTime currentTime);
     }
 }

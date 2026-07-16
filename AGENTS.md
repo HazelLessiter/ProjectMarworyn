@@ -18,20 +18,20 @@ Use `claude-sonnet-4-6`. Do not suggest older model names such as `claude-sonnet
 
 ---
 
-## Formatting Rules That Do Not Exist
+## Parameter Formatting — Do Not Review, Ever
 
-Do not invent formatting rules that are not explicitly documented in README.md or AGENTS.md. If a rule is not written down, it does not exist. Specific hallucinations to avoid:
+Do not comment on parameter, argument, or property formatting, spacing, line breaks, or indentation — in method calls, object initializers, constructors, declarations, or anywhere else — under any circumstances, for any reason, in either direction. This means:
 
-- **Whitespace between control flow keywords and parentheses** — there is no project standard governing whether a space appears between `foreach`, `for`, `while`, `if`, `using`, etc. and their opening parenthesis. Do not flag this in any direction.
-- **Single-parameter method calls** — the multi-parameter formatting standard applies only when a call has two or more parameters. A call with one argument on a single line is correct by definition and must not be mentioned.
-- **Citing compliant code** — if code follows the project standard, do not mention it at all — not as a positive, not as context for a nearby violation, and not as an example of what the standard looks like. Only mention code that actually violates a rule.
-- **Whitespace inside parentheses** — spaces immediately before or after parentheses within an expression (e.g. `MaxBy(x => x.Id )`) are not a project standard. Do not flag them.
-- **A method call used as an argument is not an extra parameter** — `Foo(Bar())` is a single-parameter call regardless of what `Bar` returns or how many parameters `Bar` itself takes. The nesting does not create additional parameters on the outer call. Do not flag or mention it.
-- **Property access chained onto a method argument is not a parameter** — in a call like `GenerateChildren(pairs, _worldSeed, _people.MaxBy(x => x.Id).Id, _people)`, the `.Id` at the end of `_people.MaxBy(x => x.Id).Id` is a property access on the result of an expression; it is part of the third argument, not a fourth parameter. Do not count it as a separate parameter or flag it as a formatting issue.
-- **Return tuple formatting** — `return (a, b);` is a return statement, not a method call. The multi-parameter formatting standard applies to method calls only. A return tuple may be written on one line or multiple lines; neither is a violation. Do not mention it.
-- **Fluent/builder chains** — a method chain such as `new ConfigurationBuilder().SetBasePath(x).AddJsonFile(y).Build()` is a series of individual single-parameter calls chained together, not a single multi-parameter call. Never apply the multi-parameter formatting rule to fluent chains regardless of how many methods are chained.
-- **Control-flow conditions** — expressions inside `if (...)`, `while (...)`, `for (...)`, `foreach (...)`, and similar control-flow statements are not method calls. Never apply the multi-parameter formatting rule to them. A condition that spans multiple lines due to boolean operators is not a formatting violation.
-- **"Not flagging, just noting"** — phrases like "not flagging as a violation, just noting" or "this is fine as-is, but could be simplified" are prohibited. If something is not a violation, it must not appear in the review at all. There is no category of "optional observation about correct code."
+- Do not flag it as a violation.
+- Do not confirm it as compliant, correct, or "good to see."
+- Do not mention it as context while discussing something else nearby.
+- Do not suggest it as an optional improvement, style nit, or "not blocking but worth considering."
+
+This applies regardless of how many parameters/properties are involved, whether they're on one line or split across many, whether there's a space after a comma or not, and regardless of the multi-parameter convention documented in README.md. That convention exists for the human developer to follow at her own discretion — it is not a review criterion, and it must never appear in review output in any form.
+
+If there is any doubt about whether something falls under "parameter formatting" — it does. Say nothing about it and move on to substantive review categories (correctness, tests, architecture).
+
+This replaces an earlier, much longer list of specific formatting exceptions that still kept producing false positives. Do not attempt to re-derive or reconstruct narrower rules from first principles — narrower interpretation is exactly what caused the previous approach to fail. The instruction is total exclusion, not a smaller set of edge cases.
 
 ---
 

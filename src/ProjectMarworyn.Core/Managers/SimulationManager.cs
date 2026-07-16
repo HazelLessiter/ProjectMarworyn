@@ -44,8 +44,10 @@ namespace ProjectMarworyn.Core.Managers
         {
             _worldSeed = _seedGenerator.CreateWorldSeed(_seedGenerator.GetThreeWords());
             var initialPeople = _fileManager.ReadInitialPersonFile();
+
             _people = _personGenerator.Initialise(initialPeople,
                 _worldSeed);
+
             _currentGeneration = _generationManager.Initialise(_people);
             _heartbeat.Start();
             _pairs = new List<Pair>();
@@ -89,18 +91,21 @@ namespace ProjectMarworyn.Core.Managers
             //Death
             _currentGeneration = _deathEngine.ProcessDeaths(_people,
                 _currentGeneration,
-                _worldSeed);
+                _worldSeed,
+                date);
 
             //Pair
             (_pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
                 _pairs,
-                _worldSeed);
+                _worldSeed,
+                date);
 
             //Generate Children
             (var children, _people) = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
-                _people);
+                _people,
+                date);
 
             _people = _people.Concat(children)
                 .ToList();

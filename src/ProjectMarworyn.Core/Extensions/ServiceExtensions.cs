@@ -7,7 +7,7 @@ namespace ProjectMarworyn.Core.Extensions
 {
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddCoreServices(this IServiceCollection services)
+        public static void AddCoreServices(this IServiceCollection services)
         {
             services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<IAgeProcessor, AgeProcessor>();
@@ -17,13 +17,15 @@ namespace ProjectMarworyn.Core.Extensions
             services.AddTransient<IPersonGenerator, PersonGenerator>();
             services.AddTransient<IDeathEngine, DeathEngine>();
             services.AddTransient<IPairingEngine, PairingEngine>();
-            services.AddTransient<ISimulationManager, SimulationManager>();
 
+            //Singleton because SimulationManager owns the one running simulation's mutable state (_people, _pairs, _currentGeneration),
+            //the same way SimulationClock/GameState below represent app-wide state. If it were Transient and ever got resolved a
+            //second time (a debug panel, a save/load screen), that second resolution would silently start a second, empty simulation
+            //instead of sharing the one already running.
+            services.AddSingleton<ISimulationManager, SimulationManager>();
             services.AddSingleton<IHeartbeat, Heartbeat>();
             services.AddSingleton<SimulationClock>();
             services.AddSingleton<GameState>();
-
-            return services;
         }
     }
 }
