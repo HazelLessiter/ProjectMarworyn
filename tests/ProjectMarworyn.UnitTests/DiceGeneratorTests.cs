@@ -25,6 +25,26 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
+        public void Create_DatesThatWouldHaveCollidedUnderMonthTimesTenFormula_ProduceDifferentSequences()
+        {
+            // Month=1,Day=21 / Month=2,Day=11 / Month=3,Day=1 all give Month*10+Day=31, colliding under a Year*100+Month*10+Day encoding
+            var diceA = _diceGenerator.Create(0,
+                new DateTime(1, 1, 21));
+            var diceB = _diceGenerator.Create(0,
+                new DateTime(1, 2, 11));
+            var diceC = _diceGenerator.Create(0,
+                new DateTime(1, 3, 1));
+
+            var resultA = diceA.Next();
+            var resultB = diceB.Next();
+            var resultC = diceC.Next();
+
+            Assert.NotEqual(resultA, resultB);
+            Assert.NotEqual(resultB, resultC);
+            Assert.NotEqual(resultA, resultC);
+        }
+
+        [Fact]
         public void Create_DifferentDays_ProducesDifferentSequences()
         {
             var diceA = _diceGenerator.Create(0,

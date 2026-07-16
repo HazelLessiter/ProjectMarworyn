@@ -5,8 +5,8 @@ namespace ProjectMarworyn.Core.Generators
         public Random Create(int worldSeed,
             DateTime currentTime)
         {
-            //Positional encoding avoids collisions between different dates (e.g. Day=1,Month=12 and Day=12,Month=1 previously summed to the same value)
-            var datePart = (currentTime.Year * 100) + (currentTime.Month * 10) + currentTime.Day;
+            //yyyyMMdd-style positional encoding: Month*100+Day never exceeds 1231, so it can never spill into Year's digits, guaranteeing no collisions
+            var datePart = (currentTime.Year * 10000) + (currentTime.Month * 100) + currentTime.Day;
             var seed = worldSeed + datePart;
 
             return new Random(seed);

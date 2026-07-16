@@ -16,7 +16,7 @@ namespace ProjectMarworyn.UnitTests
         {
             _gameState = new GameState();
             _mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            _mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            _mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(0));
             _pairingEngine = new PairingEngine(_mockDiceGenerator,
                 _gameState);
         }
@@ -356,7 +356,7 @@ namespace ProjectMarworyn.UnitTests
         public void GeneratePairs_WritesToConsole()
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
-            mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
+            mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(0));
             var gameState = new GameState();
             var pairingEngine = new PairingEngine(mockDiceGenerator, gameState);
             var people = new List<Person>
