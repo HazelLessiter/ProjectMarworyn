@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using NSubstitute;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
@@ -20,7 +22,9 @@ namespace ProjectMarworyn.UnitTests
             _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
             _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
             _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
-            _personGenerator = new PersonGenerator(_mockDiceGenerator,_gameState);
+            _personGenerator = new PersonGenerator(_mockDiceGenerator,
+                _gameState,
+                Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
         }
 
         [Fact]
@@ -238,14 +242,14 @@ namespace ProjectMarworyn.UnitTests
             var generator = CreateGeneratorWithNextDouble(nextDoubleValue);
             var pair = CreateFertilePair();
 
-            var (children, _) = generator.GenerateChildren(new List<Pair> { pair },
+            var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
                 new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Single(children);
-            Assert.Equal(expectedBiosex, children[0].Biosex);
+            Assert.Single(result.Children);
+            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
         }
 
         // Verifies the Female→Male and Male→Intersex boundary transitions.
@@ -260,13 +264,13 @@ namespace ProjectMarworyn.UnitTests
             var pair1 = CreateFertilePair();
             var pair2 = CreateFertilePair();
 
-            var (lowerChildren, _) = CreateGeneratorWithNextDouble(lowerValue)
+            var lowerResult = CreateGeneratorWithNextDouble(lowerValue)
                 .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson }, new DateTime(1, 1, 1));
-            var (upperChildren, _) = CreateGeneratorWithNextDouble(upperValue)
+            var upperResult = CreateGeneratorWithNextDouble(upperValue)
                 .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson }, new DateTime(1, 1, 1));
 
-            Assert.Equal(lowerExpected, lowerChildren[0].Biosex);
-            Assert.Equal(upperExpected, upperChildren[0].Biosex);
+            Assert.Equal(lowerExpected, lowerResult.Children[0].Biosex);
+            Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
         }
 
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue)
@@ -275,7 +279,9 @@ namespace ProjectMarworyn.UnitTests
             mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(14)); // seed 14: childChance = 5
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
-            return new PersonGenerator(mockDiceGenerator, _gameState);
+            return new PersonGenerator(mockDiceGenerator,
+                _gameState,
+                Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
         }
 
         private Pair CreateFertilePair()

@@ -27,12 +27,12 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person>();
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -41,13 +41,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person>();
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.NotNull(resultPairs);
-            Assert.NotNull(resultPeople);
+            Assert.NotNull(result.Pairs);
+            Assert.NotNull(result.People);
         }
 
         [Fact]
@@ -74,12 +74,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -106,12 +106,12 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(resultPairs);
+            Assert.Single(result.Pairs);
         }
 
         [Fact]
@@ -138,13 +138,13 @@ namespace ProjectMarworyn.UnitTests
             var people = new List<Person> { femalePerson, malePerson };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal("Jane", resultPairs[0].FPerson.Name.FullName);
-            Assert.Equal("John", resultPairs[0].MPerson.Name.FullName);
+            Assert.Equal("Jane", result.Pairs[0].FPerson.Name.FullName);
+            Assert.Equal("John", result.Pairs[0].MPerson.Name.FullName);
         }
 
         [Fact]
@@ -171,12 +171,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -203,12 +203,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -235,12 +235,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -269,12 +269,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(resultPairs);
+            Assert.Single(result.Pairs);
         }
 
         [Fact]
@@ -301,12 +301,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(resultPairs);
+            Assert.Empty(result.Pairs);
         }
 
         [Fact]
@@ -321,12 +321,12 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(resultPairs);
+            Assert.Single(result.Pairs);
         }
 
         [Fact]
@@ -344,12 +344,12 @@ namespace ProjectMarworyn.UnitTests
                 new Person { Id = 4, Name = new Name { FullName = "John" }, Age = 28, Biosex = Biosex.Male, HasPair = false, IsAlive = true }
             };
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(2, resultPairs.Count);
+            Assert.Equal(2, result.Pairs.Count);
         }
 
         [Fact]
@@ -417,13 +417,13 @@ namespace ProjectMarworyn.UnitTests
             };
             var pairs = new List<Pair>();
 
-            var (resultPairs, resultPeople) = _pairingEngine.GeneratePairs(people,
+            var result = _pairingEngine.GeneratePairs(people,
                 pairs,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.NotNull(resultPeople);
-            Assert.Equal(people, resultPeople);
+            Assert.NotNull(result.People);
+            Assert.Equal(people, result.People);
         }
     }
 }

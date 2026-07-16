@@ -6,5 +6,6 @@ namespace ProjectMarworyn.Core.Configuration
         public string InitialPeopleFilePath { get; set; }
         public string SeedWordFilePath { get; set; }
         public TimeSpan DayDuration { get; set; }
+        public int FertilityCooldownYears { get; set; }
     }
 }

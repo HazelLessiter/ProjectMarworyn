@@ -2,6 +2,24 @@
 
 ---
 
+## [2.0.2]
+
+-`PairingEngine.GeneratePairs` and `PersonGenerator.GenerateChildren` now return dedicated `PairingResult` and `ChildGenerationResult` types instead of tuples
+-Added `FertilityCooldownYears` to `AppSettings` - previously a hardcoded `3` duplicated across `PersonGenerator` and `AgeProcessor`
+-Fixed O(n²) performance issue in `PairingEngine` where the single male pool was rebuilt from scratch on every female instead of once
+
+## [2.0.1]
+
+-Fixed seed collision bug in `DiceGenerator` where different calendar dates could produce identical random sequences
+-Rebalanced `DeathModifier` values back to realistic numbers
++Death/birth chance had been over-tuned while debugging an unrelated bug and was never brought back down afterwards
+-`DeathEngine`, `PairingEngine` and `PersonGenerator` no longer share one `Random` instance passed down from `SimulationManager` - each now seeds its own internally from the world seed and current date
+-Added `DiceGeneratorTests` - `DiceGenerator` previously had no dedicated test coverage
+-Fixed dead, unused mock setup left behind in `PairingEngineTests`
+-Removed the AI PR reviewer's parameter formatting rules entirely - it kept misapplying them and creating noise every review
+-Added Known Issues and Pathway sections to `ROADMAP.md`
+-Fixed a flaky integration test that relied on too small a sample size and could fail randomly
+
 ## [2.0.0]
 
 -Added Monogame

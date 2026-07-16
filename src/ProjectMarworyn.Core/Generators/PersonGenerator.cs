@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
 
@@ -7,12 +9,15 @@ namespace ProjectMarworyn.Core.Generators
     {
         private readonly IDiceGenerator _diceGenerator;
         private GameState _gameState;
+        private readonly AppSettings _appSettings;
 
         public PersonGenerator(IDiceGenerator diceGenerator,
-            GameState gameState)
+            GameState gameState,
+            IOptions<AppSettings> appSettings)
         {
             _diceGenerator = diceGenerator;
             _gameState = gameState;
+            _appSettings = appSettings.Value;
         }
 
         public List<Person> Initialise(List<InitialPerson> initialPeople,
@@ -76,7 +81,7 @@ namespace ProjectMarworyn.Core.Generators
             return people;
         }
 
-        public (List<Person>, List<Person>) GenerateChildren(List<Pair> pairs,
+        public ChildGenerationResult GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
             List<Person> people,
@@ -93,8 +98,8 @@ namespace ProjectMarworyn.Core.Generators
                     x.MPerson.Age >= 18 &&
                     x.FPerson.WillHaveChildren &&
                     x.MPerson.WillHaveChildren &&
-                    x.FPerson.TimeFromLastChild.Year >= 3 &&
-                    x.MPerson.TimeFromLastChild.Year >= 3)
+                    x.FPerson.TimeFromLastChild.Year >= _appSettings.FertilityCooldownYears &&
+                    x.MPerson.TimeFromLastChild.Year >= _appSettings.FertilityCooldownYears)
                 .ToList();
 
             var children = new List<Person>();
@@ -168,7 +173,11 @@ namespace ProjectMarworyn.Core.Generators
                 people.Add(person);
             }
 
-            return (children, people);
+            return new ChildGenerationResult
+            {
+                Children = children,
+                People = people
+            };
         }
 
         private Gender RandomGender(Random random)

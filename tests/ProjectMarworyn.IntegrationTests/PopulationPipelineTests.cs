@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Managers;
 using ProjectMarworyn.Core.Models;
@@ -20,10 +22,13 @@ public class PopulationPipelineTests
     {
         _gameState = new GameState();
         _diceGenerator = new DiceGenerator();
-        _ageProcessor = new AgeProcessor(_gameState);
+        _ageProcessor = new AgeProcessor(_gameState,
+            Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
         _deathEngine = new DeathEngine(_diceGenerator, _gameState);
         _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
-        _personGenerator = new PersonGenerator(_diceGenerator, _gameState);
+        _personGenerator = new PersonGenerator(_diceGenerator,
+            _gameState,
+            Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
         _generationManager = new GenerationManager();
     }
 
@@ -113,12 +118,12 @@ public class PopulationPipelineTests
             CreatePerson(4, biosex: Biosex.Male, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotEmpty(pairs);
+        Assert.NotEmpty(result.Pairs);
     }
 
     [Fact]
@@ -131,12 +136,12 @@ public class PopulationPipelineTests
             CreatePerson(2, biosex: Biosex.Female, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(pairs);
+        Assert.Empty(result.Pairs);
     }
 
     [Fact]
@@ -149,12 +154,12 @@ public class PopulationPipelineTests
             CreatePerson(2, biosex: Biosex.Male, age: 17),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(pairs);
+        Assert.Empty(result.Pairs);
     }
 
     [Fact]
@@ -169,18 +174,18 @@ public class PopulationPipelineTests
             })
             .ToList();
 
-        var (pairs, updatedPeople) = _pairingEngine.GeneratePairs(people,
+        var pairingResult = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
-        var (children, _) = _personGenerator.GenerateChildren(pairs,
+        var childResult = _personGenerator.GenerateChildren(pairingResult.Pairs,
             worldSeed,
             people.Max(p => p.Id),
-            updatedPeople,
+            pairingResult.People,
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(children);
-        Assert.NotEmpty(children);
+        Assert.NotNull(childResult.Children);
+        Assert.NotEmpty(childResult.Children);
     }
 
     [Fact]

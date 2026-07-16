@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.Core
@@ -5,10 +7,13 @@ namespace ProjectMarworyn.Core
     internal class AgeProcessor : IAgeProcessor
     {
         private GameState _gameState;
+        private readonly AppSettings _appSettings;
 
-        public AgeProcessor(GameState gameState)
+        public AgeProcessor(GameState gameState,
+            IOptions<AppSettings> appSettings)
         {
             _gameState = gameState;
+            _appSettings = appSettings.Value;
         }
 
         public List<Person> Age(List<Person> people)
@@ -65,7 +70,7 @@ namespace ProjectMarworyn.Core
         {
             var timeFromLastChild = person.TimeFromLastChild;
 
-            if (person.WillHaveChildren == true && timeFromLastChild.Year < 3)
+            if (person.WillHaveChildren == true && timeFromLastChild.Year < _appSettings.FertilityCooldownYears)
             {
                 timeFromLastChild = timeFromLastChild.AddDays(1);
             }

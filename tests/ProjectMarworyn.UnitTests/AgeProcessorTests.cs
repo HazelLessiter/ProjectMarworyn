@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.UnitTests
@@ -9,7 +11,8 @@ namespace ProjectMarworyn.UnitTests
 
         public AgeProcessorTests()
         {
-            _ageProcessor = new AgeProcessor(new GameState());
+            _ageProcessor = new AgeProcessor(new GameState(),
+                Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
         }
 
         [Fact]
