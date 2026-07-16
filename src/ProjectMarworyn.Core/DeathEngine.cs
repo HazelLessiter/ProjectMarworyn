@@ -19,8 +19,11 @@ namespace ProjectMarworyn.Core
         public Generation ProcessDeaths(List<Person> people,
             Generation generation,
             int worldSeed,
-            Random dice)
+            DateTime currentTime)
         {
+            var dice = _diceGenerator.Create(worldSeed,
+                currentTime);
+
             var deathChance = 0.0;
             var deathModifier = DeathModifier.Zero;
             var survivors = new List<Person>();

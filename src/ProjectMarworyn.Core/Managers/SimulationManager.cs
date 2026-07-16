@@ -13,7 +13,6 @@ namespace ProjectMarworyn.Core.Managers
         private readonly IAgeProcessor _ageProcessor;
         private readonly IDeathEngine _deathEngine;
         private readonly IPairingEngine _pairingEngine;
-        private readonly IDiceGenerator _diceGenerator;
         private int _worldSeed;
         private List<Person> _people;
         private Generation _currentGeneration;
@@ -28,7 +27,6 @@ namespace ProjectMarworyn.Core.Managers
             IAgeProcessor ageProcessor,
             IDeathEngine deathEngine,
             IPairingEngine pairingEngine,
-            IDiceGenerator diceGenerator,
             GameState gameState)
         {
             _fileManager = fileManager;
@@ -39,7 +37,6 @@ namespace ProjectMarworyn.Core.Managers
             _ageProcessor = ageProcessor;
             _deathEngine = deathEngine;
             _pairingEngine = pairingEngine;
-            _diceGenerator = diceGenerator;
             _gameState = gameState;
         }
 
@@ -63,9 +60,6 @@ namespace ProjectMarworyn.Core.Managers
             _gameState.Text.Clear();
             var date = _heartbeat.GetCurrentTime();
             _gameState.Text.Add($"Date: {date.Day} {date.Month} {date.Year}");
-
-            var dice = _diceGenerator.Create(_worldSeed,
-                date);
 
             //Extinction
             if (_generationManager.CheckForExtinction(_people))
@@ -98,13 +92,13 @@ namespace ProjectMarworyn.Core.Managers
             _currentGeneration = _deathEngine.ProcessDeaths(_people,
                 _currentGeneration,
                 _worldSeed,
-                dice);
+                date);
 
             //Pair
             (_pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
                 _pairs,
                 _worldSeed,
-                dice);
+                date);
 
             //Generate Children
             (var children, _people) = _personGenerator.GenerateChildren(_pairs,

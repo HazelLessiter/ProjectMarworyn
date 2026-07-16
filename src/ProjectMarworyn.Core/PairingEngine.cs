@@ -19,8 +19,11 @@ namespace ProjectMarworyn.Core
         public (List<Pair>, List<Person>) GeneratePairs(List<Person> people,
             List<Pair> pairs,
             int worldSeed,
-            Random dice)
+            DateTime currentTime)
         {
+            var dice = _diceGenerator.Create(worldSeed,
+                currentTime);
+
             //Note: I did some reading today regarding the perfomance of foreach, in some cases there can be a negative performance hit
             //I should take a closer look at O(n) vs O(1) to optimise my code
             var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
