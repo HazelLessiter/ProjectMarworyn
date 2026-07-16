@@ -89,7 +89,9 @@ public class PopulationPipelineTests
     public void DeathEngine_VeryOldPopulation_HighMortalityOverTime()
     {
         var worldSeed = 42;
-        var people = Enumerable.Range(0, 100)
+        // 1000 samples at the Hundred bracket's 2.5% daily chance keeps a zero-death outcome
+        // astronomically unlikely (~0.975^1000), so the assertion holds regardless of seed
+        var people = Enumerable.Range(0, 1000)
             .Select(i => CreatePerson(i, age: 100))
             .ToList();
         var generation = _generationManager.Initialise(people);
