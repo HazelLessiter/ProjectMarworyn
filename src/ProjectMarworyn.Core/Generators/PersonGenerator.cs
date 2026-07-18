@@ -91,7 +91,7 @@ namespace ProjectMarworyn.Core.Generators
                 currentTime);
 
             //For each pair
-            var aliveFurtilePairs = pairs.Where(x => x.FPerson.IsAlive &&
+            var aliveFertilePairs = pairs.Where(x => x.FPerson.IsAlive &&
                     x.MPerson.IsAlive &&
                     x.FPerson.Age >= 18 &&
                     x.FPerson.Age <= 45 &&
@@ -105,7 +105,7 @@ namespace ProjectMarworyn.Core.Generators
             var children = new List<Person>();
             List<Person> peopleToUpdate = new List<Person>();
 
-            foreach (var pair in aliveFurtilePairs)
+            foreach (var pair in aliveFertilePairs)
             {
                 var childChance = dice.Next(1,
                     101);

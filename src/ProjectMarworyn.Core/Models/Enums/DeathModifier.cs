@@ -6,7 +6,7 @@ namespace ProjectMarworyn.Core.Models.Enums
         Ten = 1,
         Twenty = 2,
         Thirty = 5,
-        Fourty = 10,
+        Forty = 10,
         Fifty = 15,
         Sixty = 20,
         Seventy = 25,

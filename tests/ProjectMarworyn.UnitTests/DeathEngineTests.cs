@@ -226,7 +226,7 @@ namespace ProjectMarworyn.UnitTests
         [InlineData(25,  0.00022, false)]
         [InlineData(35,  0.00045, true)]  // Thirty (30-39, modifier   5): threshold 0.0005
         [InlineData(35,  0.00055, false)]
-        [InlineData(45,  0.0009,  true)]  // Fourty (40-49, modifier  10): threshold 0.001
+        [InlineData(45,  0.0009,  true)]  // Forty (40-49, modifier  10): threshold 0.001
         [InlineData(45,  0.0011,  false)]
         [InlineData(55,  0.00135, true)]  // Fifty  (50-59, modifier  15): threshold 0.0015
         [InlineData(55,  0.00165, false)]
@@ -265,8 +265,8 @@ namespace ProjectMarworyn.UnitTests
         [InlineData(9,  10,  0.0005,   true,  false)]  // Zero(10)→Ten(1):        threshold 0.001   vs 0.0001, value between
         [InlineData(19, 20,  0.00015,  false, true)]   // Ten(1)→Twenty(2):       threshold 0.0001  vs 0.0002
         [InlineData(29, 30,  0.00035,  false, true)]   // Twenty(2)→Thirty(5):    threshold 0.0002  vs 0.0005
-        [InlineData(39, 40,  0.00075,  false, true)]   // Thirty(5)→Fourty(10):   threshold 0.0005  vs 0.001
-        [InlineData(49, 50,  0.00125,  false, true)]   // Fourty(10)→Fifty(15):   threshold 0.001   vs 0.0015
+        [InlineData(39, 40,  0.00075,  false, true)]   // Thirty(5)→Forty(10):   threshold 0.0005  vs 0.001
+        [InlineData(49, 50,  0.00125,  false, true)]   // Forty(10)→Fifty(15):   threshold 0.001   vs 0.0015
         [InlineData(59, 60,  0.00175,  false, true)]   // Fifty(15)→Sixty(20):    threshold 0.0015  vs 0.002
         [InlineData(69, 70,  0.00225,  false, true)]   // Sixty(20)→Seventy(25):  threshold 0.002   vs 0.0025
         [InlineData(79, 80,  0.00375,  false, true)]   // Seventy(25)→Eighty(50): threshold 0.0025  vs 0.005

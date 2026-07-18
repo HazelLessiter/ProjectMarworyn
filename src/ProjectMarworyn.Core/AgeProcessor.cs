@@ -22,7 +22,7 @@ namespace ProjectMarworyn.Core
 
             foreach (var person in people)
             {
-                if (!GetIfALive(person))
+                if (!GetIfAlive(person))
                 {
                     continue;
                 }
@@ -43,7 +43,7 @@ namespace ProjectMarworyn.Core
             return agedPeople;
         }
 
-        private bool GetIfALive(Person person)
+        private bool GetIfAlive(Person person)
         {
             return person.IsAlive;
         }

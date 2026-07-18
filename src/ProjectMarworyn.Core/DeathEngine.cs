@@ -39,7 +39,7 @@ namespace ProjectMarworyn.Core
                     <= 19 => DeathModifier.Ten,
                     <= 29 => DeathModifier.Twenty,
                     <= 39 => DeathModifier.Thirty,
-                    <= 49 => DeathModifier.Fourty,
+                    <= 49 => DeathModifier.Forty,
                     <= 59 => DeathModifier.Fifty,
                     <= 69 => DeathModifier.Sixty,
                     <= 79 => DeathModifier.Seventy,
