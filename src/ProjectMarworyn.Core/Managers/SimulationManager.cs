@@ -102,6 +102,13 @@ namespace ProjectMarworyn.Core.Managers
             _pairs = pairingResult.Pairs;
             _people = pairingResult.People;
 
+            //Everyone alive can die on the same day, and the extinction check only runs at the
+            //start of the next day - so the rest of this day must handle an empty population
+            if (_people.Count == 0)
+            {
+                return;
+            }
+
             //Generate Children
             var childGenerationResult = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
