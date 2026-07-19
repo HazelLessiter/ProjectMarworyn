@@ -24,6 +24,10 @@ namespace ProjectMarworyn.Core
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
+            //Deliberately not materialised: the deferred query re-evaluates HasPair as iteration
+            //advances, so anyone paired mid-loop is skipped automatically. A .ToList() snapshot
+            //would re-visit them - irrelevant while partners only come from the male pool, but a
+            //trap once pairing can touch upcoming females (e.g. same-sex pairing, issue #15 stage 4)
             var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
                 x.Age >= 18 &&
                 x.HasPair == false);
