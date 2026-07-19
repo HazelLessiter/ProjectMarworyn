@@ -18,13 +18,13 @@ namespace ProjectMarworyn.UnitTests
             _gameState = new GameState();
             _mockDiceGenerator = Substitute.For<IDiceGenerator>();
             _mockDiceGenerator.Create(Arg.Any<int>()).Returns(new Random(0));
-            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 12)).Returns(1);
-            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(1);
-            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 4)).Returns(2);
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 13)).Returns(6);  // birthMonth
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 29)).Returns(15); // birthDay
+            _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 3)).Returns(1);   // yearsFromLastChild
             _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
             _personGenerator = new PersonGenerator(_mockDiceGenerator,
                 _gameState,
-                Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
+                Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
         }
 
         [Fact]
@@ -192,7 +192,7 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
-        public void Initialise_SetsTimeFromLastChildToTwo()
+        public void Initialise_SetsDaysSinceLastChildFromDiceRolls()
         {
             var initialPeople = new List<InitialPerson>
             {
@@ -202,7 +202,8 @@ namespace ProjectMarworyn.UnitTests
             var result = _personGenerator.Initialise(initialPeople,
                 0);
 
-            Assert.Equal(2, result[0].TimeFromLastChild.Year);
+            // yearsFromLastChild (1) * 365 + day-of-year offset of 15 June (165)
+            Assert.Equal(530, result[0].DaysSinceLastChild);
         }
 
         [Fact]
@@ -220,7 +221,7 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
-        public void Initialise_SetsTimeLivedBasedOnAge()
+        public void Initialise_SetsBirthdayFromDiceRolls()
         {
             var initialPeople = new List<InitialPerson>
             {
@@ -230,8 +231,8 @@ namespace ProjectMarworyn.UnitTests
             var result = _personGenerator.Initialise(initialPeople,
                 0);
 
-            var expectedTimeLived = new DateTime(1, 1, 1).AddYears(result[0].Age);
-            Assert.Equal(expectedTimeLived, result[0].TimeLived);
+            Assert.Equal(6, result[0].BirthMonth);
+            Assert.Equal(15, result[0].BirthDay);
         }
 
         // Verifies the exact biosex probability thresholds used in RandomBiosex.
@@ -460,10 +461,27 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
+        public void GenerateChildren_SetsChildBirthdayFromCurrentTime()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(2, 6, 15));
+
+            Assert.Equal(6, result.Children[0].BirthMonth);
+            Assert.Equal(15, result.Children[0].BirthDay);
+        }
+
+        [Fact]
         public void GenerateChildren_WithCustomFertilityCooldownYears_ExcludesPairBelowConfiguredThreshold()
         {
-            // Same nextDoubleValue as the passing Female case above, but the pair's TimeFromLastChild.Year (3)
-            // is below this generator's configured threshold (5), so the pair must be excluded regardless of the dice roll
+            // Same nextDoubleValue as the passing Female case above, but the pair's DaysSinceLastChild (730)
+            // is below this generator's configured threshold (5 years = 1825 days), so the pair must be
+            // excluded regardless of the dice roll
             var generator = CreateGeneratorWithNextDouble(0.4514,
                 fertilityCooldownYears: 5);
             var pair = CreateFertilePair();
@@ -478,7 +496,7 @@ namespace ProjectMarworyn.UnitTests
         }
 
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue,
-            int fertilityCooldownYears = 3,
+            int fertilityCooldownYears = 2,
             double transgenderProbability = 0,
             double nonBinaryProbability = 0,
             int namingRoute = 0,
@@ -512,7 +530,7 @@ namespace ProjectMarworyn.UnitTests
                     Biosex = Biosex.Female,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = new DateTime(3, 1, 1)
+                    DaysSinceLastChild = 730
                 },
                 MPerson = new Person
                 {
@@ -522,7 +540,7 @@ namespace ProjectMarworyn.UnitTests
                     Biosex = Biosex.Male,
                     IsAlive = true,
                     WillHaveChildren = true,
-                    TimeFromLastChild = new DateTime(3, 1, 1)
+                    DaysSinceLastChild = 730
                 }
             };
         }

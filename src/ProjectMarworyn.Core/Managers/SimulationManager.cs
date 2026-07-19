@@ -86,7 +86,8 @@ namespace ProjectMarworyn.Core.Managers
             }
 
             //Age
-            _people = _ageProcessor.Age(_people);
+            _people = _ageProcessor.Age(_people,
+                date);
 
             //Death
             _currentGeneration = _deathEngine.ProcessDeaths(_people,

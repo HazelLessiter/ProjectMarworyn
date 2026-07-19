@@ -23,12 +23,12 @@ public class PopulationPipelineTests
         _gameState = new GameState();
         _diceGenerator = new DiceGenerator();
         _ageProcessor = new AgeProcessor(_gameState,
-            Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
+            Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
         _deathEngine = new DeathEngine(_diceGenerator, _gameState);
         _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
         _personGenerator = new PersonGenerator(_diceGenerator,
             _gameState,
-            Options.Create(new AppSettings { FertilityCooldownYears = 3 }));
+            Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
         _generationManager = new GenerationManager();
     }
 
@@ -41,28 +41,31 @@ public class PopulationPipelineTests
             CreatePerson(2, isAlive: false)
         };
 
-        var result = _ageProcessor.Age(people);
+        var result = _ageProcessor.Age(people,
+            new DateTime(1, 1, 1));
 
         Assert.Single(result);
         Assert.Equal(1, result[0].Id);
     }
 
     [Fact]
-    public void AgeProcessor_PersonAtYearBoundary_AgeIsIncremented()
+    public void AgeProcessor_OnBirthday_AgeIsIncremented()
     {
-        var person = CreatePerson(1, age: 20, timeLived: new DateTime(1, 12, 31));
+        var person = CreatePerson(1, age: 20);
 
-        var result = _ageProcessor.Age(new List<Person> { person });
+        var result = _ageProcessor.Age(new List<Person> { person },
+            new DateTime(1, 6, 15));
 
         Assert.Equal(21, result[0].Age);
     }
 
     [Fact]
-    public void AgeProcessor_PersonNotAtYearBoundary_AgeIsUnchanged()
+    public void AgeProcessor_NotOnBirthday_AgeIsUnchanged()
     {
-        var person = CreatePerson(1, age: 20, timeLived: new DateTime(1, 6, 15));
+        var person = CreatePerson(1, age: 20);
 
-        var result = _ageProcessor.Age(new List<Person> { person });
+        var result = _ageProcessor.Age(new List<Person> { person },
+            new DateTime(1, 6, 14));
 
         Assert.Equal(20, result[0].Age);
     }
@@ -76,7 +79,8 @@ public class PopulationPipelineTests
             .ToList();
         var generation = _generationManager.Initialise(people);
 
-        var aged = _ageProcessor.Age(people);
+        var aged = _ageProcessor.Age(people,
+            new DateTime(1, 1, 1));
 
         var result = _deathEngine.ProcessDeaths(aged,
             generation,
@@ -215,7 +219,7 @@ public class PopulationPipelineTests
     }
 
     private static Person CreatePerson(int id, bool isAlive = true, int age = 30,
-        Biosex biosex = Biosex.Female, DateTime? timeLived = null) =>
+        Biosex biosex = Biosex.Female, int birthMonth = 6, int birthDay = 15) =>
         new()
         {
             Id = id,
@@ -224,8 +228,9 @@ public class PopulationPipelineTests
             Biosex = biosex,
             Gender = biosex == Biosex.Male ? Gender.Male : Gender.Female,
             Name = new Name { FullName = $"Person{id}", Prefix = "Person", Suffix = $"{id}" },
-            TimeLived = timeLived ?? new DateTime(1, 1, 1),
-            TimeFromLastChild = new DateTime(1, 1, 1),
+            BirthMonth = birthMonth,
+            BirthDay = birthDay,
+            DaysSinceLastChild = 0,
             WillHaveChildren = true,
             HasPair = false
         };
@@ -239,8 +244,9 @@ public class PopulationPipelineTests
             Biosex = biosex,
             Gender = biosex == Biosex.Male ? Gender.Male : Gender.Female,
             Name = new Name { FullName = $"Person{id}", Prefix = "Person", Suffix = $"{id}" },
-            TimeLived = new DateTime(1, 1, 1),
-            TimeFromLastChild = new DateTime(3, 1, 1),
+            BirthMonth = 6,
+            BirthDay = 15,
+            DaysSinceLastChild = 730,
             WillHaveChildren = true,
             HasPair = false
         };

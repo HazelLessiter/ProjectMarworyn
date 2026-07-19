@@ -47,7 +47,7 @@ namespace ProjectMarworyn.UnitTests
                 .Returns(new ChildGenerationResult { Children = new List<Person>(), People = _people });
 
             var mockAgeProcessor = Substitute.For<IAgeProcessor>();
-            mockAgeProcessor.Age(Arg.Any<List<Person>>()).Returns(_people);
+            mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(_people);
 
             _mockDeathEngine = Substitute.For<IDeathEngine>();
 
@@ -132,8 +132,9 @@ namespace ProjectMarworyn.UnitTests
                 IsAlive = true,
                 Age = 30,
                 Name = new Name { FullName = $"Person{id}", Prefix = "Person", Suffix = $"{id}" },
-                TimeLived = new DateTime(1, 1, 1),
-                TimeFromLastChild = new DateTime(1, 1, 1),
+                BirthMonth = 6,
+                BirthDay = 15,
+                DaysSinceLastChild = 0,
                 WillHaveChildren = true,
                 HasPair = false
             };

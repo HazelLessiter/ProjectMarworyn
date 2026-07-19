@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+-`Person.TimeLived` is replaced by an explicit birthday (`BirthMonth`/`BirthDay`) and `Person.TimeFromLastChild` by a plain day counter (`DaysSinceLastChild`) - no more 1-based `DateTime` fields misused as durations
++People age up when the simulation calendar hits their birthday, so leap years are modelled; those born on the 29th of February age up on the 1st of March in non-leap years
++`FertilityCooldownYears` now means true elapsed years: default changed from 3 to 2, preserving the same 730-day cooldown the old 1-based `DateTime.Year` comparison produced (cooldown years are a fixed 365 days via `SimulationConstants.DaysPerYear`)
++Fixed initial people never being born in December - the old month roll's upper bound was exclusive
+
 -Fixed `GenerateChildren` conflating biosex and gender - a child's gender was a direct cast of their biosex
 -Added `TransgenderProbability` to `AppSettings` (in %, default 0.2 = trans man 0.10% + trans woman 0.10% per ONS census 2021) - a child's gender now aligns with their biosex in the majority of cases, with a small seeded chance of deviating
 -Added `Gender` to `InitialPerson` and `InitialPeople.json` - initial people's gender is now explicit data instead of being derived from biosex, at the same ~0.5% trans representation (Tammy)

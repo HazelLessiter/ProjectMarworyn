@@ -32,16 +32,21 @@ namespace ProjectMarworyn.Core.Generators
                 var age = dice.Next(18,
                     40);
 
-                var year = 1;
-                var month = _diceGenerator.Next(dice,
+                var birthMonth = _diceGenerator.Next(dice,
                     1,
-                    12);
-                var day = _diceGenerator.Next(dice,
+                    13);
+                //Capped at 28 so the birthday is valid in every month
+                var birthDay = _diceGenerator.Next(dice,
                     1,
                     29);
-                var yearFromLastChild = _diceGenerator.Next(dice,
-                    1,
-                    4);
+                var yearsFromLastChild = _diceGenerator.Next(dice,
+                    0,
+                    3);
+                //Day-of-year offset staggers cooldowns so they don't all expire on the same day
+                var dayOffset = new DateTime(1,
+                        birthMonth,
+                        birthDay)
+                    .DayOfYear - 1;
 
                 var person = new Person()
                 {
@@ -56,14 +61,10 @@ namespace ProjectMarworyn.Core.Generators
                     Gender = initialPerson.Gender,
                     Age = age,
                     IsAlive = true,
-                    TimeLived = new DateTime(year,
-                            month,
-                            day)
-                        .AddYears(age),
+                    BirthMonth = birthMonth,
+                    BirthDay = birthDay,
                     WillHaveChildren = CalcWillHaveChildren(dice),
-                    TimeFromLastChild = new DateTime(yearFromLastChild,
-                        month,
-                        day),
+                    DaysSinceLastChild = yearsFromLastChild * SimulationConstants.DaysPerYear + dayOffset,
                     HasPair = false
                 };
 
@@ -92,8 +93,8 @@ namespace ProjectMarworyn.Core.Generators
                     x.MPerson.Age >= 18 &&
                     x.FPerson.WillHaveChildren &&
                     x.MPerson.WillHaveChildren &&
-                    x.FPerson.TimeFromLastChild.Year >= _appSettings.FertilityCooldownYears &&
-                    x.MPerson.TimeFromLastChild.Year >= _appSettings.FertilityCooldownYears)
+                    x.FPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear &&
+                    x.MPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
                 .ToList();
 
             var children = new List<Person>();
@@ -124,8 +125,9 @@ namespace ProjectMarworyn.Core.Generators
                         Gender = gender,
                         Name = name,
                         HasPair = false,
-                        TimeFromLastChild = new DateTime(1, 1, 1),
-                        TimeLived = new DateTime(1, 1, 1),
+                        DaysSinceLastChild = 0,
+                        BirthMonth = currentTime.Month,
+                        BirthDay = currentTime.Day,
                         WillHaveChildren = CalcWillHaveChildren(dice)
                     };
 
@@ -142,7 +144,7 @@ namespace ProjectMarworyn.Core.Generators
 
             foreach (var person in peopleToUpdate)
             {
-                person.TimeFromLastChild = new DateTime(1, 1, 1);
+                person.DaysSinceLastChild = 0;
                 people.Add(person);
             }
 

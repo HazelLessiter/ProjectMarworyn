@@ -16,7 +16,8 @@ namespace ProjectMarworyn.Core
             _appSettings = appSettings.Value;
         }
 
-        public List<Person> Age(List<Person> people)
+        public List<Person> Age(List<Person> people,
+            DateTime currentTime)
         {
             var agedPeople = new List<Person>();
 
@@ -27,15 +28,12 @@ namespace ProjectMarworyn.Core
                     continue;
                 }
 
-                var timeLived = GetTimeLived(person);
-
                 var age = GetAge(person,
-                    timeLived);
-                var timeFromLastChild = GetTimeFromLastChild(person);
+                    currentTime);
+                var daysSinceLastChild = GetDaysSinceLastChild(person);
 
                 person.Age = age;
-                person.TimeFromLastChild = timeFromLastChild;
-                person.TimeLived = timeLived;
+                person.DaysSinceLastChild = daysSinceLastChild;
 
                 agedPeople.Add(person);
             }
@@ -48,16 +46,12 @@ namespace ProjectMarworyn.Core
             return person.IsAlive;
         }
 
-        private DateTime GetTimeLived(Person person)
-        {
-            return person.TimeLived.AddDays(1);
-        }
-
-        private int GetAge(Person person, DateTime timeLived)
+        private int GetAge(Person person, DateTime currentTime)
         {
             var age = person.Age;
 
-            if (timeLived.Year > person.TimeLived.Year)
+            if (IsBirthday(person,
+                currentTime))
             {
                 age += 1;
                 _gameState.Text.Add($"{person.Name.FullName} is now {age} years old.");
@@ -66,16 +60,32 @@ namespace ProjectMarworyn.Core
             return age;
         }
 
-        private DateTime GetTimeFromLastChild(Person person)
+        private bool IsBirthday(Person person, DateTime currentTime)
         {
-            var timeFromLastChild = person.TimeFromLastChild;
-
-            if (person.WillHaveChildren == true && timeFromLastChild.Year < _appSettings.FertilityCooldownYears)
+            if (currentTime.Month == person.BirthMonth &&
+                currentTime.Day == person.BirthDay)
             {
-                timeFromLastChild = timeFromLastChild.AddDays(1);
+                return true;
             }
 
-            return timeFromLastChild;
+            //People born on the 29th of February age up on the 1st of March in non-leap years
+            return person.BirthMonth == 2 &&
+                person.BirthDay == 29 &&
+                !DateTime.IsLeapYear(currentTime.Year) &&
+                currentTime.Month == 3 &&
+                currentTime.Day == 1;
+        }
+
+        private int GetDaysSinceLastChild(Person person)
+        {
+            var daysSinceLastChild = person.DaysSinceLastChild;
+
+            if (person.WillHaveChildren == true && daysSinceLastChild < _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
+            {
+                daysSinceLastChild += 1;
+            }
+
+            return daysSinceLastChild;
         }
     }
 }
