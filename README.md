@@ -155,6 +155,7 @@ ProjectMarworyn/
 │   └── ProjectMarworyn.Core/         # Class library — all simulation logic
 │       ├── Configuration/
 │       │   ├── AppSettings.cs        # Strongly-typed settings
+│       │   ├── DeathBracket.cs       # Age bracket + daily death chance (config shape)
 │       │   ├── SimulationConstants.cs # Fixed simulation constants (days per year)
 │       │   ├── InitialPeople.json    # Initial population data (deserialises to InitialPerson)
 │       │   └── SeedWord.json         # Word pool for world seed generation
@@ -176,7 +177,6 @@ ProjectMarworyn/
 │       │   ├── Enums/
 │       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
 │       │   │   ├── BiosexModifier.cs
-│       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
 │       │   │   └── Gender.cs         # Female / Male / NonBinary enum
 │       │   ├── ChildGenerationResult.cs # Children + updated people from GenerateChildren
 │       │   ├── GameState.cs          # Shared state — text lines rendered each frame
@@ -238,10 +238,17 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
     "DayDuration": "0.00:00:0.50",
     "FertilityCooldownYears": 2,
     "TransgenderProbability": 0.2,
-    "NonBinaryProbability": 0.06
+    "NonBinaryProbability": 0.06,
+    "DeathBrackets": [
+      { "MaxAge": 9, "DailyDeathChance": 0.1 },
+      { "MaxAge": 99, "DailyDeathChance": 1.0 },
+      { "DailyDeathChance": 2.5 }
+    ]
   }
 }
 ```
+
+The `DeathBrackets` sample above is abridged — the real file has one bracket per decade of life.
 
 | Setting | Description |
 |---|---|
@@ -252,6 +259,7 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
 | `FertilityCooldownYears` | Elapsed years before a parent can have another child (cooldown years are a fixed 365 days) |
 | `TransgenderProbability` | Chance in % that a child's gender is the binary opposite of their biosex-aligned gender (default 0.2, ONS census 2021: trans men 0.10% + trans women 0.10%) |
 | `NonBinaryProbability` | Chance in % that a child is non-binary, rolled independently of `TransgenderProbability` and taking precedence (default 0.06, ONS census 2021) |
+| `DeathBrackets` | Ordered age brackets with a daily death chance in % — the first bracket whose `MaxAge` fits wins; omit `MaxAge` on the final bracket to make it the catch-all |
 
 ### Initial population file format (`InitialPeople.json`)
 

@@ -24,7 +24,9 @@ public class PopulationPipelineTests
         _diceGenerator = new DiceGenerator();
         _ageProcessor = new AgeProcessor(_gameState,
             Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
-        _deathEngine = new DeathEngine(_diceGenerator, _gameState);
+        _deathEngine = new DeathEngine(_diceGenerator,
+            _gameState,
+            Options.Create(new AppSettings { DeathBrackets = CreateDefaultDeathBrackets() }));
         _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
         _personGenerator = new PersonGenerator(_diceGenerator,
             _gameState,
@@ -217,6 +219,22 @@ public class PopulationPipelineTests
 
         Assert.False(_generationManager.CheckForExtinction(people));
     }
+
+    private static List<DeathBracket> CreateDefaultDeathBrackets() =>
+        new()
+        {
+            new DeathBracket { MaxAge = 9, DailyDeathChance = 0.1 },
+            new DeathBracket { MaxAge = 19, DailyDeathChance = 0.01 },
+            new DeathBracket { MaxAge = 29, DailyDeathChance = 0.02 },
+            new DeathBracket { MaxAge = 39, DailyDeathChance = 0.05 },
+            new DeathBracket { MaxAge = 49, DailyDeathChance = 0.1 },
+            new DeathBracket { MaxAge = 59, DailyDeathChance = 0.15 },
+            new DeathBracket { MaxAge = 69, DailyDeathChance = 0.2 },
+            new DeathBracket { MaxAge = 79, DailyDeathChance = 0.25 },
+            new DeathBracket { MaxAge = 89, DailyDeathChance = 0.5 },
+            new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 },
+            new DeathBracket { DailyDeathChance = 2.5 }
+        };
 
     private static Person CreatePerson(int id, bool isAlive = true, int age = 30,
         Biosex biosex = Biosex.Female, int birthMonth = 6, int birthDay = 15) =>

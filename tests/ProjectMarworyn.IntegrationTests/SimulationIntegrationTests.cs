@@ -20,6 +20,11 @@ public class SimulationIntegrationTests : IDisposable
         {
             options.InitialPeopleFilePath = ConfigFileHelper.GetPath("Configuration/InitialPeople.json");
             options.SeedWordFilePath = ConfigFileHelper.GetPath("Configuration/SeedWord.json");
+            //A single catch-all bracket keeps the population alive for the clock/logging assertions
+            options.DeathBrackets = new List<DeathBracket>
+            {
+                new DeathBracket { DailyDeathChance = 0.05 }
+            };
         });
         services.AddCoreServices();
 
