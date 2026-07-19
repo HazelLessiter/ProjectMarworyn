@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Models;
 
 namespace ProjectMarworyn.UnitTests
@@ -9,15 +11,37 @@ namespace ProjectMarworyn.UnitTests
 
         public AgeProcessorTests()
         {
-            _ageProcessor = new AgeProcessor(new GameState());
+            _ageProcessor = new AgeProcessor(new GameState(),
+                Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
         }
+
+        private static Person CreatePerson(int age = 25,
+            bool isAlive = true,
+            int birthMonth = 3,
+            int birthDay = 10,
+            int daysSinceLastChild = 0,
+            bool willHaveChildren = false,
+            int id = 1,
+            Name name = null) =>
+            new()
+            {
+                Id = id,
+                Name = name ?? new Name { FullName = "Test" },
+                Age = age,
+                IsAlive = isAlive,
+                BirthMonth = birthMonth,
+                BirthDay = birthDay,
+                DaysSinceLastChild = daysSinceLastChild,
+                WillHaveChildren = willHaveChildren
+            };
 
         [Fact]
         public void Age_WithEmptyList_ReturnsEmptyList()
         {
             var people = new List<Person>();
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Empty(result);
         }
@@ -27,88 +51,66 @@ namespace ProjectMarworyn.UnitTests
         {
             var people = new List<Person>();
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.NotNull(result);
         }
 
         [Fact]
-        public void Age_WithAlivePerson_IncrementsTimeLivedByOneDay()
+        public void Age_OnPersonsBirthday_IncrementsAge()
         {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 1, 1).AddYears(25),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var originalTimeLived = person.TimeLived;
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(age: 25, birthMonth: 3, birthDay: 10) };
 
-            var result = _ageProcessor.Age(people);
-
-            Assert.Equal(originalTimeLived.AddDays(1), result[0].TimeLived);
-        }
-
-        [Fact]
-        public void Age_WithPersonAtYearBoundary_IncrementsAge()
-        {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 12, 31),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
-
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 3, 10));
 
             Assert.Equal(26, result[0].Age);
         }
 
-        [Fact]
-        public void Age_WithPersonNotAtYearBoundary_DoesNotIncrementAge()
+        [Theory]
+        [InlineData(5, 6, 15)]  // different month and day
+        [InlineData(5, 3, 11)]  // right month, wrong day
+        [InlineData(5, 4, 10)]  // right day, wrong month
+        public void Age_NotOnPersonsBirthday_DoesNotIncrementAge(int year,
+            int month,
+            int day)
         {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(age: 25, birthMonth: 3, birthDay: 10) };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(year, month, day));
 
             Assert.Equal(25, result[0].Age);
+        }
+
+        // People born on the 29th of February age up on the 29th in leap years
+        // and on the 1st of March in non-leap years - never twice, never zero times.
+        [Theory]
+        [InlineData(4, 2, 29, 26)]  // leap year, actual birthday
+        [InlineData(4, 3, 1, 25)]   // leap year, 1st of March is not their day
+        [InlineData(5, 3, 1, 26)]   // non-leap year, ages up on the 1st of March
+        [InlineData(5, 2, 28, 25)]  // non-leap year, 28th of February is not their day
+        public void Age_PersonBornOnLeapDay_AgesUpExactlyOncePerYear(int year,
+            int month,
+            int day,
+            int expectedAge)
+        {
+            var people = new List<Person> { CreatePerson(age: 25, birthMonth: 2, birthDay: 29) };
+
+            var result = _ageProcessor.Age(people,
+                new DateTime(year, month, day));
+
+            Assert.Equal(expectedAge, result[0].Age);
         }
 
         [Fact]
         public void Age_WithDeadPerson_DoesNotIncludeInResult()
         {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = false,
-                TimeLived = new DateTime(1, 1, 1).AddYears(25),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(isAlive: false) };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Empty(result);
         }
@@ -118,139 +120,87 @@ namespace ProjectMarworyn.UnitTests
         {
             var people = new List<Person>
             {
-                new Person
-                {
-                    Id = 1,
-                    Name = new Name
-                    {
-                        FullName = "Alive"
-                    },
-                    Age = 25, IsAlive = true, TimeLived = new DateTime(1, 6, 15),
-                    TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                },
-                new Person
-                {
-                    Id = 2,
-                    Name = new Name
-                    {
-                        FullName = "Dead"
-                    },
-                    Age = 30, IsAlive = false, TimeLived = new DateTime(1, 6, 15),
-                    TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                },
-                new Person
-                {
-                    Id = 3,
-                    Name = new Name
-                    {
-                        FullName = "Alive2"
-                    },
-                    Age = 28, IsAlive = true, TimeLived = new DateTime(1, 6, 15),
-                    TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                }
+                CreatePerson(id: 1, isAlive: true),
+                CreatePerson(id: 2, isAlive: false),
+                CreatePerson(id: 3, isAlive: true)
             };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Equal(2, result.Count);
         }
 
-        [Fact]
-        public void Age_WithPersonWantingChildrenAndTimeFromLastChildLessThan2_IncrementsTimeFromLastChild()
+        // Cooldown threshold with FertilityCooldownYears = 2 is 730 days.
+        [Theory]
+        [InlineData(0)]
+        [InlineData(729)]
+        public void Age_WithPersonWantingChildrenBelowCooldown_IncrementsDaysSinceLastChild(int daysSinceLastChild)
         {
-            var person = new Person
+            var people = new List<Person>
             {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = true
+                CreatePerson(daysSinceLastChild: daysSinceLastChild, willHaveChildren: true)
             };
-            var people = new List<Person> { person };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
-            Assert.Equal(new DateTime(1, 1, 2), result[0].TimeFromLastChild);
+            Assert.Equal(daysSinceLastChild + 1, result[0].DaysSinceLastChild);
         }
 
         [Fact]
-        public void Age_WithPersonWantingChildrenAndTimeFromLastChildEquals1_IncrementsTimeFromLastChild()
+        public void Age_WithPersonWantingChildrenAtCooldown_DoesNotIncrementDaysSinceLastChild()
         {
-            var person = new Person
+            var people = new List<Person>
             {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = true
+                CreatePerson(daysSinceLastChild: 2 * 365, willHaveChildren: true)
             };
-            var people = new List<Person> { person };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
-            Assert.Equal(new DateTime(1, 1, 2), result[0].TimeFromLastChild);
+            Assert.Equal(2 * 365, result[0].DaysSinceLastChild);
         }
 
         [Fact]
-        public void Age_WithPersonWantingChildrenAndTimeFromLastChildEquals2_DoesNotIncrementTimeFromLastChild()
+        public void Age_WithCustomFertilityCooldownYears_RespectsConfiguredThreshold()
         {
-            var person = new Person
+            // Same 730-day input as the test above, but a higher configured threshold (5 years = 1825 days)
+            // means it has NOT reached cooldown yet and should increment
+            var ageProcessor = new AgeProcessor(new GameState(),
+                Options.Create(new AppSettings { FertilityCooldownYears = 5 }));
+            var people = new List<Person>
             {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(3, 1, 1),
-                WillHaveChildren = true
+                CreatePerson(daysSinceLastChild: 2 * 365, willHaveChildren: true)
             };
-            var people = new List<Person> { person };
 
-            var result = _ageProcessor.Age(people);
+            var result = ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
-            Assert.Equal(new DateTime(3, 1, 1), result[0].TimeFromLastChild);
+            Assert.Equal(2 * 365 + 1, result[0].DaysSinceLastChild);
         }
 
         [Fact]
-        public void Age_PersonWillHaveChildFalse_DoesNotIncrementTimeFromLastChild()
+        public void Age_PersonWillHaveChildFalse_DoesNotIncrementDaysSinceLastChild()
         {
-            var person = new Person
+            var people = new List<Person>
             {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
+                CreatePerson(daysSinceLastChild: 0, willHaveChildren: false)
             };
-            var people = new List<Person> { person };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
-            Assert.Equal(new DateTime(1, 1, 1), result[0].TimeFromLastChild);
+            Assert.Equal(0, result[0].DaysSinceLastChild);
         }
 
         [Fact]
         public void Age_PreservesPersonId()
         {
-            var person = new Person
-            {
-                Id = 42,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(id: 42) };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Equal(42, result[0].Id);
         }
@@ -259,19 +209,10 @@ namespace ProjectMarworyn.UnitTests
         public void Age_PreservesPersonName()
         {
             var name = new Name { FullName = "TestName" };
-            var person = new Person
-            {
-                Id = 1,
-                Name = name,
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(name: name) };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Equal(name, result[0].Name);
         }
@@ -279,19 +220,10 @@ namespace ProjectMarworyn.UnitTests
         [Fact]
         public void Age_PreservesIsAliveStatus()
         {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson() };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.True(result[0].IsAlive);
         }
@@ -299,19 +231,10 @@ namespace ProjectMarworyn.UnitTests
         [Fact]
         public void Age_PreservesWillHaveChildren()
         {
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = new DateTime(1, 6, 15),
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = true
-            };
-            var people = new List<Person> { person };
+            var people = new List<Person> { CreatePerson(willHaveChildren: true) };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.True(result[0].WillHaveChildren);
         }
@@ -321,52 +244,18 @@ namespace ProjectMarworyn.UnitTests
         {
             var people = new List<Person>
             {
-                new Person
-                {
-                    Id = 1, Name = new Name { FullName = "P1" }, Age = 20, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                },
-                new Person
-                {
-                    Id = 2, Name = new Name { FullName = "P2" }, Age = 30, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                },
-                new Person
-                {
-                    Id = 3, Name = new Name { FullName = "P3" }, Age = 40, IsAlive = true, TimeLived = new DateTime(1, 6, 15), TimeFromLastChild = new DateTime(1, 1, 1), WillHaveChildren = false
-                }
+                CreatePerson(id: 1, age: 20, birthMonth: 6, birthDay: 15),
+                CreatePerson(id: 2, age: 30, birthMonth: 6, birthDay: 15),
+                CreatePerson(id: 3, age: 40, birthMonth: 6, birthDay: 15)
             };
 
-            var result = _ageProcessor.Age(people);
+            var result = _ageProcessor.Age(people,
+                new DateTime(5, 6, 15));
 
             Assert.Equal(3, result.Count);
-            Assert.All(result, p => Assert.Equal(new DateTime(1, 6, 16), p.TimeLived));
-        }
-
-        [Theory]
-        [InlineData(1, 1, 1)]
-        [InlineData(1, 6, 15)]
-        [InlineData(1, 12, 30)]
-        public void Age_WithDifferentDates_AddsOneDay(int year,
-            int month,
-            int day)
-        {
-            var timeLived = new DateTime(year,
-                month,
-                day);
-            var person = new Person
-            {
-                Id = 1,
-                Name = new Name { FullName = "Test" },
-                Age = 25,
-                IsAlive = true,
-                TimeLived = timeLived,
-                TimeFromLastChild = new DateTime(1, 1, 1),
-                WillHaveChildren = false
-            };
-            var people = new List<Person> { person };
-
-            var result = _ageProcessor.Age(people);
-
-            Assert.Equal(timeLived.AddDays(1), result[0].TimeLived);
+            Assert.Equal(21, result[0].Age);
+            Assert.Equal(31, result[1].Age);
+            Assert.Equal(41, result[2].Age);
         }
     }
 }

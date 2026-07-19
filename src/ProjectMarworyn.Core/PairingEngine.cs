@@ -16,7 +16,7 @@ namespace ProjectMarworyn.Core
             _gameState = gameState;
         }
 
-        public (List<Pair>, List<Person>) GeneratePairs(List<Person> people,
+        public PairingResult GeneratePairs(List<Person> people,
             List<Pair> pairs,
             int worldSeed,
             DateTime currentTime)
@@ -24,19 +24,24 @@ namespace ProjectMarworyn.Core
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
-            //Note: I did some reading today regarding the perfomance of foreach, in some cases there can be a negative performance hit
-            //I should take a closer look at O(n) vs O(1) to optimise my code
+            //Deliberately not materialised: the deferred query re-evaluates HasPair as iteration
+            //advances, so anyone paired mid-loop is skipped automatically. A .ToList() snapshot
+            //would re-visit them - irrelevant while partners only come from the male pool, but a
+            //trap once pairing can touch upcoming females (e.g. same-sex pairing, issue #15 stage 4)
             var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
                 x.Age >= 18 &&
                 x.HasPair == false);
 
+            //Filtered once up-front and reduced via RemoveAt below, rather than re-filtering `people` on every female -
+            //RemoveAt keeps the same relative order a fresh filter would produce, so pairing outcomes for a given world seed are unchanged
+            var singleMaleAdults = people.Where(x => x.Biosex == Biosex.Male &&
+                    x.Age >= 18 &&
+                    x.HasPair == false)
+                .ToList();
+
             foreach (var fPerson in singleFemaleAdults)
             {
-                var singleMaleAdults = people.Where(x => x.Biosex == Biosex.Male &&
-                        x.Age >= 18 &&
-                        x.HasPair == false)
-                    .ToList();
-                var mCount = singleMaleAdults.Count();
+                var mCount = singleMaleAdults.Count;
 
                 if (mCount <= 0)
                 {
@@ -48,6 +53,7 @@ namespace ProjectMarworyn.Core
                     mCount);
 
                 var mPerson = singleMaleAdults[position];
+                singleMaleAdults.RemoveAt(position);
 
                 var pair = new Pair()
                 {
@@ -66,8 +72,11 @@ namespace ProjectMarworyn.Core
                     x.MPerson.IsAlive)
                 .ToList();
 
-            return (alivePairs,
-                people);
+            return new PairingResult
+            {
+                Pairs = alivePairs,
+                People = people
+            };
         }
     }
 }

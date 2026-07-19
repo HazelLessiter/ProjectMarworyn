@@ -86,7 +86,8 @@ namespace ProjectMarworyn.Core.Managers
             }
 
             //Age
-            _people = _ageProcessor.Age(_people);
+            _people = _ageProcessor.Age(_people,
+                date);
 
             //Death
             _currentGeneration = _deathEngine.ProcessDeaths(_people,
@@ -95,19 +96,28 @@ namespace ProjectMarworyn.Core.Managers
                 date);
 
             //Pair
-            (_pairs, _people) = _pairingEngine.GeneratePairs(_currentGeneration.People,
+            var pairingResult = _pairingEngine.GeneratePairs(_currentGeneration.People,
                 _pairs,
                 _worldSeed,
                 date);
+            _pairs = pairingResult.Pairs;
+            _people = pairingResult.People;
+
+            //Everyone alive can die on the same day, and the extinction check only runs at the
+            //start of the next day - so the rest of this day must handle an empty population
+            if (_people.Count == 0)
+            {
+                return;
+            }
 
             //Generate Children
-            (var children, _people) = _personGenerator.GenerateChildren(_pairs,
+            var childGenerationResult = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
                 _people,
                 date);
 
-            _people = _people.Concat(children)
+            _people = childGenerationResult.People.Concat(childGenerationResult.Children)
                 .ToList();
         }
     }
