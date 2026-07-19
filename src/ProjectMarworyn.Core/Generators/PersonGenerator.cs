@@ -53,13 +53,7 @@ namespace ProjectMarworyn.Core.Generators
                         Suffix = initialPerson.Suffix
                     },
                     Biosex = initialPerson.Biosex,
-                    Gender = initialPerson.Biosex
-                        switch
-                        {
-                            Biosex.Female => Gender.Female,
-                            Biosex.Male => Gender.Male,
-                            _ => (Gender)RandomGender(dice)
-                        },
+                    Gender = initialPerson.Gender,
                     Age = age,
                     IsAlive = true,
                     TimeLived = new DateTime(year,
@@ -113,12 +107,8 @@ namespace ProjectMarworyn.Core.Generators
                 if (childChance < 40)
                 {
                     var biosex = RandomBiosex(dice);
-                    var gender = Gender.Female;
-
-                    if (biosex == Biosex.Intersex)
-                        gender = RandomGender(dice);
-                    else
-                        gender = (Gender)biosex;
+                    var gender = CalculateGender(dice,
+                        biosex);
 
                     var name = new Name();
 
@@ -197,6 +187,30 @@ namespace ProjectMarworyn.Core.Generators
             }
 
             return gender;
+        }
+
+        private Gender CalculateGender(Random dice,
+            Biosex biosex)
+        {
+            if (biosex == Biosex.Intersex)
+            {
+                return RandomGender(dice);
+            }
+
+            var alignedGender = biosex == Biosex.Female ?
+                Gender.Female :
+                Gender.Male;
+
+            var diceRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            if (diceRoll < _appSettings.TransgenderProbability)
+            {
+                return alignedGender == Gender.Female ?
+                    Gender.Male :
+                    Gender.Female;
+            }
+
+            return alignedGender;
         }
 
         private Biosex RandomBiosex(Random dice)

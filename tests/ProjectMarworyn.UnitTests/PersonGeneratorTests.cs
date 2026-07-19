@@ -141,18 +141,25 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal(Biosex.Intersex, result[0].Biosex);
         }
 
-        [Fact]
-        public void Initialise_WithIntersexPerson_GenderIsEitherFemaleOrMale()
+        // Gender comes straight from the data file, so misaligned (trans) and intersex
+        // combinations must pass through unchanged.
+        [Theory]
+        [InlineData(Biosex.Female, Gender.Female)]
+        [InlineData(Biosex.Male, Gender.Male)]
+        [InlineData(Biosex.Male, Gender.Female)]
+        [InlineData(Biosex.Intersex, Gender.Male)]
+        public void Initialise_AssignsGenderFromInitialPerson(Biosex biosex,
+            Gender gender)
         {
             var initialPeople = new List<InitialPerson>
             {
-                new InitialPerson { FullName = "Test", Biosex = Biosex.Intersex }
+                new InitialPerson { FullName = "Test", Biosex = biosex, Gender = gender }
             };
 
             var result = _personGenerator.Initialise(initialPeople,
                 0);
 
-            Assert.True(result[0].Gender == Gender.Female || result[0].Gender == Gender.Male);
+            Assert.Equal(gender, result[0].Gender);
         }
 
         [Fact]
@@ -273,6 +280,68 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
         }
 
+        // The mocked NextDouble feeds both the biosex roll and the gender deviation roll,
+        // so 0.4514 → biosex Female (45.14 <= 50.15) and deviation roll 45.14.
+        // With TransgenderProbability at its default of 0, gender must align with biosex.
+        [Theory]
+        [InlineData(0.4514, Biosex.Female, Gender.Female)]
+        [InlineData(0.5517, Biosex.Male, Gender.Male)]
+        public void GenerateChildren_WithZeroTransgenderProbability_GenderAlignsWithBiosex(double nextDoubleValue,
+            Biosex expectedBiosex,
+            Gender expectedGender)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
+            Assert.Equal(expectedGender, result.Children[0].Gender);
+        }
+
+        // With TransgenderProbability at 100% every deviation roll hits,
+        // so gender must differ from the biosex-aligned gender.
+        [Theory]
+        [InlineData(0.4514, Biosex.Female, Gender.Male)]
+        [InlineData(0.5517, Biosex.Male, Gender.Female)]
+        public void GenerateChildren_WithFullTransgenderProbability_GenderDeviatesFromBiosex(double nextDoubleValue,
+            Biosex expectedBiosex,
+            Gender expectedGender)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue,
+                transgenderProbability: 100);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
+            Assert.Equal(expectedGender, result.Children[0].Gender);
+        }
+
+        [Fact]
+        public void GenerateChildren_IntersexChild_GenderIsEitherFemaleOrMale()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.9900);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
+            Assert.True(result.Children[0].Gender == Gender.Female || result.Children[0].Gender == Gender.Male);
+        }
+
         [Fact]
         public void GenerateChildren_WithCustomFertilityCooldownYears_ExcludesPairBelowConfiguredThreshold()
         {
@@ -292,7 +361,8 @@ namespace ProjectMarworyn.UnitTests
         }
 
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue,
-            int fertilityCooldownYears = 3)
+            int fertilityCooldownYears = 3,
+            double transgenderProbability = 0)
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(14)); // seed 14: childChance = 5
@@ -300,7 +370,11 @@ namespace ProjectMarworyn.UnitTests
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
             return new PersonGenerator(mockDiceGenerator,
                 _gameState,
-                Options.Create(new AppSettings { FertilityCooldownYears = fertilityCooldownYears }));
+                Options.Create(new AppSettings
+                {
+                    FertilityCooldownYears = fertilityCooldownYears,
+                    TransgenderProbability = transgenderProbability
+                }));
         }
 
         private Pair CreateFertilePair()

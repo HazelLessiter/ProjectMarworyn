@@ -2,6 +2,13 @@
 
 ---
 
+## [Unreleased]
+
+-Fixed `GenerateChildren` conflating biosex and gender - a child's gender was a direct cast of their biosex
+-Added `TransgenderProbability` to `AppSettings` (in %, default 0.5 based on ONS census 2021) - a child's gender now aligns with their biosex in the majority of cases, with a small seeded chance of deviating
+-Added `Gender` to `InitialPerson` and `InitialPeople.json` - initial people's gender is now explicit data instead of being derived from biosex, at the same ~0.5% trans representation (Tammy)
+-Fixed Björk's biosex in `InitialPeople.json` - was mistakenly male
+
 ## [2.0.2]
 
 -`PairingEngine.GeneratePairs` and `PersonGenerator.GenerateChildren` now return dedicated `PairingResult` and `ChildGenerationResult` types instead of tuples
