@@ -346,6 +346,44 @@ namespace ProjectMarworyn.UnitTests
             Assert.Empty(adultResult.People);
         }
 
+        // A misconfigured table (hand-edited Appsettings.json) must fail at construction
+        // with a clear message, not mid-run when someone outlives the last explicit bracket.
+        [Fact]
+        public void Constructor_WithNullDeathBrackets_Throws()
+        {
+            var exception = Record.Exception(() => CreateEngineWithBrackets(null));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithoutCatchAllBracket_Throws()
+        {
+            var bracketsWithoutCatchAll = new List<DeathBracket>
+            {
+                new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 }
+            };
+
+            var exception = Record.Exception(() => CreateEngineWithBrackets(bracketsWithoutCatchAll));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithCatchAllBracket_DoesNotThrow()
+        {
+            var exception = Record.Exception(() => CreateEngineWithBrackets(CreateDefaultDeathBrackets()));
+
+            Assert.Null(exception);
+        }
+
+        private DeathEngine CreateEngineWithBrackets(List<DeathBracket> deathBrackets)
+        {
+            return new DeathEngine(Substitute.For<IDiceGenerator>(),
+                _gameState,
+                Options.Create(new AppSettings { DeathBrackets = deathBrackets }));
+        }
+
         private static Person CreatePerson(int age, bool isAlive = true)
         {
             return new Person

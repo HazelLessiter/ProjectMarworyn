@@ -15,8 +15,10 @@
 -Fixed Björk's biosex in `InitialPeople.json` - was mistakenly male
 -Added `NonBinary` to the `Gender` enum with `NonBinaryProbability` in `AppSettings` (in %, default 0.06 per ONS census 2021) - rolled independently of `TransgenderProbability`, with the non-binary roll taking precedence
 -Seeded Raven as non-binary in `InitialPeople.json`
+-Removed `AppSettings.Delay` - read by nothing since `DayDuration` took over pacing
 -Replaced the `DeathModifier` enum with a configurable `DeathBrackets` table in `AppSettings` - age brackets with `DailyDeathChance` in %, same baseline values, no more basis points or bracket names doubling as values
 +Also removed the dead `names` list in `DeathEngine`, left over from when a person was just a name
++`DeathEngine` validates at construction that the table has a catch-all bracket, so a hand-edited config fails at startup with a clear message instead of mid-run
 -Fixed `NullReferenceException` in `SimulationManager.ProgressDay` when every remaining person dies on the same day - the extinction check runs at the start of the next day, so the rest of the day now guards against an empty population
 -Intersex children now roll for trans like everyone else - their randomly assigned binary gender is the starting point the trans roll can flip (not visible today, but will be once trans status is tracked)
 -Non-binary children now pick between three naming routes: traditional (either binary convention), prefix + prefix, or suffix + suffix, with either parent's part able to come first on the new routes - naming logic extracted into `PersonGenerator.CalculateName`

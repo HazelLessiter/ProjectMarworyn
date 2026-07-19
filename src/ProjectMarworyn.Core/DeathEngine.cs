@@ -18,6 +18,14 @@ namespace ProjectMarworyn.Core
             _diceGenerator = diceGenerator;
             _gameState = gameState;
             _appSettings = appSettings.Value;
+
+            //Fail at startup rather than mid-run: without a catch-all bracket, the first person
+            //to outlive the last explicit MaxAge would crash the simulation with a cryptic error
+            if (_appSettings.DeathBrackets == null ||
+                !_appSettings.DeathBrackets.Any(x => x.MaxAge == null))
+            {
+                throw new InvalidOperationException("DeathBrackets must contain a catch-all bracket with no MaxAge");
+            }
         }
 
         public Generation ProcessDeaths(List<Person> people,

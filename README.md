@@ -232,7 +232,6 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
 ```json
 {
   "Configuration": {
-    "Delay": 250,
     "InitialPeopleFilePath": "Configuration/InitialPeople.json",
     "SeedWordFilePath": "Configuration/SeedWord.json",
     "DayDuration": "0.00:00:0.50",
@@ -252,7 +251,6 @@ The `DeathBrackets` sample above is abridged — the real file has one bracket p
 
 | Setting | Description |
 |---|---|
-| `Delay` | Legacy delay value (milliseconds) |
 | `DayDuration` | Real-time duration of one in-world day (TimeSpan format, e.g. `"0.00:00:0.50"` for 500 ms) |
 | `InitialPeopleFilePath` | Relative path to the initial population JSON file |
 | `SeedWordFilePath` | Relative path to the seed-word pool JSON file |
