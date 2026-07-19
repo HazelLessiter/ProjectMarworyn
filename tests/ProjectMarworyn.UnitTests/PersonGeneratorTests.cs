@@ -327,6 +327,24 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal(expectedGender, result.Children[0].Gender);
         }
 
+        // Intersex children are assigned a random binary gender and then roll for trans like
+        // everyone else. Both generators consume identical dice streams, so the full-probability
+        // run must land on the opposite binary gender to the zero-probability run.
+        [Fact]
+        public void GenerateChildren_IntersexChildWithFullTransgenderProbability_AssignedGenderIsFlipped()
+        {
+            var pair1 = CreateFertilePair();
+            var pair2 = CreateFertilePair();
+
+            var alignedResult = CreateGeneratorWithNextDouble(0.9900)
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson }, new DateTime(1, 1, 1));
+            var flippedResult = CreateGeneratorWithNextDouble(0.9900, transgenderProbability: 100)
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson }, new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Intersex, alignedResult.Children[0].Biosex);
+            Assert.NotEqual(alignedResult.Children[0].Gender, flippedResult.Children[0].Gender);
+        }
+
         [Fact]
         public void GenerateChildren_IntersexChild_GenderIsEitherFemaleOrMale()
         {
@@ -366,13 +384,14 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal(Gender.NonBinary, result.Children[0].Gender);
         }
 
-        // The non-binary band sits below the binary-flip band inside the same roll:
-        // with NonBinaryProbability 50 and TransgenderProbability 100, a roll of 45.14
-        // is non-binary while 55.17 falls through to the binary flip.
+        // The non-binary and transgender probabilities are independent rolls, with the
+        // non-binary roll taking precedence: the mocked NextDouble feeds both rolls, so
+        // with NonBinaryProbability 50 and TransgenderProbability 100 a roll of 45.14
+        // is non-binary while 55.17 misses non-binary and falls through to the binary flip.
         [Theory]
         [InlineData(0.4514, Gender.NonBinary)] // biosex Female
         [InlineData(0.5517, Gender.Female)]    // biosex Male, flipped
-        public void GenerateChildren_NonBinaryBandSitsBelowBinaryFlipBand(double nextDoubleValue,
+        public void GenerateChildren_NonBinaryRollTakesPrecedenceOverBinaryFlipRoll(double nextDoubleValue,
             Gender expectedGender)
         {
             var generator = CreateGeneratorWithNextDouble(nextDoubleValue,

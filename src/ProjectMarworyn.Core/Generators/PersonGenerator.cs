@@ -242,25 +242,28 @@ namespace ProjectMarworyn.Core.Generators
         private Gender CalculateGender(Random dice,
             Biosex biosex)
         {
-            //NonBinaryProbability is a slice within the TransgenderProbability umbrella,
-            //so a single roll decides both: the non-binary band sits below the binary-flip band
-            var diceRoll = _diceGenerator.NextDouble(dice) * 100;
+            //NonBinaryProbability and TransgenderProbability are independent rolls,
+            //with the non-binary roll taking precedence
+            var nonBinaryRoll = _diceGenerator.NextDouble(dice) * 100;
 
-            if (diceRoll < _appSettings.NonBinaryProbability)
+            if (nonBinaryRoll < _appSettings.NonBinaryProbability)
             {
                 return Gender.NonBinary;
             }
 
-            if (biosex == Biosex.Intersex)
-            {
-                return RandomGender(dice);
-            }
+            //Intersex children have no biosex-aligned gender, so they are assigned a random
+            //binary one, then roll for trans like everyone else
+            var alignedGender = biosex
+                switch
+                {
+                    Biosex.Female => Gender.Female,
+                    Biosex.Male => Gender.Male,
+                    _ => RandomGender(dice)
+                };
 
-            var alignedGender = biosex == Biosex.Female ?
-                Gender.Female :
-                Gender.Male;
+            var transgenderRoll = _diceGenerator.NextDouble(dice) * 100;
 
-            if (diceRoll < _appSettings.TransgenderProbability)
+            if (transgenderRoll < _appSettings.TransgenderProbability)
             {
                 return alignedGender == Gender.Female ?
                     Gender.Male :

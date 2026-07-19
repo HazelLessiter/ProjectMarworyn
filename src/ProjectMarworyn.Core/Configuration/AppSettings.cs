@@ -7,7 +7,8 @@ namespace ProjectMarworyn.Core.Configuration
         public string SeedWordFilePath { get; set; }
         public TimeSpan DayDuration { get; set; }
         public int FertilityCooldownYears { get; set; }
-        public double TransgenderProbability { get; set; }//In %. Default 0.5% based on ONS census 2021 (https://www.ons.gov.uk/peoplepopulationandcommunity/culturalidentity/genderidentity/bulletins/genderidentityenglandandwales/census2021)
-        public double NonBinaryProbability { get; set; }//In %. A slice within TransgenderProbability, not additional to it - ONS's 0.5% umbrella includes the 0.06% who identified as non-binary (same census source)
+        public double TransgenderProbability { get; set; }//In %. Chance of a binary gender flip. Default 0.2% = trans man 0.10% + trans woman 0.10% per ONS census 2021 (https://www.ons.gov.uk/peoplepopulationandcommunity/culturalidentity/genderidentity/bulletins/genderidentityenglandandwales/census2021)
+        //Note: the census's remaining 0.24% (no specific identity given) and 0.04% (all other identities) are not modelled
+        public double NonBinaryProbability { get; set; }//In %. Default 0.06% who identified as non-binary (same census source). Rolled independently of TransgenderProbability, with non-binary taking precedence
     }
 }
