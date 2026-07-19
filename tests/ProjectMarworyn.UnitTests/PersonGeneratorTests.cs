@@ -147,6 +147,7 @@ namespace ProjectMarworyn.UnitTests
         [InlineData(Biosex.Female, Gender.Female)]
         [InlineData(Biosex.Male, Gender.Male)]
         [InlineData(Biosex.Male, Gender.Female)]
+        [InlineData(Biosex.Female, Gender.NonBinary)]
         [InlineData(Biosex.Intersex, Gender.Male)]
         public void Initialise_AssignsGenderFromInitialPerson(Biosex biosex,
             Gender gender)
@@ -342,6 +343,103 @@ namespace ProjectMarworyn.UnitTests
             Assert.True(result.Children[0].Gender == Gender.Female || result.Children[0].Gender == Gender.Male);
         }
 
+        // With NonBinaryProbability at 100% every roll lands in the non-binary band,
+        // regardless of biosex (intersex included).
+        [Theory]
+        [InlineData(0.4514, Biosex.Female)]
+        [InlineData(0.5517, Biosex.Male)]
+        [InlineData(0.9900, Biosex.Intersex)]
+        public void GenerateChildren_WithFullNonBinaryProbability_ChildIsNonBinary(double nextDoubleValue,
+            Biosex expectedBiosex)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue,
+                nonBinaryProbability: 100);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
+            Assert.Equal(Gender.NonBinary, result.Children[0].Gender);
+        }
+
+        // The non-binary band sits below the binary-flip band inside the same roll:
+        // with NonBinaryProbability 50 and TransgenderProbability 100, a roll of 45.14
+        // is non-binary while 55.17 falls through to the binary flip.
+        [Theory]
+        [InlineData(0.4514, Gender.NonBinary)] // biosex Female
+        [InlineData(0.5517, Gender.Female)]    // biosex Male, flipped
+        public void GenerateChildren_NonBinaryBandSitsBelowBinaryFlipBand(double nextDoubleValue,
+            Gender expectedGender)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue,
+                transgenderProbability: 100,
+                nonBinaryProbability: 50);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedGender, result.Children[0].Gender);
+        }
+
+        // Route 0: the traditional route, either binary convention at random.
+        [Fact]
+        public void GenerateChildren_NonBinaryChildOnTraditionalRoute_TakesOneOfTheTwoBinaryConventions()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                nonBinaryProbability: 100,
+                namingRoute: 0);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            var fullName = result.Children[0].Name.FullName;
+            Assert.True(fullName == "JaneSmith" || fullName == "JohnDoe",
+                $"Expected one of the two binary name conventions but got '{fullName}'");
+        }
+
+        // Routes 1 and 2: the dedicated non-binary conventions, with either parent's
+        // part able to come first. The child's own Prefix/Suffix must decompose the
+        // FullName so their children can inherit parts.
+        [Theory]
+        [InlineData(1, 0, "JaneJohn", "Jane", "John")]  // prefix + prefix, FPerson first
+        [InlineData(1, 1, "JohnJane", "John", "Jane")]  // prefix + prefix, MPerson first
+        [InlineData(2, 0, "DoeSmith", "Doe", "Smith")]  // suffix + suffix, FPerson first
+        [InlineData(2, 1, "SmithDoe", "Smith", "Doe")]  // suffix + suffix, MPerson first
+        public void GenerateChildren_NonBinaryChildOnDedicatedRoute_CombinesParentNameParts(int namingRoute,
+            int partOrder,
+            string expectedFullName,
+            string expectedPrefix,
+            string expectedSuffix)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                nonBinaryProbability: 100,
+                namingRoute: namingRoute,
+                partOrder: partOrder);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedFullName, result.Children[0].Name.FullName);
+            Assert.Equal(expectedPrefix, result.Children[0].Name.Prefix);
+            Assert.Equal(expectedSuffix, result.Children[0].Name.Suffix);
+        }
+
         [Fact]
         public void GenerateChildren_WithCustomFertilityCooldownYears_ExcludesPairBelowConfiguredThreshold()
         {
@@ -362,18 +460,24 @@ namespace ProjectMarworyn.UnitTests
 
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue,
             int fertilityCooldownYears = 3,
-            double transgenderProbability = 0)
+            double transgenderProbability = 0,
+            double nonBinaryProbability = 0,
+            int namingRoute = 0,
+            int partOrder = 0)
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(14)); // seed 14: childChance = 5
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
             mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Any<int>()).Returns(50);
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 3)).Returns(namingRoute);
+            mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 2)).Returns(partOrder);
             return new PersonGenerator(mockDiceGenerator,
                 _gameState,
                 Options.Create(new AppSettings
                 {
                     FertilityCooldownYears = fertilityCooldownYears,
-                    TransgenderProbability = transgenderProbability
+                    TransgenderProbability = transgenderProbability,
+                    NonBinaryProbability = nonBinaryProbability
                 }));
         }
 

@@ -8,6 +8,9 @@
 -Added `TransgenderProbability` to `AppSettings` (in %, default 0.5 based on ONS census 2021) - a child's gender now aligns with their biosex in the majority of cases, with a small seeded chance of deviating
 -Added `Gender` to `InitialPerson` and `InitialPeople.json` - initial people's gender is now explicit data instead of being derived from biosex, at the same ~0.5% trans representation (Tammy)
 -Fixed Björk's biosex in `InitialPeople.json` - was mistakenly male
+-Added `NonBinary` to the `Gender` enum with `NonBinaryProbability` in `AppSettings` (in %, default 0.06 per ONS census 2021, a slice within the `TransgenderProbability` umbrella) - non-binary children take one of the two existing name conventions at random
+-Seeded Raven as non-binary in `InitialPeople.json`
+-Non-binary children now pick between three naming routes: traditional (either binary convention), prefix + prefix, or suffix + suffix, with either parent's part able to come first on the new routes - naming logic extracted into `PersonGenerator.CalculateName`
 
 ## [2.0.2]
 

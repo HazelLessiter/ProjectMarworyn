@@ -110,26 +110,9 @@ namespace ProjectMarworyn.Core.Generators
                     var gender = CalculateGender(dice,
                         biosex);
 
-                    var name = new Name();
-
-                    if (gender == Gender.Male)
-                    {
-                        name = new Name
-                        {
-                            FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
-                            Prefix = pair.FPerson.Name.Prefix,
-                            Suffix = pair.MPerson.Name.Suffix,
-                        };
-                    }
-                    if (gender == Gender.Female)
-                    {
-                        name = new Name
-                        {
-                            FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
-                            Prefix = pair.MPerson.Name.Prefix,
-                            Suffix = pair.FPerson.Name.Suffix,
-                        };
-                    }
+                    var name = CalculateName(dice,
+                        gender,
+                        pair);
 
                     personId++;
                     var child = new Person()
@@ -170,6 +153,73 @@ namespace ProjectMarworyn.Core.Generators
             };
         }
 
+        private Name CalculateName(Random dice,
+            Gender gender,
+            Pair pair)
+        {
+            var namingGender = gender;
+
+            if (gender == Gender.NonBinary)
+            {
+                //Non-binary children pick the traditional route (either binary convention at random)
+                //or one of two dedicated routes: prefix + prefix or suffix + suffix
+                switch (_diceGenerator.Next(dice, 0, 3))
+                {
+                    case 0:
+                        namingGender = RandomGender(dice);
+                        break;
+                    case 1:
+                        return RandomOrderName(dice,
+                            pair.FPerson.Name.Prefix,
+                            pair.MPerson.Name.Prefix);
+                    case 2:
+                        return RandomOrderName(dice,
+                            pair.FPerson.Name.Suffix,
+                            pair.MPerson.Name.Suffix);
+                    default:
+                        throw new InvalidOperationException("Error randomising naming route");
+                }
+            }
+
+            if (namingGender == Gender.Male)
+            {
+                return new Name
+                {
+                    FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
+                    Prefix = pair.FPerson.Name.Prefix,
+                    Suffix = pair.MPerson.Name.Suffix,
+                };
+            }
+
+            return new Name
+            {
+                FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
+                Prefix = pair.MPerson.Name.Prefix,
+                Suffix = pair.FPerson.Name.Suffix,
+            };
+        }
+
+        private Name RandomOrderName(Random dice,
+            string fPersonPart,
+            string mPersonPart)
+        {
+            var mPersonFirst = _diceGenerator.Next(dice, 0, 2) == 1;
+
+            var firstPart = mPersonFirst ?
+                mPersonPart :
+                fPersonPart;
+            var secondPart = mPersonFirst ?
+                fPersonPart :
+                mPersonPart;
+
+            return new Name
+            {
+                FullName = firstPart + secondPart,
+                Prefix = firstPart,
+                Suffix = secondPart,
+            };
+        }
+
         private Gender RandomGender(Random random)
         {
             var gender = new Gender();
@@ -192,6 +242,15 @@ namespace ProjectMarworyn.Core.Generators
         private Gender CalculateGender(Random dice,
             Biosex biosex)
         {
+            //NonBinaryProbability is a slice within the TransgenderProbability umbrella,
+            //so a single roll decides both: the non-binary band sits below the binary-flip band
+            var diceRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            if (diceRoll < _appSettings.NonBinaryProbability)
+            {
+                return Gender.NonBinary;
+            }
+
             if (biosex == Biosex.Intersex)
             {
                 return RandomGender(dice);
@@ -200,8 +259,6 @@ namespace ProjectMarworyn.Core.Generators
             var alignedGender = biosex == Biosex.Female ?
                 Gender.Female :
                 Gender.Male;
-
-            var diceRoll = _diceGenerator.NextDouble(dice) * 100;
 
             if (diceRoll < _appSettings.TransgenderProbability)
             {
