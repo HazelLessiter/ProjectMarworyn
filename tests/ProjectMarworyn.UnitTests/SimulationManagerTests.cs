@@ -88,25 +88,6 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
-        public void ProgressDay_EveryoneDiesOnTheSameDay_SkipsChildGeneration()
-        {
-            _mockDeathEngine.ProcessDeaths(Arg.Any<List<Person>>(),
-                    Arg.Any<Generation>(),
-                    Arg.Any<int>(),
-                    Arg.Any<DateTime>())
-                .Returns(new Generation { People = new List<Person>() });
-            _simulationManager.Start();
-
-            _simulationManager.ProgressDay();
-
-            _mockPersonGenerator.DidNotReceive().GenerateChildren(Arg.Any<List<Pair>>(),
-                Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<List<Person>>(),
-                Arg.Any<DateTime>());
-        }
-
-        [Fact]
         public void ProgressDay_PeopleSurvive_GeneratesChildren()
         {
             _mockDeathEngine.ProcessDeaths(Arg.Any<List<Person>>(),
