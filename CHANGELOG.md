@@ -2,7 +2,7 @@
 
 ---
 
-## [Unreleased]
+## [2.1.0]
 
 -`Person.TimeLived` is replaced by an explicit birthday (`BirthMonth`/`BirthDay`) and `Person.TimeFromLastChild` by a plain day counter (`DaysSinceLastChild`) - no more 1-based `DateTime` fields misused as durations
 +People age up when the simulation calendar hits their birthday, so leap years are modelled; those born on the 29th of February age up on the 1st of March in non-leap years
