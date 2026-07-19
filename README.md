@@ -169,6 +169,8 @@ ProjectMarworyn/
 │       │   ├── SeedGenerator.cs      # World seed creation
 │       │   └── ISeedGenerator.cs
 │       ├── Managers/
+│       │   ├── FileManager.cs        # Reads InitialPeople.json & SeedWord.json
+│       │   ├── IFileManager.cs
 │       │   ├── GenerationManager.cs  # Manages generation state and extinction checks
 │       │   ├── IGenerationManager.cs
 │       │   ├── SimulationManager.cs  # Orchestrates the day-by-day simulation loop
@@ -188,12 +190,11 @@ ProjectMarworyn/
 │       │   ├── Person.cs             # Individual with age, biosex, gender, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
+│       ├── Appsettings.json          # Runtime settings (see Configuration below)
 │       ├── AgeProcessor.cs           # Advances person age each tick
 │       ├── IAgeProcessor.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
 │       ├── IDeathEngine.cs
-│       ├── FileManager.cs            # Reads InitialPeople.json & SeedWord.json
-│       ├── IFileManager.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock
 │       ├── IHeartbeat.cs
 │       ├── PairingEngine.cs          # Pairs eligible individuals each generation

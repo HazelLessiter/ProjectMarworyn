@@ -11,6 +11,7 @@ namespace ProjectMarworyn.UnitTests
         private readonly SimulationManager _simulationManager;
         private readonly IPersonGenerator _mockPersonGenerator;
         private readonly IDeathEngine _mockDeathEngine;
+        private readonly IAgeProcessor _mockAgeProcessor;
         private readonly List<Person> _people;
 
         public SimulationManagerTests()
@@ -46,8 +47,8 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<DateTime>())
                 .Returns(new ChildGenerationResult { Children = new List<Person>(), People = _people });
 
-            var mockAgeProcessor = Substitute.For<IAgeProcessor>();
-            mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(_people);
+            _mockAgeProcessor = Substitute.For<IAgeProcessor>();
+            _mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(x => x.ArgAt<List<Person>>(0));
 
             _mockDeathEngine = Substitute.For<IDeathEngine>();
 
@@ -63,7 +64,7 @@ namespace ProjectMarworyn.UnitTests
                 mockSeedGenerator,
                 mockHeartbeat,
                 _mockPersonGenerator,
-                mockAgeProcessor,
+                _mockAgeProcessor,
                 _mockDeathEngine,
                 mockPairingEngine,
                 new GameState());
@@ -87,22 +88,34 @@ namespace ProjectMarworyn.UnitTests
             Assert.Null(exception);
         }
 
+        // A child born today must be part of tomorrow's population. This also guards the
+        // empty-population check against being inverted: if child generation stopped running
+        // on normal days, the child would never appear and the second day's roll call fails.
         [Fact]
-        public void ProgressDay_PeopleSurvive_GeneratesChildren()
+        public void ProgressDay_ChildBornToday_JoinsTheNextDaysPopulation()
         {
+            var child = CreatePerson(99);
             _mockDeathEngine.ProcessDeaths(Arg.Any<List<Person>>(),
                     Arg.Any<Generation>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(new Generation { People = _people });
+                .Returns(x => new Generation { People = x.ArgAt<List<Person>>(0) });
+            _mockPersonGenerator.GenerateChildren(Arg.Any<List<Pair>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>(),
+                    Arg.Any<List<Person>>(),
+                    Arg.Any<DateTime>())
+                .Returns(x => new ChildGenerationResult
+                {
+                    Children = new List<Person> { child },
+                    People = x.ArgAt<List<Person>>(3)
+                });
             _simulationManager.Start();
 
             _simulationManager.ProgressDay();
+            _simulationManager.ProgressDay();
 
-            _mockPersonGenerator.Received().GenerateChildren(Arg.Any<List<Pair>>(),
-                Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<List<Person>>(),
+            _mockAgeProcessor.Received().Age(Arg.Is<List<Person>>(x => x.Contains(child)),
                 Arg.Any<DateTime>());
         }
 
