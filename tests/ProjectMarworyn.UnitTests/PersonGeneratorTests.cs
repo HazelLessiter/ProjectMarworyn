@@ -24,7 +24,11 @@ namespace ProjectMarworyn.UnitTests
             _mockDiceGenerator.Next(Arg.Any<Random>(), Arg.Any<int>(), Arg.Is<int>(x => x == 101)).Returns(50);
             _personGenerator = new PersonGenerator(_mockDiceGenerator,
                 _gameState,
-                Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
+                Options.Create(new AppSettings
+                {
+                    FertilityCooldownYears = 2,
+                    OrientationWeights = CreateDefaultOrientationWeights()
+                }));
         }
 
         [Fact]
@@ -161,6 +165,53 @@ namespace ProjectMarworyn.UnitTests
                 0);
 
             Assert.Equal(gender, result[0].Gender);
+        }
+
+        // Orientation and WillPair come straight from the data file - no dice at init,
+        // matching the Gender precedent above.
+        [Theory]
+        [InlineData(Orientation.Heterosexual)]
+        [InlineData(Orientation.Homosexual)]
+        [InlineData(Orientation.Aroace)]
+        public void Initialise_AssignsOrientationFromInitialPerson(Orientation orientation)
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Female, Orientation = orientation }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.Equal(orientation, result[0].Orientation);
+        }
+
+        [Fact]
+        public void Initialise_WillPairDefaultsToTrue()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.True(result[0].WillPair);
+        }
+
+        [Fact]
+        public void Initialise_WithNeverPairingPerson_WillPairIsFalse()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Female, WillPair = false }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.False(result[0].WillPair);
         }
 
         [Fact]
@@ -495,10 +546,137 @@ namespace ProjectMarworyn.UnitTests
             Assert.Empty(result.Children);
         }
 
+        // Verifies the cumulative-band walk in CalculateOrientation against the default census
+        // weights. Band upper bounds (cumulative %): Heterosexual 96.81, Homosexual 98.31,
+        // Bisexual 99.61, Pansexual 99.84, Asexual 99.90, Aromantic 99.95, Aroace 100.
+        [Theory]
+        [InlineData(0.4514, Orientation.Heterosexual)]
+        [InlineData(0.9700, Orientation.Homosexual)]
+        [InlineData(0.9840, Orientation.Bisexual)]
+        [InlineData(0.9970, Orientation.Pansexual)]
+        [InlineData(0.9985, Orientation.Asexual)]
+        [InlineData(0.9992, Orientation.Aromantic)]
+        [InlineData(0.9997, Orientation.Aroace)]
+        public void GenerateChildren_OrientationDiceRollThreshold_ReturnsCorrectOrientation(double nextDoubleValue,
+            Orientation expectedOrientation)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedOrientation, result.Children[0].Orientation);
+        }
+
+        // A rigged table (everything on Aroace) proves the child's orientation comes from
+        // OrientationWeights - reverting the wiring leaves the enum default Heterosexual and fails.
+        [Fact]
+        public void GenerateChildren_WithFullAroaceWeight_ChildIsAroace()
+        {
+            var weights = CreateDefaultOrientationWeights();
+            weights.ForEach(x => x.Weight = 0);
+            weights.Single(x => x.Orientation == Orientation.Aroace).Weight = 100;
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                orientationWeights: weights);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Orientation.Aroace, result.Children[0].Orientation);
+        }
+
+        // The never-pair roll is independent of orientation. The mocked NextDouble feeds it
+        // like every other roll, so 45.14 lands under a 50% probability and 55.17 above it.
+        [Theory]
+        [InlineData(0.4514, 0, true)]
+        [InlineData(0.4514, 100, false)]
+        [InlineData(0.4514, 50, false)]
+        [InlineData(0.5517, 50, true)]
+        public void GenerateChildren_NeverPairProbability_SetsWillPair(double nextDoubleValue,
+            double neverPairProbability,
+            bool expectedWillPair)
+        {
+            var generator = CreateGeneratorWithNextDouble(nextDoubleValue,
+                neverPairProbability: neverPairProbability);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.FPerson, pair.MPerson },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(expectedWillPair, result.Children[0].WillPair);
+        }
+
+        // A misconfigured weight table (hand-edited Appsettings.json) must fail at construction
+        // with a clear message, not silently skew every birth.
+        [Fact]
+        public void Constructor_WithNullOrientationWeights_Throws()
+        {
+            var exception = Record.Exception(() => CreateGeneratorWithWeights(null));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithMissingOrientationEntry_Throws()
+        {
+            // Aroace's weight is folded into Heterosexual so only the missing entry can trigger
+            var weights = CreateDefaultOrientationWeights();
+            weights.RemoveAll(x => x.Orientation == Orientation.Aroace);
+            weights.Single(x => x.Orientation == Orientation.Heterosexual).Weight += 0.05;
+
+            var exception = Record.Exception(() => CreateGeneratorWithWeights(weights));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithDuplicateOrientationEntry_Throws()
+        {
+            // Aromantic replaced by a second Aroace entry: count and sum both stay valid
+            var weights = CreateDefaultOrientationWeights();
+            weights.Single(x => x.Orientation == Orientation.Aromantic).Orientation = Orientation.Aroace;
+
+            var exception = Record.Exception(() => CreateGeneratorWithWeights(weights));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithWeightsNotSummingTo100_Throws()
+        {
+            var weights = CreateDefaultOrientationWeights();
+            weights.Single(x => x.Orientation == Orientation.Heterosexual).Weight = 90;
+
+            var exception = Record.Exception(() => CreateGeneratorWithWeights(weights));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithValidOrientationWeights_DoesNotThrow()
+        {
+            var exception = Record.Exception(() => CreateGeneratorWithWeights(CreateDefaultOrientationWeights()));
+
+            Assert.Null(exception);
+        }
+
         private PersonGenerator CreateGeneratorWithNextDouble(double nextDoubleValue,
             int fertilityCooldownYears = 2,
             double transgenderProbability = 0,
             double nonBinaryProbability = 0,
+            double neverPairProbability = 0,
+            List<OrientationWeight> orientationWeights = null,
             int namingRoute = 0,
             int partOrder = 0)
         {
@@ -514,8 +692,31 @@ namespace ProjectMarworyn.UnitTests
                 {
                     FertilityCooldownYears = fertilityCooldownYears,
                     TransgenderProbability = transgenderProbability,
-                    NonBinaryProbability = nonBinaryProbability
+                    NonBinaryProbability = nonBinaryProbability,
+                    NeverPairProbability = neverPairProbability,
+                    OrientationWeights = orientationWeights ?? CreateDefaultOrientationWeights()
                 }));
+        }
+
+        private PersonGenerator CreateGeneratorWithWeights(List<OrientationWeight> orientationWeights)
+        {
+            return new PersonGenerator(_mockDiceGenerator,
+                _gameState,
+                Options.Create(new AppSettings { OrientationWeights = orientationWeights }));
+        }
+
+        private static List<OrientationWeight> CreateDefaultOrientationWeights()
+        {
+            return new List<OrientationWeight>
+            {
+                new OrientationWeight { Orientation = Orientation.Heterosexual, Weight = 96.81 },
+                new OrientationWeight { Orientation = Orientation.Homosexual, Weight = 1.5 },
+                new OrientationWeight { Orientation = Orientation.Bisexual, Weight = 1.3 },
+                new OrientationWeight { Orientation = Orientation.Pansexual, Weight = 0.23 },
+                new OrientationWeight { Orientation = Orientation.Asexual, Weight = 0.06 },
+                new OrientationWeight { Orientation = Orientation.Aromantic, Weight = 0.05 },
+                new OrientationWeight { Orientation = Orientation.Aroace, Weight = 0.05 }
+            };
         }
 
         private Pair CreateFertilePair()

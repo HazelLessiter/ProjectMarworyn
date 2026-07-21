@@ -30,7 +30,11 @@ public class PopulationPipelineTests
         _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
         _personGenerator = new PersonGenerator(_diceGenerator,
             _gameState,
-            Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
+            Options.Create(new AppSettings
+            {
+                FertilityCooldownYears = 2,
+                OrientationWeights = CreateDefaultOrientationWeights()
+            }));
         _generationManager = new GenerationManager();
     }
 
@@ -234,6 +238,18 @@ public class PopulationPipelineTests
             new DeathBracket { MaxAge = 89, DailyDeathChance = 0.5 },
             new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 },
             new DeathBracket { DailyDeathChance = 2.5 }
+        };
+
+    private static List<OrientationWeight> CreateDefaultOrientationWeights() =>
+        new()
+        {
+            new OrientationWeight { Orientation = Orientation.Heterosexual, Weight = 96.81 },
+            new OrientationWeight { Orientation = Orientation.Homosexual, Weight = 1.5 },
+            new OrientationWeight { Orientation = Orientation.Bisexual, Weight = 1.3 },
+            new OrientationWeight { Orientation = Orientation.Pansexual, Weight = 0.23 },
+            new OrientationWeight { Orientation = Orientation.Asexual, Weight = 0.06 },
+            new OrientationWeight { Orientation = Orientation.Aromantic, Weight = 0.05 },
+            new OrientationWeight { Orientation = Orientation.Aroace, Weight = 0.05 }
         };
 
     private static Person CreatePerson(int id, bool isAlive = true, int age = 30,
