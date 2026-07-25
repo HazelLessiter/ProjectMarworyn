@@ -314,6 +314,8 @@ namespace ProjectMarworyn.Core.Generators
         private static bool CanFillRole(Person person,
             Biosex role)
         {
+            //Unreachable via SelectParent (its exact-biosex branches run first), but kept
+            //so the method answers truthfully if ever called on its own
             if (person.Biosex == role)
             {
                 return true;
