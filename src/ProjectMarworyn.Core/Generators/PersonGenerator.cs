@@ -18,6 +18,15 @@ namespace ProjectMarworyn.Core.Generators
             _diceGenerator = diceGenerator;
             _gameState = gameState;
             _appSettings = appSettings.Value;
+
+            //Fail at startup rather than mid-run: a hand-edited weight table with a missing,
+            //duplicated or misweighted entry would silently skew every birth
+            if (_appSettings.OrientationWeights == null ||
+                Enum.GetValues<Orientation>().Any(x => _appSettings.OrientationWeights.Count(w => w.Orientation == x) != 1) ||
+                Math.Abs(_appSettings.OrientationWeights.Sum(x => x.Weight) - 100) > 0.001)
+            {
+                throw new InvalidOperationException("OrientationWeights must contain exactly one entry per Orientation value, with weights summing to 100");
+            }
         }
 
         public List<Person> Initialise(List<InitialPerson> initialPeople,
@@ -59,11 +68,13 @@ namespace ProjectMarworyn.Core.Generators
                     },
                     Biosex = initialPerson.Biosex,
                     Gender = initialPerson.Gender,
+                    Orientation = initialPerson.Orientation,
                     Age = age,
                     IsAlive = true,
                     BirthMonth = birthMonth,
                     BirthDay = birthDay,
                     WillHaveChildren = CalcWillHaveChildren(dice),
+                    WillPair = initialPerson.WillPair,
                     DaysSinceLastChild = yearsFromLastChild * SimulationConstants.DaysPerYear + dayOffset,
                     HasPair = false
                 };
@@ -128,7 +139,9 @@ namespace ProjectMarworyn.Core.Generators
                         DaysSinceLastChild = 0,
                         BirthMonth = currentTime.Month,
                         BirthDay = currentTime.Day,
-                        WillHaveChildren = CalcWillHaveChildren(dice)
+                        WillHaveChildren = CalcWillHaveChildren(dice),
+                        Orientation = CalculateOrientation(dice),
+                        WillPair = CalcWillPair(dice)
                     };
 
                     children.Add(child);
@@ -299,6 +312,34 @@ namespace ProjectMarworyn.Core.Generators
             var willHaveChildren = willHaveChildrenModifier >= 7;
 
             return willHaveChildren;
+        }
+
+        private Orientation CalculateOrientation(Random dice)
+        {
+            var roll = _diceGenerator.NextDouble(dice) * 100;
+
+            var cumulative = 0.0;
+            foreach (var orientationWeight in _appSettings.OrientationWeights)
+            {
+                cumulative += orientationWeight.Weight;
+
+                if (roll < cumulative)
+                {
+                    return orientationWeight.Orientation;
+                }
+            }
+
+            //Floating point rounding can leave the cumulative total fractionally short of 100
+            return _appSettings.OrientationWeights.Last().Orientation;
+        }
+
+        //Independent of orientation: a proportion of the population never pairs at all,
+        //whoever they are attracted to
+        private bool CalcWillPair(Random dice)
+        {
+            var neverPairRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            return neverPairRoll >= _appSettings.NeverPairProbability;
         }
     }
 }

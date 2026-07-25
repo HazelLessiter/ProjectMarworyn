@@ -38,7 +38,7 @@ namespace ProjectMarworyn.Core
 
             var survivors = new List<Person>();
 
-            foreach (var person in people.Where(x => x.IsAlive == true))
+            foreach (var person in people.Where(x => x.IsAlive))
             {
                 var deathBracket = _appSettings.DeathBrackets.First(x => x.MaxAge == null ||
                     person.Age <= x.MaxAge);
@@ -50,7 +50,6 @@ namespace ProjectMarworyn.Core
                 }
                 else
                 {
-                    person.IsAlive = true;
                     survivors.Add(person);
                 }
             }

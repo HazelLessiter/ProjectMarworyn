@@ -130,6 +130,7 @@ namespace ProjectMarworyn.UnitTests
                 BirthDay = 15,
                 DaysSinceLastChild = 0,
                 WillHaveChildren = true,
+                WillPair = true,
                 HasPair = false
             };
     }

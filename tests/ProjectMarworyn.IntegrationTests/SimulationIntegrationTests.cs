@@ -3,6 +3,7 @@ using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Extensions;
 using ProjectMarworyn.Core.Managers;
 using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.IntegrationTests;
 
@@ -25,6 +26,15 @@ public class SimulationIntegrationTests : IDisposable
             {
                 new DeathBracket { DailyDeathChance = 0.05 }
             };
+            //PersonGenerator's startup guard needs the full weight table; everything on
+            //Heterosexual keeps these clock/logging assertions independent of orientation balance
+            options.OrientationWeights = Enum.GetValues<Orientation>()
+                .Select(x => new OrientationWeight
+                {
+                    Orientation = x,
+                    Weight = x == Orientation.Heterosexual ? 100 : 0
+                })
+                .ToList();
         });
         services.AddCoreServices();
 
