@@ -12,6 +12,7 @@ public class PopulationPipelineTests
 {
     private readonly GameState _gameState;
     private readonly IDiceGenerator _diceGenerator;
+    private readonly IAttractionCalculator _attractionCalculator;
     private readonly AgeProcessor _ageProcessor;
     private readonly DeathEngine _deathEngine;
     private readonly PairingEngine _pairingEngine;
@@ -27,7 +28,10 @@ public class PopulationPipelineTests
         _deathEngine = new DeathEngine(_diceGenerator,
             _gameState,
             Options.Create(new AppSettings { DeathBrackets = CreateDefaultDeathBrackets() }));
-        _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
+        _attractionCalculator = new AttractionCalculator();
+        _pairingEngine = new PairingEngine(_diceGenerator,
+            _attractionCalculator,
+            _gameState);
         _personGenerator = new PersonGenerator(_diceGenerator,
             _gameState,
             Options.Create(new AppSettings

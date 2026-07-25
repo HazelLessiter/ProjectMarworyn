@@ -4,8 +4,15 @@ using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.UnitTests
 {
-    public class AttractionRulesTests
+    public class AttractionCalculatorTests
     {
+        private readonly AttractionCalculator _attractionCalculator;
+
+        public AttractionCalculatorTests()
+        {
+            _attractionCalculator = new AttractionCalculator();
+        }
+
         // The full policy matrix: attraction is decided by own orientation + own gender
         // against the candidate's gender, never biosex.
         [Theory]
@@ -47,7 +54,7 @@ namespace ProjectMarworyn.UnitTests
             var candidate = CreatePerson(Orientation.Pansexual,
                 candidateGender);
 
-            Assert.Equal(expected, AttractionRules.IsAttractedTo(person, candidate));
+            Assert.Equal(expected, _attractionCalculator.IsAttractedTo(person, candidate));
         }
 
         [Fact]
@@ -59,8 +66,8 @@ namespace ProjectMarworyn.UnitTests
             var man = CreatePerson(Orientation.Homosexual,
                 Gender.Male);
 
-            Assert.False(AttractionRules.AreMutuallyAttracted(woman, man));
-            Assert.False(AttractionRules.AreMutuallyAttracted(man, woman));
+            Assert.False(_attractionCalculator.AreMutuallyAttracted(woman, man));
+            Assert.False(_attractionCalculator.AreMutuallyAttracted(man, woman));
         }
 
         [Fact]
@@ -71,7 +78,7 @@ namespace ProjectMarworyn.UnitTests
             var man = CreatePerson(Orientation.Heterosexual,
                 Gender.Male);
 
-            Assert.True(AttractionRules.AreMutuallyAttracted(woman, man));
+            Assert.True(_attractionCalculator.AreMutuallyAttracted(woman, man));
         }
 
         [Theory]
@@ -88,7 +95,7 @@ namespace ProjectMarworyn.UnitTests
             var person = CreatePerson(orientation,
                 Gender.Female);
 
-            Assert.Equal(expected, AttractionRules.CanPair(person));
+            Assert.Equal(expected, _attractionCalculator.CanPair(person));
         }
 
         private static Person CreatePerson(Orientation orientation,

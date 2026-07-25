@@ -10,6 +10,7 @@ namespace ProjectMarworyn.UnitTests
     {
         private readonly PairingEngine _pairingEngine;
         private readonly GameState _gameState;
+        private readonly IAttractionCalculator _attractionCalculator;
         private IDiceGenerator _mockDiceGenerator;
 
         public PairingEngineTests()
@@ -17,7 +18,11 @@ namespace ProjectMarworyn.UnitTests
             _gameState = new GameState();
             _mockDiceGenerator = Substitute.For<IDiceGenerator>();
             _mockDiceGenerator.Create(Arg.Any<int>(), Arg.Any<DateTime>()).Returns(new Random(0));
+            //The real calculator, not a mock: these tests assert orientation-driven pairing
+            //outcomes, which is the engine and the attraction policy working together
+            _attractionCalculator = new AttractionCalculator();
             _pairingEngine = new PairingEngine(_mockDiceGenerator,
+                _attractionCalculator,
                 _gameState);
         }
 

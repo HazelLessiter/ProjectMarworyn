@@ -3,17 +3,17 @@ using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.Core
 {
-    internal static class AttractionRules
+    internal class AttractionCalculator : IAttractionCalculator
     {
         //Aromantic and aroace people never form pairs; WillPair is the separate
         //orientation-independent opt-out rolled at birth
-        public static bool CanPair(Person person)
+        public bool CanPair(Person person)
         {
             return person.Orientation != Orientation.Aromantic &&
                 person.Orientation != Orientation.Aroace;
         }
 
-        public static bool AreMutuallyAttracted(Person personA,
+        public bool AreMutuallyAttracted(Person personA,
             Person personB)
         {
             return IsAttractedTo(personA,
@@ -26,7 +26,7 @@ namespace ProjectMarworyn.Core
         //gated separately on biosex in GenerateChildren. Heterosexual means any gender
         //different from one's own, so a heterosexual non-binary person is attracted to
         //both binary genders. Asexual people pair (romance, not sex) with any gender
-        public static bool IsAttractedTo(Person person,
+        public bool IsAttractedTo(Person person,
             Person candidate)
         {
             return person.Orientation switch

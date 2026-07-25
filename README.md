@@ -196,7 +196,8 @@ ProjectMarworyn/
 │       ├── Appsettings.json          # Runtime settings (see Configuration below)
 │       ├── AgeProcessor.cs           # Advances person age each tick
 │       ├── IAgeProcessor.cs
-│       ├── AttractionRules.cs        # Orientation × gender attraction policy
+│       ├── AttractionCalculator.cs   # Orientation × gender attraction policy
+│       ├── IAttractionCalculator.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
 │       ├── IDeathEngine.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock

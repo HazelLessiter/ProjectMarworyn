@@ -17,8 +17,9 @@ namespace ProjectMarworyn.Core.Extensions
             services.AddTransient<IPersonGenerator, PersonGenerator>();
             services.AddTransient<IDeathEngine, DeathEngine>();
             services.AddTransient<IPairingEngine, PairingEngine>();
+            services.AddTransient<IAttractionCalculator, AttractionCalculator>();
 
-            //Singleton because SimulationManager owns the one running simulation's mutable state (_people, _pairs, _currentGeneration),
+            //Singleton because SimulationManager owns the one running simulation's mutable state (_people, _pairs, _generationIteration),
             //the same way SimulationClock/GameState below represent app-wide state. If it were Transient and ever got resolved a
             //second time (a debug panel, a save/load screen), that second resolution would silently start a second, empty simulation
             //instead of sharing the one already running.

@@ -4,7 +4,7 @@
 
 ## [2.2.0]
 
--Pairing rewritten around mutual attraction (Issue #15 Stage 4): new `AttractionRules` decides attraction from orientation and the candidate's gender - heterosexual means any gender different from your own (so a heterosexual non-binary person is attracted to both binary genders), homosexual the same gender, bisexual the binary genders, pansexual everyone, asexual anyone; both sides must be attracted or no pair forms
+-Pairing rewritten around mutual attraction (Issue #15 Stage 4): new `AttractionCalculator` (injected as `IAttractionCalculator`) decides attraction from orientation and the candidate's gender - heterosexual means any gender different from your own (so a heterosexual non-binary person is attracted to both binary genders), homosexual the same gender, bisexual the binary genders, pansexual everyone, asexual anyone; both sides must be attracted or no pair forms
 +Aromantic and aroace people never pair; `WillPair` is respected as the orientation-independent opt-out
 +Intersex people now enter the pairing pool - the old female/male biosex pools silently excluded them
 -`Pair` is now `PersonA`/`PersonB` instead of `FPerson`/`MPerson`; `GenerateChildren` derives mother/father from biosex, so reproduction needs the egg and sperm sides covered and same-sex pairs don't conceive

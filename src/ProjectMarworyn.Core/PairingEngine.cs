@@ -6,12 +6,15 @@ namespace ProjectMarworyn.Core
     internal class PairingEngine : IPairingEngine
     {
         private readonly IDiceGenerator _diceGenerator;
+        private readonly IAttractionCalculator _attractionCalculator;
         private GameState _gameState;
 
         public PairingEngine(IDiceGenerator diceGenerator,
+            IAttractionCalculator attractionCalculator,
             GameState gameState)
         {
             _diceGenerator = diceGenerator;
+            _attractionCalculator = attractionCalculator;
             _gameState = gameState;
         }
 
@@ -28,7 +31,7 @@ namespace ProjectMarworyn.Core
             var singleAdults = people.Where(x => x.Age >= 18 &&
                     x.HasPair == false &&
                     x.WillPair &&
-                    AttractionRules.CanPair(x))
+                    _attractionCalculator.CanPair(x))
                 .ToList();
 
             foreach (var person in singleAdults)
@@ -40,7 +43,7 @@ namespace ProjectMarworyn.Core
 
                 var candidates = singleAdults.Where(x => x.Id != person.Id &&
                         x.HasPair == false &&
-                        AttractionRules.AreMutuallyAttracted(person,
+                        _attractionCalculator.AreMutuallyAttracted(person,
                             x))
                     .ToList();
 
