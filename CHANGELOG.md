@@ -2,6 +2,18 @@
 
 ---
 
+## [2.2.0]
+
+-Pairing rewritten around mutual attraction (Issue #15 Stage 4): new `AttractionRules` decides attraction from orientation and the candidate's gender - heterosexual means any gender different from your own (so a heterosexual non-binary person is attracted to both binary genders), homosexual the same gender, bisexual the binary genders, pansexual everyone, asexual anyone; both sides must be attracted or no pair forms
++Aromantic and aroace people never pair; `WillPair` is respected as the orientation-independent opt-out
++Intersex people now enter the pairing pool - the old female/male biosex pools silently excluded them
+-`Pair` is now `PersonA`/`PersonB` instead of `FPerson`/`MPerson`; `GenerateChildren` derives mother/father from biosex, so reproduction needs the egg and sperm sides covered and same-sex pairs don't conceive
++Adoption (later) will redistribute children orphaned in the simulation instead - people never appear from nowhere
+-Asexual people pair romantically but never conceive - a child means sexual reproduction by definition until the adoption system exists
+-Added `IsFertile` to `Person` and `IntersexFertileProbability` to `AppSettings` (in %, default 50 - a modelling estimate, no citable fertile/infertile split exists): intersex newborns roll it at birth, binary biosex is always fertile, and a fertile intersex person reproduces in the direction of their gender with non-binary gender able to fill either role
++`IsFertile` defaults to true in `InitialPeople.json` - only infertile people carry it in the data file
+-`DeathEngine.ProcessDeaths` now returns the survivor list and the `Generation` model is removed - it was recreated every day just to carry `Iteration` plus the survivors (#41); `Iteration` now lives on `SimulationManager`
+
 ## [2.1.0]
 
 -`Person.TimeLived` is replaced by an explicit birthday (`BirthMonth`/`BirthDay`) and `Person.TimeFromLastChild` by a plain day counter (`DaysSinceLastChild`) - no more 1-based `DateTime` fields misused as durations
