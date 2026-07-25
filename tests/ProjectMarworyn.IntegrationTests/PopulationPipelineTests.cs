@@ -266,6 +266,7 @@ public class PopulationPipelineTests
             BirthDay = birthDay,
             DaysSinceLastChild = 0,
             WillHaveChildren = true,
+            WillPair = true,
             HasPair = false
         };
 
@@ -282,6 +283,7 @@ public class PopulationPipelineTests
             BirthDay = 15,
             DaysSinceLastChild = 730,
             WillHaveChildren = true,
+            WillPair = true,
             HasPair = false
         };
 }

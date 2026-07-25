@@ -731,6 +731,7 @@ namespace ProjectMarworyn.UnitTests
                     Biosex = Biosex.Female,
                     IsAlive = true,
                     WillHaveChildren = true,
+                    WillPair = true,
                     DaysSinceLastChild = 730
                 },
                 MPerson = new Person
@@ -741,6 +742,7 @@ namespace ProjectMarworyn.UnitTests
                     Biosex = Biosex.Male,
                     IsAlive = true,
                     WillHaveChildren = true,
+                    WillPair = true,
                     DaysSinceLastChild = 730
                 }
             };
