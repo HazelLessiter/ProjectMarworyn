@@ -83,18 +83,16 @@ public class PopulationPipelineTests
         var people = Enumerable.Range(0, 50)
             .Select(i => CreatePerson(i, age: 30))
             .ToList();
-        var generation = _generationManager.Initialise(people);
 
         var aged = _ageProcessor.Age(people,
             new DateTime(1, 1, 1));
 
-        var result = _deathEngine.ProcessDeaths(aged,
-            generation,
+        var survivors = _deathEngine.ProcessDeaths(aged,
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(result.People);
-        Assert.True(result.People.Count <= aged.Count);
+        Assert.NotNull(survivors);
+        Assert.True(survivors.Count <= aged.Count);
     }
 
     [Fact]
@@ -106,14 +104,12 @@ public class PopulationPipelineTests
         var people = Enumerable.Range(0, 1000)
             .Select(i => CreatePerson(i, age: 100))
             .ToList();
-        var generation = _generationManager.Initialise(people);
 
-        var result = _deathEngine.ProcessDeaths(people,
-            generation,
+        var survivors = _deathEngine.ProcessDeaths(people,
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.True(result.People.Count < people.Count);
+        Assert.True(survivors.Count < people.Count);
     }
 
     [Fact]
@@ -196,16 +192,6 @@ public class PopulationPipelineTests
 
         Assert.NotNull(childResult.Children);
         Assert.NotEmpty(childResult.Children);
-    }
-
-    [Fact]
-    public void GenerationManager_Initialise_SetsIterationToZero()
-    {
-        var people = new List<Person> { CreatePerson(1) };
-
-        var generation = _generationManager.Initialise(people);
-
-        Assert.Equal(0, generation.Iteration);
     }
 
     [Fact]
