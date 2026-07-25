@@ -234,6 +234,8 @@ namespace ProjectMarworyn.Core.Generators
                 }
             }
 
+            //The cross-parent conventions look reversed but are intentional and date from v1:
+            //male children take mother's prefix + father's suffix, female children the mirror
             if (namingGender == Gender.Male)
             {
                 return new Name
