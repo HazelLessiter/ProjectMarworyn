@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Options;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.Core
 {
@@ -8,12 +9,23 @@ namespace ProjectMarworyn.Core
     {
         private readonly IDiceGenerator _diceGenerator;
         private GameState _gameState;
+        private readonly AppSettings _appSettings;
 
         public DeathEngine(IDiceGenerator diceGenerator,
-            GameState gameState)
+            GameState gameState,
+            IOptions<AppSettings> appSettings)
         {
             _diceGenerator = diceGenerator;
             _gameState = gameState;
+            _appSettings = appSettings.Value;
+
+            //Fail at startup rather than mid-run: without a catch-all bracket, the first person
+            //to outlive the last explicit MaxAge would crash the simulation with a cryptic error
+            if (_appSettings.DeathBrackets == null ||
+                !_appSettings.DeathBrackets.Any(x => x.MaxAge == null))
+            {
+                throw new InvalidOperationException("DeathBrackets must contain a catch-all bracket with no MaxAge");
+            }
         }
 
         public Generation ProcessDeaths(List<Person> people,
@@ -24,42 +36,21 @@ namespace ProjectMarworyn.Core
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
-            var deathChance = 0.0;
-            var deathModifier = DeathModifier.Zero;
             var survivors = new List<Person>();
-            var names = new List<Name>();
 
-            foreach (var person in people.Where(x => x.IsAlive == true))
+            foreach (var person in people.Where(x => x.IsAlive))
             {
-                var age = person.Age;
+                var deathBracket = _appSettings.DeathBrackets.First(x => x.MaxAge == null ||
+                    person.Age <= x.MaxAge);
 
-                deathModifier = age switch
-                {
-                    <= 9 => DeathModifier.Zero,
-                    <= 19 => DeathModifier.Ten,
-                    <= 29 => DeathModifier.Twenty,
-                    <= 39 => DeathModifier.Thirty,
-                    <= 49 => DeathModifier.Fourty,
-                    <= 59 => DeathModifier.Fifty,
-                    <= 69 => DeathModifier.Sixty,
-                    <= 79 => DeathModifier.Seventy,
-                    <= 89 => DeathModifier.Eighty,
-                    <= 99 => DeathModifier.Ninety,
-                    _ => DeathModifier.Hundred
-                };
-
-                deathChance = (int)deathModifier / 100.0;
-
-                if (_diceGenerator.NextDouble(dice) * 100 <= deathChance)
+                if (_diceGenerator.NextDouble(dice) * 100 <= deathBracket.DailyDeathChance)
                 {
                     person.IsAlive = false;
                     _gameState.Text.Add($"{person.Name.FullName} has died at age {person.Age}");
                 }
                 else
                 {
-                    person.IsAlive = true;
                     survivors.Add(person);
-                    names.Add(person.Name);
                 }
             }
 

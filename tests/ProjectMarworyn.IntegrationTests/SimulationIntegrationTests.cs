@@ -3,6 +3,7 @@ using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Extensions;
 using ProjectMarworyn.Core.Managers;
 using ProjectMarworyn.Core.Models;
+using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.IntegrationTests;
 
@@ -20,6 +21,20 @@ public class SimulationIntegrationTests : IDisposable
         {
             options.InitialPeopleFilePath = ConfigFileHelper.GetPath("Configuration/InitialPeople.json");
             options.SeedWordFilePath = ConfigFileHelper.GetPath("Configuration/SeedWord.json");
+            //A single catch-all bracket keeps the population alive for the clock/logging assertions
+            options.DeathBrackets = new List<DeathBracket>
+            {
+                new DeathBracket { DailyDeathChance = 0.05 }
+            };
+            //PersonGenerator's startup guard needs the full weight table; everything on
+            //Heterosexual keeps these clock/logging assertions independent of orientation balance
+            options.OrientationWeights = Enum.GetValues<Orientation>()
+                .Select(x => new OrientationWeight
+                {
+                    Orientation = x,
+                    Weight = x == Orientation.Heterosexual ? 100 : 0
+                })
+                .ToList();
         });
         services.AddCoreServices();
 
@@ -90,5 +105,27 @@ public class SimulationIntegrationTests : IDisposable
         }
 
         Assert.Contains(_gameState.Text, t => t == "Happy new year!");
+    }
+
+    // State-based counterpart to the SimulationManagerTests orchestration test: with the real
+    // engines running, children being born is observable through GameState. Roughly a third of
+    // the initial population starts fertility-eligible and each fertile pair has a ~40% daily
+    // birth chance, so a birthless year is astronomically unlikely regardless of seed.
+    // GameState.Text is cleared every day, so the check runs inside the loop.
+    [Fact]
+    public void ProgressDay_OverAYear_ChildrenAreBorn()
+    {
+        _simulationManager.Start();
+
+        for (int i = 0; i < 365; i++)
+        {
+            _simulationManager.ProgressDay();
+            if (_gameState.Text.Any(t => t.Contains("was born to")))
+                return;
+            if (!_clock.IsRunning)
+                break;
+        }
+
+        Assert.Fail("Expected at least one child to be born within a year");
     }
 }

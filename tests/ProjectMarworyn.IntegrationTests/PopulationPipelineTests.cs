@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Managers;
 using ProjectMarworyn.Core.Models;
@@ -20,10 +22,19 @@ public class PopulationPipelineTests
     {
         _gameState = new GameState();
         _diceGenerator = new DiceGenerator();
-        _ageProcessor = new AgeProcessor(_gameState);
-        _deathEngine = new DeathEngine(_diceGenerator, _gameState);
+        _ageProcessor = new AgeProcessor(_gameState,
+            Options.Create(new AppSettings { FertilityCooldownYears = 2 }));
+        _deathEngine = new DeathEngine(_diceGenerator,
+            _gameState,
+            Options.Create(new AppSettings { DeathBrackets = CreateDefaultDeathBrackets() }));
         _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
-        _personGenerator = new PersonGenerator(_diceGenerator, _gameState);
+        _personGenerator = new PersonGenerator(_diceGenerator,
+            _gameState,
+            Options.Create(new AppSettings
+            {
+                FertilityCooldownYears = 2,
+                OrientationWeights = CreateDefaultOrientationWeights()
+            }));
         _generationManager = new GenerationManager();
     }
 
@@ -36,28 +47,31 @@ public class PopulationPipelineTests
             CreatePerson(2, isAlive: false)
         };
 
-        var result = _ageProcessor.Age(people);
+        var result = _ageProcessor.Age(people,
+            new DateTime(1, 1, 1));
 
         Assert.Single(result);
         Assert.Equal(1, result[0].Id);
     }
 
     [Fact]
-    public void AgeProcessor_PersonAtYearBoundary_AgeIsIncremented()
+    public void AgeProcessor_OnBirthday_AgeIsIncremented()
     {
-        var person = CreatePerson(1, age: 20, timeLived: new DateTime(1, 12, 31));
+        var person = CreatePerson(1, age: 20);
 
-        var result = _ageProcessor.Age(new List<Person> { person });
+        var result = _ageProcessor.Age(new List<Person> { person },
+            new DateTime(1, 6, 15));
 
         Assert.Equal(21, result[0].Age);
     }
 
     [Fact]
-    public void AgeProcessor_PersonNotAtYearBoundary_AgeIsUnchanged()
+    public void AgeProcessor_NotOnBirthday_AgeIsUnchanged()
     {
-        var person = CreatePerson(1, age: 20, timeLived: new DateTime(1, 6, 15));
+        var person = CreatePerson(1, age: 20);
 
-        var result = _ageProcessor.Age(new List<Person> { person });
+        var result = _ageProcessor.Age(new List<Person> { person },
+            new DateTime(1, 6, 14));
 
         Assert.Equal(20, result[0].Age);
     }
@@ -71,7 +85,8 @@ public class PopulationPipelineTests
             .ToList();
         var generation = _generationManager.Initialise(people);
 
-        var aged = _ageProcessor.Age(people);
+        var aged = _ageProcessor.Age(people,
+            new DateTime(1, 1, 1));
 
         var result = _deathEngine.ProcessDeaths(aged,
             generation,
@@ -113,12 +128,12 @@ public class PopulationPipelineTests
             CreatePerson(4, biosex: Biosex.Male, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotEmpty(pairs);
+        Assert.NotEmpty(result.Pairs);
     }
 
     [Fact]
@@ -131,12 +146,12 @@ public class PopulationPipelineTests
             CreatePerson(2, biosex: Biosex.Female, age: 28),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(pairs);
+        Assert.Empty(result.Pairs);
     }
 
     [Fact]
@@ -149,12 +164,12 @@ public class PopulationPipelineTests
             CreatePerson(2, biosex: Biosex.Male, age: 17),
         };
 
-        var (pairs, _) = _pairingEngine.GeneratePairs(people,
+        var result = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(pairs);
+        Assert.Empty(result.Pairs);
     }
 
     [Fact]
@@ -169,18 +184,18 @@ public class PopulationPipelineTests
             })
             .ToList();
 
-        var (pairs, updatedPeople) = _pairingEngine.GeneratePairs(people,
+        var pairingResult = _pairingEngine.GeneratePairs(people,
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
-        var (children, _) = _personGenerator.GenerateChildren(pairs,
+        var childResult = _personGenerator.GenerateChildren(pairingResult.Pairs,
             worldSeed,
             people.Max(p => p.Id),
-            updatedPeople,
+            pairingResult.People,
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(children);
-        Assert.NotEmpty(children);
+        Assert.NotNull(childResult.Children);
+        Assert.NotEmpty(childResult.Children);
     }
 
     [Fact]
@@ -209,8 +224,36 @@ public class PopulationPipelineTests
         Assert.False(_generationManager.CheckForExtinction(people));
     }
 
+    private static List<DeathBracket> CreateDefaultDeathBrackets() =>
+        new()
+        {
+            new DeathBracket { MaxAge = 9, DailyDeathChance = 0.1 },
+            new DeathBracket { MaxAge = 19, DailyDeathChance = 0.01 },
+            new DeathBracket { MaxAge = 29, DailyDeathChance = 0.02 },
+            new DeathBracket { MaxAge = 39, DailyDeathChance = 0.05 },
+            new DeathBracket { MaxAge = 49, DailyDeathChance = 0.1 },
+            new DeathBracket { MaxAge = 59, DailyDeathChance = 0.15 },
+            new DeathBracket { MaxAge = 69, DailyDeathChance = 0.2 },
+            new DeathBracket { MaxAge = 79, DailyDeathChance = 0.25 },
+            new DeathBracket { MaxAge = 89, DailyDeathChance = 0.5 },
+            new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 },
+            new DeathBracket { DailyDeathChance = 2.5 }
+        };
+
+    private static List<OrientationWeight> CreateDefaultOrientationWeights() =>
+        new()
+        {
+            new OrientationWeight { Orientation = Orientation.Heterosexual, Weight = 96.81 },
+            new OrientationWeight { Orientation = Orientation.Homosexual, Weight = 1.5 },
+            new OrientationWeight { Orientation = Orientation.Bisexual, Weight = 1.3 },
+            new OrientationWeight { Orientation = Orientation.Pansexual, Weight = 0.23 },
+            new OrientationWeight { Orientation = Orientation.Asexual, Weight = 0.06 },
+            new OrientationWeight { Orientation = Orientation.Aromantic, Weight = 0.05 },
+            new OrientationWeight { Orientation = Orientation.Aroace, Weight = 0.05 }
+        };
+
     private static Person CreatePerson(int id, bool isAlive = true, int age = 30,
-        Biosex biosex = Biosex.Female, DateTime? timeLived = null) =>
+        Biosex biosex = Biosex.Female, int birthMonth = 6, int birthDay = 15) =>
         new()
         {
             Id = id,
@@ -219,9 +262,11 @@ public class PopulationPipelineTests
             Biosex = biosex,
             Gender = biosex == Biosex.Male ? Gender.Male : Gender.Female,
             Name = new Name { FullName = $"Person{id}", Prefix = "Person", Suffix = $"{id}" },
-            TimeLived = timeLived ?? new DateTime(1, 1, 1),
-            TimeFromLastChild = new DateTime(1, 1, 1),
+            BirthMonth = birthMonth,
+            BirthDay = birthDay,
+            DaysSinceLastChild = 0,
             WillHaveChildren = true,
+            WillPair = true,
             HasPair = false
         };
 
@@ -234,9 +279,11 @@ public class PopulationPipelineTests
             Biosex = biosex,
             Gender = biosex == Biosex.Male ? Gender.Male : Gender.Female,
             Name = new Name { FullName = $"Person{id}", Prefix = "Person", Suffix = $"{id}" },
-            TimeLived = new DateTime(1, 1, 1),
-            TimeFromLastChild = new DateTime(3, 1, 1),
+            BirthMonth = 6,
+            BirthDay = 15,
+            DaysSinceLastChild = 730,
             WillHaveChildren = true,
+            WillPair = true,
             HasPair = false
         };
 }

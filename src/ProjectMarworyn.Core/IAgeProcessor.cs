@@ -4,6 +4,6 @@ namespace ProjectMarworyn.Core
 {
     internal interface IAgeProcessor
     {
-        List<Person> Age(List<Person> people);
+        List<Person> Age(List<Person> people, DateTime currentTime);
     }
 }

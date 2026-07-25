@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
 
@@ -7,12 +9,24 @@ namespace ProjectMarworyn.Core.Generators
     {
         private readonly IDiceGenerator _diceGenerator;
         private GameState _gameState;
+        private readonly AppSettings _appSettings;
 
         public PersonGenerator(IDiceGenerator diceGenerator,
-            GameState gameState)
+            GameState gameState,
+            IOptions<AppSettings> appSettings)
         {
             _diceGenerator = diceGenerator;
             _gameState = gameState;
+            _appSettings = appSettings.Value;
+
+            //Fail at startup rather than mid-run: a hand-edited weight table with a missing,
+            //duplicated or misweighted entry would silently skew every birth
+            if (_appSettings.OrientationWeights == null ||
+                Enum.GetValues<Orientation>().Any(x => _appSettings.OrientationWeights.Count(w => w.Orientation == x) != 1) ||
+                Math.Abs(_appSettings.OrientationWeights.Sum(x => x.Weight) - 100) > 0.001)
+            {
+                throw new InvalidOperationException("OrientationWeights must contain exactly one entry per Orientation value, with weights summing to 100");
+            }
         }
 
         public List<Person> Initialise(List<InitialPerson> initialPeople,
@@ -27,16 +41,21 @@ namespace ProjectMarworyn.Core.Generators
                 var age = dice.Next(18,
                     40);
 
-                var year = 1;
-                var month = _diceGenerator.Next(dice,
+                var birthMonth = _diceGenerator.Next(dice,
                     1,
-                    12);
-                var day = _diceGenerator.Next(dice,
+                    13);
+                //Capped at 28 so the birthday is valid in every month
+                var birthDay = _diceGenerator.Next(dice,
                     1,
                     29);
-                var yearFromLastChild = _diceGenerator.Next(dice,
-                    1,
-                    4);
+                var yearsFromLastChild = _diceGenerator.Next(dice,
+                    0,
+                    3);
+                //Day-of-year offset staggers cooldowns so they don't all expire on the same day
+                var dayOffset = new DateTime(1,
+                        birthMonth,
+                        birthDay)
+                    .DayOfYear - 1;
 
                 var person = new Person()
                 {
@@ -48,23 +67,15 @@ namespace ProjectMarworyn.Core.Generators
                         Suffix = initialPerson.Suffix
                     },
                     Biosex = initialPerson.Biosex,
-                    Gender = initialPerson.Biosex
-                        switch
-                        {
-                            Biosex.Female => Gender.Female,
-                            Biosex.Male => Gender.Male,
-                            _ => (Gender)RandomGender(dice)
-                        },
+                    Gender = initialPerson.Gender,
+                    Orientation = initialPerson.Orientation,
                     Age = age,
                     IsAlive = true,
-                    TimeLived = new DateTime(year,
-                            month,
-                            day)
-                        .AddYears(age),
+                    BirthMonth = birthMonth,
+                    BirthDay = birthDay,
                     WillHaveChildren = CalcWillHaveChildren(dice),
-                    TimeFromLastChild = new DateTime(yearFromLastChild,
-                        month,
-                        day),
+                    WillPair = initialPerson.WillPair,
+                    DaysSinceLastChild = yearsFromLastChild * SimulationConstants.DaysPerYear + dayOffset,
                     HasPair = false
                 };
 
@@ -76,7 +87,7 @@ namespace ProjectMarworyn.Core.Generators
             return people;
         }
 
-        public (List<Person>, List<Person>) GenerateChildren(List<Pair> pairs,
+        public ChildGenerationResult GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
             List<Person> people,
@@ -86,21 +97,21 @@ namespace ProjectMarworyn.Core.Generators
                 currentTime);
 
             //For each pair
-            var aliveFurtilePairs = pairs.Where(x => x.FPerson.IsAlive &&
+            var aliveFertilePairs = pairs.Where(x => x.FPerson.IsAlive &&
                     x.MPerson.IsAlive &&
                     x.FPerson.Age >= 18 &&
                     x.FPerson.Age <= 45 &&
                     x.MPerson.Age >= 18 &&
                     x.FPerson.WillHaveChildren &&
                     x.MPerson.WillHaveChildren &&
-                    x.FPerson.TimeFromLastChild.Year >= 3 &&
-                    x.MPerson.TimeFromLastChild.Year >= 3)
+                    x.FPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear &&
+                    x.MPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
                 .ToList();
 
             var children = new List<Person>();
             List<Person> peopleToUpdate = new List<Person>();
 
-            foreach (var pair in aliveFurtilePairs)
+            foreach (var pair in aliveFertilePairs)
             {
                 var childChance = dice.Next(1,
                     101);
@@ -108,33 +119,12 @@ namespace ProjectMarworyn.Core.Generators
                 if (childChance < 40)
                 {
                     var biosex = RandomBiosex(dice);
-                    var gender = Gender.Female;
+                    var gender = CalculateGender(dice,
+                        biosex);
 
-                    if (biosex == Biosex.Intersex)
-                        gender = RandomGender(dice);
-                    else
-                        gender = (Gender)biosex;
-
-                    var name = new Name();
-
-                    if (gender == Gender.Male)
-                    {
-                        name = new Name
-                        {
-                            FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
-                            Prefix = pair.FPerson.Name.Prefix,
-                            Suffix = pair.MPerson.Name.Suffix,
-                        };
-                    }
-                    if (gender == Gender.Female)
-                    {
-                        name = new Name
-                        {
-                            FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
-                            Prefix = pair.MPerson.Name.Prefix,
-                            Suffix = pair.FPerson.Name.Suffix,
-                        };
-                    }
+                    var name = CalculateName(dice,
+                        gender,
+                        pair);
 
                     personId++;
                     var child = new Person()
@@ -146,9 +136,12 @@ namespace ProjectMarworyn.Core.Generators
                         Gender = gender,
                         Name = name,
                         HasPair = false,
-                        TimeFromLastChild = new DateTime(1, 1, 1),
-                        TimeLived = new DateTime(1, 1, 1),
-                        WillHaveChildren = CalcWillHaveChildren(dice)
+                        DaysSinceLastChild = 0,
+                        BirthMonth = currentTime.Month,
+                        BirthDay = currentTime.Day,
+                        WillHaveChildren = CalcWillHaveChildren(dice),
+                        Orientation = CalculateOrientation(dice),
+                        WillPair = CalcWillPair(dice)
                     };
 
                     children.Add(child);
@@ -164,11 +157,82 @@ namespace ProjectMarworyn.Core.Generators
 
             foreach (var person in peopleToUpdate)
             {
-                person.TimeFromLastChild = new DateTime(1, 1, 1);
+                person.DaysSinceLastChild = 0;
                 people.Add(person);
             }
 
-            return (children, people);
+            return new ChildGenerationResult
+            {
+                Children = children,
+                People = people
+            };
+        }
+
+        private Name CalculateName(Random dice,
+            Gender gender,
+            Pair pair)
+        {
+            var namingGender = gender;
+
+            if (gender == Gender.NonBinary)
+            {
+                //Non-binary children pick the traditional route (either binary convention at random)
+                //or one of two dedicated routes: prefix + prefix or suffix + suffix
+                switch (_diceGenerator.Next(dice, 0, 3))
+                {
+                    case 0:
+                        namingGender = RandomGender(dice);
+                        break;
+                    case 1:
+                        return RandomOrderName(dice,
+                            pair.FPerson.Name.Prefix,
+                            pair.MPerson.Name.Prefix);
+                    case 2:
+                        return RandomOrderName(dice,
+                            pair.FPerson.Name.Suffix,
+                            pair.MPerson.Name.Suffix);
+                    default:
+                        throw new InvalidOperationException("Error randomising naming route");
+                }
+            }
+
+            if (namingGender == Gender.Male)
+            {
+                return new Name
+                {
+                    FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
+                    Prefix = pair.FPerson.Name.Prefix,
+                    Suffix = pair.MPerson.Name.Suffix,
+                };
+            }
+
+            return new Name
+            {
+                FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
+                Prefix = pair.MPerson.Name.Prefix,
+                Suffix = pair.FPerson.Name.Suffix,
+            };
+        }
+
+        private Name RandomOrderName(Random dice,
+            string fPersonPart,
+            string mPersonPart)
+        {
+            var mPersonFirst = _diceGenerator.Next(dice, 0, 2) == 1;
+
+            var firstPart = mPersonFirst ?
+                mPersonPart :
+                fPersonPart;
+            var secondPart = mPersonFirst ?
+                fPersonPart :
+                mPersonPart;
+
+            return new Name
+            {
+                FullName = firstPart + secondPart,
+                Prefix = firstPart,
+                Suffix = secondPart,
+            };
         }
 
         private Gender RandomGender(Random random)
@@ -188,6 +252,40 @@ namespace ProjectMarworyn.Core.Generators
             }
 
             return gender;
+        }
+
+        private Gender CalculateGender(Random dice,
+            Biosex biosex)
+        {
+            //NonBinaryProbability and TransgenderProbability are independent rolls,
+            //with the non-binary roll taking precedence
+            var nonBinaryRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            if (nonBinaryRoll < _appSettings.NonBinaryProbability)
+            {
+                return Gender.NonBinary;
+            }
+
+            //Intersex children have no biosex-aligned gender, so they are assigned a random
+            //binary one, then roll for trans like everyone else
+            var alignedGender = biosex
+                switch
+                {
+                    Biosex.Female => Gender.Female,
+                    Biosex.Male => Gender.Male,
+                    _ => RandomGender(dice)
+                };
+
+            var transgenderRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            if (transgenderRoll < _appSettings.TransgenderProbability)
+            {
+                return alignedGender == Gender.Female ?
+                    Gender.Male :
+                    Gender.Female;
+            }
+
+            return alignedGender;
         }
 
         private Biosex RandomBiosex(Random dice)
@@ -214,6 +312,34 @@ namespace ProjectMarworyn.Core.Generators
             var willHaveChildren = willHaveChildrenModifier >= 7;
 
             return willHaveChildren;
+        }
+
+        private Orientation CalculateOrientation(Random dice)
+        {
+            var roll = _diceGenerator.NextDouble(dice) * 100;
+
+            var cumulative = 0.0;
+            foreach (var orientationWeight in _appSettings.OrientationWeights)
+            {
+                cumulative += orientationWeight.Weight;
+
+                if (roll < cumulative)
+                {
+                    return orientationWeight.Orientation;
+                }
+            }
+
+            //Floating point rounding can leave the cumulative total fractionally short of 100
+            return _appSettings.OrientationWeights.Last().Orientation;
+        }
+
+        //Independent of orientation: a proportion of the population never pairs at all,
+        //whoever they are attracted to
+        private bool CalcWillPair(Random dice)
+        {
+            var neverPairRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            return neverPairRoll >= _appSettings.NeverPairProbability;
         }
     }
 }

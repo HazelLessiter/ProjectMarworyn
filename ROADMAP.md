@@ -46,7 +46,7 @@ Minor aside noticed nearby: singleMaleAdults.Count() uses the LINQ extension ins
 
 ### #21 — Magic constant for fertility threshold
 Git history: originally an int TimeFromLastChild >= 2; became DateTime .Year >= 3 after the int-to-DateTime refactor moved the reset baseline from 0 to Year 1 — same "2 years must pass" concept, different absolute number.
-Duplicated in three places across two files: PersonGenerator.cs (twice, in the aliveFurtilePairs filter) and AgeProcessor.cs (once, in GetTimeFromLastChild) — a private const scoped to PersonGenerator alone would miss AgeProcessor's copy.
+Duplicated in three places across two files: PersonGenerator.cs (twice, in the aliveFertilePairs filter) and AgeProcessor.cs (once, in GetTimeFromLastChild) — a private const scoped to PersonGenerator alone would miss AgeProcessor's copy.
 Decided: promote to AppSettings so both classes read the same configured value instead of a shared constant class.
 
 ### #27 — Intersex inclusion in pairing/reproduction

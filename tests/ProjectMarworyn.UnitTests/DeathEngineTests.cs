@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using ProjectMarworyn.Core;
+using ProjectMarworyn.Core.Configuration;
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
 using ProjectMarworyn.Core.Models.Enums;
@@ -213,32 +215,32 @@ namespace ProjectMarworyn.UnitTests
             Assert.Contains("55", _gameState.Text[0]);
         }
 
-        // Verifies the exact death probability thresholds for all 11 age brackets.
-        // Formula: deathChance = (int)deathModifier / 100.0; death when NextDouble() * 100 <= deathChance
-        // Threshold (NextDouble boundary) = (int)deathModifier / 10000
+        // Verifies the exact death probability thresholds for all 11 default age brackets.
+        // Formula: death when NextDouble() * 100 <= DailyDeathChance (in %)
+        // Threshold (NextDouble boundary) = DailyDeathChance / 100
         // Test values use a 10% margin either side of each threshold.
         [Theory]
-        [InlineData(5,   0.0009,  true)]  // Zero   (0-9,   modifier  10): threshold 0.001
+        [InlineData(5,   0.0009,  true)]  // 0-9    (0.1%):  threshold 0.001
         [InlineData(5,   0.0011,  false)]
-        [InlineData(15,  0.00009, true)]  // Ten    (10-19, modifier   1): threshold 0.0001
+        [InlineData(15,  0.00009, true)]  // 10-19  (0.01%): threshold 0.0001
         [InlineData(15,  0.00011, false)]
-        [InlineData(25,  0.00018, true)]  // Twenty (20-29, modifier   2): threshold 0.0002
+        [InlineData(25,  0.00018, true)]  // 20-29  (0.02%): threshold 0.0002
         [InlineData(25,  0.00022, false)]
-        [InlineData(35,  0.00045, true)]  // Thirty (30-39, modifier   5): threshold 0.0005
+        [InlineData(35,  0.00045, true)]  // 30-39  (0.05%): threshold 0.0005
         [InlineData(35,  0.00055, false)]
-        [InlineData(45,  0.0009,  true)]  // Fourty (40-49, modifier  10): threshold 0.001
+        [InlineData(45,  0.0009,  true)]  // 40-49  (0.1%):  threshold 0.001
         [InlineData(45,  0.0011,  false)]
-        [InlineData(55,  0.00135, true)]  // Fifty  (50-59, modifier  15): threshold 0.0015
+        [InlineData(55,  0.00135, true)]  // 50-59  (0.15%): threshold 0.0015
         [InlineData(55,  0.00165, false)]
-        [InlineData(65,  0.0018,  true)]  // Sixty  (60-69, modifier  20): threshold 0.002
+        [InlineData(65,  0.0018,  true)]  // 60-69  (0.2%):  threshold 0.002
         [InlineData(65,  0.0022,  false)]
-        [InlineData(75,  0.00225, true)]  // Seventy(70-79, modifier  25): threshold 0.0025
+        [InlineData(75,  0.00225, true)]  // 70-79  (0.25%): threshold 0.0025
         [InlineData(75,  0.00275, false)]
-        [InlineData(85,  0.0045,  true)]  // Eighty (80-89, modifier  50): threshold 0.005
+        [InlineData(85,  0.0045,  true)]  // 80-89  (0.5%):  threshold 0.005
         [InlineData(85,  0.0055,  false)]
-        [InlineData(95,  0.009,   true)]  // Ninety (90-99, modifier 100): threshold 0.01
+        [InlineData(95,  0.009,   true)]  // 90-99  (1.0%):  threshold 0.01
         [InlineData(95,  0.011,   false)]
-        [InlineData(105, 0.0225,  true)]  // Hundred(100+,  modifier 250): threshold 0.025
+        [InlineData(105, 0.0225,  true)]  // 100+   (2.5%):  threshold 0.025
         [InlineData(105, 0.0275,  false)]
         public void ProcessDeaths_DeathProbabilityThreshold_CorrectlyDeterminesOutcome(int age,
             double nextDoubleValue,
@@ -257,22 +259,22 @@ namespace ProjectMarworyn.UnitTests
                 Assert.Single(result.People);
         }
 
-        // Verifies the switch expression assigns the correct DeathModifier at every age boundary.
+        // Verifies bracket selection at every age boundary of the default table.
         // A NextDouble value between the two adjacent thresholds produces opposite outcomes
         // for each side, proving the boundary is wired correctly.
-        // The 9→10 boundary is an exception: infant mortality means 0-9 has a higher modifier than 10-19.
+        // The 9→10 boundary is an exception: infant mortality means 0-9 has a higher chance than 10-19.
         [Theory]
-        [InlineData(9,  10,  0.0005,   true,  false)]  // Zero(10)→Ten(1):        threshold 0.001   vs 0.0001, value between
-        [InlineData(19, 20,  0.00015,  false, true)]   // Ten(1)→Twenty(2):       threshold 0.0001  vs 0.0002
-        [InlineData(29, 30,  0.00035,  false, true)]   // Twenty(2)→Thirty(5):    threshold 0.0002  vs 0.0005
-        [InlineData(39, 40,  0.00075,  false, true)]   // Thirty(5)→Fourty(10):   threshold 0.0005  vs 0.001
-        [InlineData(49, 50,  0.00125,  false, true)]   // Fourty(10)→Fifty(15):   threshold 0.001   vs 0.0015
-        [InlineData(59, 60,  0.00175,  false, true)]   // Fifty(15)→Sixty(20):    threshold 0.0015  vs 0.002
-        [InlineData(69, 70,  0.00225,  false, true)]   // Sixty(20)→Seventy(25):  threshold 0.002   vs 0.0025
-        [InlineData(79, 80,  0.00375,  false, true)]   // Seventy(25)→Eighty(50): threshold 0.0025  vs 0.005
-        [InlineData(89, 90,  0.0075,   false, true)]   // Eighty(50)→Ninety(100): threshold 0.005   vs 0.01
-        [InlineData(99, 100, 0.0175,   false, true)]   // Ninety(100)→Hundred(250):threshold 0.01   vs 0.025
-        public void ProcessDeaths_AgeBoundaryTransition_CorrectModifierApplied(int lowerAge,
+        [InlineData(9,  10,  0.0005,   true,  false)]  // 0.1%→0.01%:  threshold 0.001   vs 0.0001, value between
+        [InlineData(19, 20,  0.00015,  false, true)]   // 0.01%→0.02%: threshold 0.0001  vs 0.0002
+        [InlineData(29, 30,  0.00035,  false, true)]   // 0.02%→0.05%: threshold 0.0002  vs 0.0005
+        [InlineData(39, 40,  0.00075,  false, true)]   // 0.05%→0.1%:  threshold 0.0005  vs 0.001
+        [InlineData(49, 50,  0.00125,  false, true)]   // 0.1%→0.15%:  threshold 0.001   vs 0.0015
+        [InlineData(59, 60,  0.00175,  false, true)]   // 0.15%→0.2%:  threshold 0.0015  vs 0.002
+        [InlineData(69, 70,  0.00225,  false, true)]   // 0.2%→0.25%:  threshold 0.002   vs 0.0025
+        [InlineData(79, 80,  0.00375,  false, true)]   // 0.25%→0.5%:  threshold 0.0025  vs 0.005
+        [InlineData(89, 90,  0.0075,   false, true)]   // 0.5%→1.0%:   threshold 0.005   vs 0.01
+        [InlineData(99, 100, 0.0175,   false, true)]   // 1.0%→2.5%:   threshold 0.01    vs 0.025
+        public void ProcessDeaths_AgeBoundaryTransition_CorrectBracketApplied(int lowerAge,
             int upperAge,
             double nextDoubleValue,
             bool lowerDies,
@@ -318,6 +320,70 @@ namespace ProjectMarworyn.UnitTests
             Assert.Single(result.People);
         }
 
+        // Custom brackets flip the default outcomes for both ages at the same dice roll,
+        // so this fails if the engine stops reading the configured table.
+        [Fact]
+        public void ProcessDeaths_WithCustomDeathBrackets_UsesConfiguredChances()
+        {
+            var customBrackets = new List<DeathBracket>
+            {
+                new DeathBracket { MaxAge = 9, DailyDeathChance = 0 },
+                new DeathBracket { DailyDeathChance = 100 }
+            };
+            var engine = CreateEngine(0.5,
+                customBrackets);
+
+            var childResult = engine.ProcessDeaths(new List<Person> { CreatePerson(5) },
+                CreateGeneration(),
+                0,
+                new DateTime(1, 1, 1));
+            var adultResult = engine.ProcessDeaths(new List<Person> { CreatePerson(50) },
+                CreateGeneration(),
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(childResult.People);
+            Assert.Empty(adultResult.People);
+        }
+
+        // A misconfigured table (hand-edited Appsettings.json) must fail at construction
+        // with a clear message, not mid-run when someone outlives the last explicit bracket.
+        [Fact]
+        public void Constructor_WithNullDeathBrackets_Throws()
+        {
+            var exception = Record.Exception(() => CreateEngineWithBrackets(null));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithoutCatchAllBracket_Throws()
+        {
+            var bracketsWithoutCatchAll = new List<DeathBracket>
+            {
+                new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 }
+            };
+
+            var exception = Record.Exception(() => CreateEngineWithBrackets(bracketsWithoutCatchAll));
+
+            Assert.IsType<InvalidOperationException>(exception);
+        }
+
+        [Fact]
+        public void Constructor_WithCatchAllBracket_DoesNotThrow()
+        {
+            var exception = Record.Exception(() => CreateEngineWithBrackets(CreateDefaultDeathBrackets()));
+
+            Assert.Null(exception);
+        }
+
+        private DeathEngine CreateEngineWithBrackets(List<DeathBracket> deathBrackets)
+        {
+            return new DeathEngine(Substitute.For<IDiceGenerator>(),
+                _gameState,
+                Options.Create(new AppSettings { DeathBrackets = deathBrackets }));
+        }
+
         private static Person CreatePerson(int age, bool isAlive = true)
         {
             return new Person
@@ -335,11 +401,32 @@ namespace ProjectMarworyn.UnitTests
             return new Generation { Iteration = iteration, People = new List<Person>() };
         }
 
-        private DeathEngine CreateEngine(double nextDoubleValue)
+        private DeathEngine CreateEngine(double nextDoubleValue,
+            List<DeathBracket> deathBrackets = null)
         {
             var mockDiceGenerator = Substitute.For<IDiceGenerator>();
             mockDiceGenerator.NextDouble(Arg.Any<Random>()).Returns(nextDoubleValue);
-            return new DeathEngine(mockDiceGenerator, _gameState);
+            return new DeathEngine(mockDiceGenerator,
+                _gameState,
+                Options.Create(new AppSettings { DeathBrackets = deathBrackets ?? CreateDefaultDeathBrackets() }));
+        }
+
+        private static List<DeathBracket> CreateDefaultDeathBrackets()
+        {
+            return new List<DeathBracket>
+            {
+                new DeathBracket { MaxAge = 9, DailyDeathChance = 0.1 },
+                new DeathBracket { MaxAge = 19, DailyDeathChance = 0.01 },
+                new DeathBracket { MaxAge = 29, DailyDeathChance = 0.02 },
+                new DeathBracket { MaxAge = 39, DailyDeathChance = 0.05 },
+                new DeathBracket { MaxAge = 49, DailyDeathChance = 0.1 },
+                new DeathBracket { MaxAge = 59, DailyDeathChance = 0.15 },
+                new DeathBracket { MaxAge = 69, DailyDeathChance = 0.2 },
+                new DeathBracket { MaxAge = 79, DailyDeathChance = 0.25 },
+                new DeathBracket { MaxAge = 89, DailyDeathChance = 0.5 },
+                new DeathBracket { MaxAge = 99, DailyDeathChance = 1.0 },
+                new DeathBracket { DailyDeathChance = 2.5 }
+            };
         }
     }
 }

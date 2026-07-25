@@ -13,7 +13,8 @@ This project utilises the unmodified Pixeloid font by GGBotNet. It can be found 
 ## Features
 
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.
-- **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes.
+- **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes; non-binary children draw from three naming routes (traditional, prefix + prefix, or suffix + suffix).
+- **Biosex and gender modelled separately** — biosex (female/male/intersex) and gender (female/male/non-binary) are independent fields, with intersex, trans, and non-binary representation driven by ONS census 2021 statistics through seeded, configurable probabilities.
 - **Day-based simulation** — the simulation ticks forward one real-time interval per in-world day, with pairing and births evaluated each new year and generations advancing every 20 years.
 - **Simulation clock** — a universal heartbeat system tracks simulation time independently from real-world time, with each tick advancing the simulation by one day.
 - **Graphical output** — simulation events are rendered in a MonoGame window using a pixel sprite font.
@@ -154,6 +155,8 @@ ProjectMarworyn/
 │   └── ProjectMarworyn.Core/         # Class library — all simulation logic
 │       ├── Configuration/
 │       │   ├── AppSettings.cs        # Strongly-typed settings
+│       │   ├── DeathBracket.cs       # Age bracket + daily death chance (config shape)
+│       │   ├── SimulationConstants.cs # Fixed simulation constants (days per year)
 │       │   ├── InitialPeople.json    # Initial population data (deserialises to InitialPerson)
 │       │   └── SeedWord.json         # Word pool for world seed generation
 │       ├── Extensions/
@@ -166,6 +169,8 @@ ProjectMarworyn/
 │       │   ├── SeedGenerator.cs      # World seed creation
 │       │   └── ISeedGenerator.cs
 │       ├── Managers/
+│       │   ├── FileManager.cs        # Reads InitialPeople.json & SeedWord.json
+│       │   ├── IFileManager.cs
 │       │   ├── GenerationManager.cs  # Manages generation state and extinction checks
 │       │   ├── IGenerationManager.cs
 │       │   ├── SimulationManager.cs  # Orchestrates the day-by-day simulation loop
@@ -174,22 +179,22 @@ ProjectMarworyn/
 │       │   ├── Enums/
 │       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
 │       │   │   ├── BiosexModifier.cs
-│       │   │   ├── DeathModifier.cs  # Age-bracket death probability modifiers
-│       │   │   └── Gender.cs         # Female / Male enum
+│       │   │   └── Gender.cs         # Female / Male / NonBinary enum
+│       │   ├── ChildGenerationResult.cs # Children + updated people from GenerateChildren
 │       │   ├── GameState.cs          # Shared state — text lines rendered each frame
 │       │   ├── Generation.cs         # Iteration + person list
-│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex — maps from InitialPeople.json
+│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex, Gender — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
 │       │   ├── Pair.cs               # Matched pair of individuals
-│       │   ├── Person.cs             # Individual with age, biosex, name, and simulation state
+│       │   ├── PairingResult.cs      # Pairs + updated people from GeneratePairs
+│       │   ├── Person.cs             # Individual with age, biosex, gender, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
+│       ├── Appsettings.json          # Runtime settings (see Configuration below)
 │       ├── AgeProcessor.cs           # Advances person age each tick
 │       ├── IAgeProcessor.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
 │       ├── IDeathEngine.cs
-│       ├── FileManager.cs            # Reads InitialPeople.json & SeedWord.json
-│       ├── IFileManager.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock
 │       ├── IHeartbeat.cs
 │       ├── PairingEngine.cs          # Pairs eligible individuals each generation
@@ -228,20 +233,32 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
 ```json
 {
   "Configuration": {
-    "Delay": 500,
-    "DayDuration": "00:00:00.500",
     "InitialPeopleFilePath": "Configuration/InitialPeople.json",
-    "SeedWordFilePath": "Configuration/SeedWord.json"
+    "SeedWordFilePath": "Configuration/SeedWord.json",
+    "DayDuration": "0.00:00:0.50",
+    "FertilityCooldownYears": 2,
+    "TransgenderProbability": 0.2,
+    "NonBinaryProbability": 0.06,
+    "DeathBrackets": [
+      { "MaxAge": 9, "DailyDeathChance": 0.1 },
+      { "MaxAge": 99, "DailyDeathChance": 1.0 },
+      { "DailyDeathChance": 2.5 }
+    ]
   }
 }
 ```
 
+The `DeathBrackets` sample above is abridged — the real file has one bracket per decade of life.
+
 | Setting | Description |
 |---|---|
-| `Delay` | Legacy delay value (milliseconds) |
-| `DayDuration` | Real-time duration of one in-world day (TimeSpan format, e.g. `"00:00:00.500"` for 500 ms) |
+| `DayDuration` | Real-time duration of one in-world day (TimeSpan format, e.g. `"0.00:00:0.50"` for 500 ms) |
 | `InitialPeopleFilePath` | Relative path to the initial population JSON file |
 | `SeedWordFilePath` | Relative path to the seed-word pool JSON file |
+| `FertilityCooldownYears` | Elapsed years before a parent can have another child (cooldown years are a fixed 365 days) |
+| `TransgenderProbability` | Chance in % that a child's gender is the binary opposite of their biosex-aligned gender (default 0.2, ONS census 2021: trans men 0.10% + trans women 0.10%) |
+| `NonBinaryProbability` | Chance in % that a child is non-binary, rolled independently of `TransgenderProbability` and taking precedence (default 0.06, ONS census 2021) |
+| `DeathBrackets` | Ordered age brackets with a daily death chance in % — the first bracket whose `MaxAge` fits wins; omit `MaxAge` on the final bracket to make it the catch-all |
 
 ### Initial population file format (`InitialPeople.json`)
 
@@ -249,11 +266,12 @@ Deserialises into `InitialPerson`. Each entry defines one member of the starting
 
 ```json
 [
-  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0 }
+  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0, "Gender": 0 }
 ]
 ```
 
-`Biosex` values: `0` = Female, `1` = Male.
+`Biosex` values: `0` = Female, `1` = Male, `2` = Intersex.
+`Gender` values: `0` = Female, `1` = Male, `2` = NonBinary — explicit per person, not derived from biosex, so trans and non-binary people can be seeded directly.
 
 ### Seed-word file format (`SeedWord.json`)
 
@@ -271,8 +289,8 @@ Three words are chosen at random and combined (e.g. `ACORN-BIRCH-BROOK`) then SH
 2. **Seed** — three words are drawn randomly from `SeedWord.json` and hashed to produce the world seed.
 3. **Loop** — the MonoGame update loop calls `SimulationManager.ProgressDay()` once per `DayDuration` interval:
    - The simulation clock ticks, advancing in-world time by one day.
-   - Ages are updated and death is evaluated for each person based on their age bracket.
-   - Each day, the simulation checks for eligible pairs and potential births. Children receive a blended name built from both parents' prefixes and suffixes.
+   - Each person ages up when the calendar reaches their birthday (leap years included; leap-day babies age up on 1 March in non-leap years), and death is evaluated based on their age bracket.
+   - Each day, the simulation checks for eligible pairs and potential births. Newborns are assigned a biosex and, independently, a gender via seeded rolls against the configured probabilities, then receive a blended name built from both parents' prefixes and suffixes.
    - On 1 January each year, population statistics are logged to the screen. Every 20 years the generation counter increments.
    - The current date, population count, and events are written to `GameState.Text` and rendered to the window each frame.
 4. **End** — when fewer than two individuals remain, extinction is declared and the clock stops.
