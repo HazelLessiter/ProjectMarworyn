@@ -215,6 +215,34 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
+        public void Initialise_IsFertileDefaultsToTrue()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.True(result[0].IsFertile);
+        }
+
+        [Fact]
+        public void Initialise_WithInfertilePerson_IsFertileIsFalse()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Intersex, IsFertile = false }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.False(result[0].IsFertile);
+        }
+
+        [Fact]
         public void Initialise_SetsIsAliveToTrue()
         {
             var initialPeople = new List<InitialPerson>
@@ -659,10 +687,50 @@ namespace ProjectMarworyn.UnitTests
             Assert.Equal("JohnDoe", result.Children[0].Name.FullName);
         }
 
-        // Intersex partners cannot fill either biological role yet - fertile intersex
-        // reproduction arrives with IsFertile in the next stage 4 commit.
+        // A child here means sexual reproduction, so asexual partners wait for the
+        // adoption system regardless of which side of the pair they are on.
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void GenerateChildren_AsexualPartner_ProducesNoChildren(bool asexualIsPersonA)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            if (asexualIsPersonA)
+                pair.PersonA.Orientation = Orientation.Asexual;
+            else
+                pair.PersonB.Orientation = Orientation.Asexual;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result.Children);
+        }
+
         [Fact]
-        public void GenerateChildren_PairWithIntersexPartner_ProducesNoChildren()
+        public void GenerateChildren_InfertileIntersexPartner_ProducesNoChildren()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonB.Biosex = Biosex.Intersex;
+            pair.PersonB.IsFertile = false;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result.Children);
+        }
+
+        // A fertile intersex person reproduces in the direction of their gender:
+        // male-gendered John supplies the sperm side opposite female-biosex Jane.
+        [Fact]
+        public void GenerateChildren_FertileIntersexPartner_TakesRoleFromGender()
         {
             var generator = CreateGeneratorWithNextDouble(0.4514);
             var pair = CreateFertilePair();
@@ -674,7 +742,88 @@ namespace ProjectMarworyn.UnitTests
                 new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Single(result.Children);
+        }
+
+        // A non-binary-gendered fertile intersex person can fill whichever role the
+        // partner leaves open - here the exact biosex match takes their own side first.
+        [Theory]
+        [InlineData(true)]  // intersex partner covers the sperm side opposite female Jane
+        [InlineData(false)] // intersex partner covers the egg side opposite male John
+        public void GenerateChildren_NonBinaryGenderedFertileIntersex_FillsMissingRole(bool intersexIsPersonB)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            var intersexPartner = intersexIsPersonB ?
+                pair.PersonB :
+                pair.PersonA;
+            intersexPartner.Biosex = Biosex.Intersex;
+            intersexPartner.Gender = Gender.NonBinary;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result.Children);
+        }
+
+        // Both roles filled by intersex partners: entirely gender-derived reproduction.
+        [Fact]
+        public void GenerateChildren_TwoFertileIntersexPartnersWithOppositeGenders_Reproduce()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonA.Biosex = Biosex.Intersex;
+            pair.PersonB.Biosex = Biosex.Intersex;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result.Children);
+        }
+
+        // The fertility roll only applies to intersex newborns and reads the configured
+        // probability - the mocked 0.9900 roll (99.00) sits under 100 and over 0.
+        [Theory]
+        [InlineData(100, true)]
+        [InlineData(0, false)]
+        public void GenerateChildren_IntersexChild_FertileRollAgainstConfig(double intersexFertileProbability,
+            bool expectedIsFertile)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.9900,
+                intersexFertileProbability: intersexFertileProbability);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
+            Assert.Equal(expectedIsFertile, result.Children[0].IsFertile);
+        }
+
+        [Fact]
+        public void GenerateChildren_BinaryBiosexChild_IsAlwaysFertile()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                intersexFertileProbability: 0);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new List<Person> { pair.PersonA, pair.PersonB },
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Female, result.Children[0].Biosex);
+            Assert.True(result.Children[0].IsFertile);
         }
 
         // A misconfigured weight table (hand-edited Appsettings.json) must fail at construction
@@ -736,6 +885,7 @@ namespace ProjectMarworyn.UnitTests
             double transgenderProbability = 0,
             double nonBinaryProbability = 0,
             double neverPairProbability = 0,
+            double intersexFertileProbability = 0,
             List<OrientationWeight> orientationWeights = null,
             int namingRoute = 0,
             int partOrder = 0)
@@ -754,6 +904,7 @@ namespace ProjectMarworyn.UnitTests
                     TransgenderProbability = transgenderProbability,
                     NonBinaryProbability = nonBinaryProbability,
                     NeverPairProbability = neverPairProbability,
+                    IntersexFertileProbability = intersexFertileProbability,
                     OrientationWeights = orientationWeights ?? CreateDefaultOrientationWeights()
                 }));
         }
@@ -793,6 +944,7 @@ namespace ProjectMarworyn.UnitTests
                     IsAlive = true,
                     WillHaveChildren = true,
                     WillPair = true,
+                    IsFertile = true,
                     DaysSinceLastChild = 730
                 },
                 PersonB = new Person
@@ -805,6 +957,7 @@ namespace ProjectMarworyn.UnitTests
                     IsAlive = true,
                     WillHaveChildren = true,
                     WillPair = true,
+                    IsFertile = true,
                     DaysSinceLastChild = 730
                 }
             };

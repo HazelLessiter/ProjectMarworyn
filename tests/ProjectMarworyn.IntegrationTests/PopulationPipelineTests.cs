@@ -253,6 +253,7 @@ public class PopulationPipelineTests
             DaysSinceLastChild = 0,
             WillHaveChildren = true,
             WillPair = true,
+            IsFertile = true,
             HasPair = false
         };
 
@@ -270,6 +271,7 @@ public class PopulationPipelineTests
             DaysSinceLastChild = 730,
             WillHaveChildren = true,
             WillPair = true,
+            IsFertile = true,
             HasPair = false
         };
 }

@@ -75,6 +75,7 @@ namespace ProjectMarworyn.Core.Generators
                     BirthDay = birthDay,
                     WillHaveChildren = CalcWillHaveChildren(dice),
                     WillPair = initialPerson.WillPair,
+                    IsFertile = initialPerson.IsFertile,
                     DaysSinceLastChild = yearsFromLastChild * SimulationConstants.DaysPerYear + dayOffset,
                     HasPair = false
                 };
@@ -101,14 +102,29 @@ namespace ProjectMarworyn.Core.Generators
 
             foreach (var pair in pairs)
             {
-                //Reproduction is strictly biological (issue #15 stage 4): it needs exactly one
-                //female-biosex and one male-biosex parent, so same-sex pairs don't conceive.
+                //Reproduction is strictly biological (issue #15 stage 4): one partner must
+                //supply the egg side and one the sperm side, so same-sex pairs don't conceive.
                 //Adoption (later) will redistribute children orphaned in the simulation instead -
                 //people never appear from nowhere
-                var mother = SinglePartnerWithBiosex(pair,
+                //Asexual partners pair romantically, but a child here means sexual reproduction,
+                //so they wait for the adoption system too
+                if (pair.PersonA.Orientation == Orientation.Asexual ||
+                    pair.PersonB.Orientation == Orientation.Asexual)
+                {
+                    continue;
+                }
+
+                if (!pair.PersonA.IsFertile ||
+                    !pair.PersonB.IsFertile)
+                {
+                    continue;
+                }
+
+                var mother = SelectParent(pair,
                     Biosex.Female);
-                var father = SinglePartnerWithBiosex(pair,
-                    Biosex.Male);
+                var father = SelectParent(pair,
+                    Biosex.Male,
+                    mother);
 
                 if (mother == null ||
                     father == null)
@@ -158,7 +174,9 @@ namespace ProjectMarworyn.Core.Generators
                         BirthDay = currentTime.Day,
                         WillHaveChildren = CalcWillHaveChildren(dice),
                         Orientation = CalculateOrientation(dice),
-                        WillPair = CalcWillPair(dice)
+                        WillPair = CalcWillPair(dice),
+                        IsFertile = CalcIsFertile(dice,
+                            biosex)
                     };
 
                     children.Add(child);
@@ -255,20 +273,76 @@ namespace ProjectMarworyn.Core.Generators
             };
         }
 
-        private static Person SinglePartnerWithBiosex(Pair pair,
-            Biosex biosex)
+        private static Person SelectParent(Pair pair,
+            Biosex role,
+            Person exclude = null)
         {
-            var aMatches = pair.PersonA.Biosex == biosex;
-            var bMatches = pair.PersonB.Biosex == biosex;
-
-            if (aMatches == bMatches)
+            //The exact biosex match takes the role first, leaving a flexible intersex
+            //partner free to cover the other side
+            if (pair.PersonA != exclude &&
+                pair.PersonA.Biosex == role)
             {
-                return null;
+                return pair.PersonA;
             }
 
-            return aMatches ?
-                pair.PersonA :
-                pair.PersonB;
+            if (pair.PersonB != exclude &&
+                pair.PersonB.Biosex == role)
+            {
+                return pair.PersonB;
+            }
+
+            if (pair.PersonA != exclude &&
+                CanFillRole(pair.PersonA,
+                    role))
+            {
+                return pair.PersonA;
+            }
+
+            if (pair.PersonB != exclude &&
+                CanFillRole(pair.PersonB,
+                    role))
+            {
+                return pair.PersonB;
+            }
+
+            return null;
+        }
+
+        //A fertile intersex person reproduces in the direction of their gender -
+        //female-gendered supplies the egg side, male-gendered the sperm side, and
+        //non-binary leaves both directions open
+        private static bool CanFillRole(Person person,
+            Biosex role)
+        {
+            if (person.Biosex == role)
+            {
+                return true;
+            }
+
+            if (person.Biosex != Biosex.Intersex)
+            {
+                return false;
+            }
+
+            var roleAlignedGender = role == Biosex.Female ?
+                Gender.Female :
+                Gender.Male;
+
+            return person.Gender == roleAlignedGender ||
+                person.Gender == Gender.NonBinary;
+        }
+
+        private bool CalcIsFertile(Random dice,
+            Biosex biosex)
+        {
+            if (biosex != Biosex.Intersex)
+            {
+                return true;
+            }
+
+            var fertileRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            return fertileRoll < _appSettings.IntersexFertileProbability;
         }
 
         private Gender RandomGender(Random random)

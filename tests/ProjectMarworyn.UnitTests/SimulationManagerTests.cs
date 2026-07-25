@@ -127,6 +127,7 @@ namespace ProjectMarworyn.UnitTests
                 DaysSinceLastChild = 0,
                 WillHaveChildren = true,
                 WillPair = true,
+                IsFertile = true,
                 HasPair = false
             };
     }
