@@ -96,23 +96,39 @@ namespace ProjectMarworyn.Core.Generators
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
-            //For each pair
-            var aliveFertilePairs = pairs.Where(x => x.FPerson.IsAlive &&
-                    x.MPerson.IsAlive &&
-                    x.FPerson.Age >= 18 &&
-                    x.FPerson.Age <= 45 &&
-                    x.MPerson.Age >= 18 &&
-                    x.FPerson.WillHaveChildren &&
-                    x.MPerson.WillHaveChildren &&
-                    x.FPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear &&
-                    x.MPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
-                .ToList();
-
             var children = new List<Person>();
             List<Person> peopleToUpdate = new List<Person>();
 
-            foreach (var pair in aliveFertilePairs)
+            foreach (var pair in pairs)
             {
+                //Reproduction is strictly biological (issue #15 stage 4): it needs exactly one
+                //female-biosex and one male-biosex parent, so same-sex pairs don't conceive.
+                //Adoption (later) will redistribute children orphaned in the simulation instead -
+                //people never appear from nowhere
+                var mother = SinglePartnerWithBiosex(pair,
+                    Biosex.Female);
+                var father = SinglePartnerWithBiosex(pair,
+                    Biosex.Male);
+
+                if (mother == null ||
+                    father == null)
+                {
+                    continue;
+                }
+
+                if (!mother.IsAlive ||
+                    !father.IsAlive ||
+                    mother.Age < 18 ||
+                    mother.Age > 45 ||
+                    father.Age < 18 ||
+                    !mother.WillHaveChildren ||
+                    !father.WillHaveChildren ||
+                    mother.DaysSinceLastChild < _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear ||
+                    father.DaysSinceLastChild < _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
+                {
+                    continue;
+                }
+
                 var childChance = dice.Next(1,
                     101);
 
@@ -124,7 +140,8 @@ namespace ProjectMarworyn.Core.Generators
 
                     var name = CalculateName(dice,
                         gender,
-                        pair);
+                        mother,
+                        father);
 
                     personId++;
                     var child = new Person()
@@ -145,13 +162,13 @@ namespace ProjectMarworyn.Core.Generators
                     };
 
                     children.Add(child);
-                    _gameState.Text.Add($"Child {child.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
+                    _gameState.Text.Add($"Child {child.Name.FullName} was born to {mother.Name.FullName} and {father.Name.FullName}");
 
-                    peopleToUpdate.Add(pair.FPerson);
-                    peopleToUpdate.Add(pair.MPerson);
+                    peopleToUpdate.Add(mother);
+                    peopleToUpdate.Add(father);
 
-                    people.Remove(pair.FPerson);
-                    people.Remove(pair.MPerson);
+                    people.Remove(mother);
+                    people.Remove(father);
                 }
             }
 
@@ -168,9 +185,12 @@ namespace ProjectMarworyn.Core.Generators
             };
         }
 
+        //The pair's biosex roles never change mid-simulation, so the mother/father naming
+        //conventions survive the Pair model losing its FPerson/MPerson shape
         private Name CalculateName(Random dice,
             Gender gender,
-            Pair pair)
+            Person mother,
+            Person father)
         {
             var namingGender = gender;
 
@@ -185,12 +205,12 @@ namespace ProjectMarworyn.Core.Generators
                         break;
                     case 1:
                         return RandomOrderName(dice,
-                            pair.FPerson.Name.Prefix,
-                            pair.MPerson.Name.Prefix);
+                            mother.Name.Prefix,
+                            father.Name.Prefix);
                     case 2:
                         return RandomOrderName(dice,
-                            pair.FPerson.Name.Suffix,
-                            pair.MPerson.Name.Suffix);
+                            mother.Name.Suffix,
+                            father.Name.Suffix);
                     default:
                         throw new InvalidOperationException("Error randomising naming route");
                 }
@@ -200,32 +220,32 @@ namespace ProjectMarworyn.Core.Generators
             {
                 return new Name
                 {
-                    FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
-                    Prefix = pair.FPerson.Name.Prefix,
-                    Suffix = pair.MPerson.Name.Suffix,
+                    FullName = mother.Name.Prefix + father.Name.Suffix,
+                    Prefix = mother.Name.Prefix,
+                    Suffix = father.Name.Suffix,
                 };
             }
 
             return new Name
             {
-                FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
-                Prefix = pair.MPerson.Name.Prefix,
-                Suffix = pair.FPerson.Name.Suffix,
+                FullName = father.Name.Prefix + mother.Name.Suffix,
+                Prefix = father.Name.Prefix,
+                Suffix = mother.Name.Suffix,
             };
         }
 
         private Name RandomOrderName(Random dice,
-            string fPersonPart,
-            string mPersonPart)
+            string motherPart,
+            string fatherPart)
         {
-            var mPersonFirst = _diceGenerator.Next(dice, 0, 2) == 1;
+            var fatherFirst = _diceGenerator.Next(dice, 0, 2) == 1;
 
-            var firstPart = mPersonFirst ?
-                mPersonPart :
-                fPersonPart;
-            var secondPart = mPersonFirst ?
-                fPersonPart :
-                mPersonPart;
+            var firstPart = fatherFirst ?
+                fatherPart :
+                motherPart;
+            var secondPart = fatherFirst ?
+                motherPart :
+                fatherPart;
 
             return new Name
             {
@@ -233,6 +253,22 @@ namespace ProjectMarworyn.Core.Generators
                 Prefix = firstPart,
                 Suffix = secondPart,
             };
+        }
+
+        private static Person SinglePartnerWithBiosex(Pair pair,
+            Biosex biosex)
+        {
+            var aMatches = pair.PersonA.Biosex == biosex;
+            var bMatches = pair.PersonB.Biosex == biosex;
+
+            if (aMatches == bMatches)
+            {
+                return null;
+            }
+
+            return aMatches ?
+                pair.PersonA :
+                pair.PersonB;
         }
 
         private Gender RandomGender(Random random)
