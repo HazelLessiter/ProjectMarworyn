@@ -34,6 +34,12 @@
 -Fixed `NullReferenceException` in `SimulationManager.ProgressDay` when every remaining person dies on the same day - the extinction check runs at the start of the next day, so the rest of the day now guards against an empty population
 -Intersex children now roll for trans like everyone else - their randomly assigned binary gender is the starting point the trans roll can flip (not visible today, but will be once trans status is tracked)
 -Non-binary children now pick between three naming routes: traditional (either binary convention), prefix + prefix, or suffix + suffix, with either parent's part able to come first on the new routes - naming logic extracted into `PersonGenerator.CalculateName`
+-Added `Orientation` to `Person` (Issue #15 Stage 3): heterosexual, homosexual, bisexual, pansexual, asexual, aromantic and aroace. Newborns roll it against a new `OrientationWeights` table in `AppSettings` (in %, defaults from ONS census 2021; aromantic and aroace at 0.05 each are invented placeholders - no census records them)
++`PersonGenerator` validates the table at construction (one entry per orientation, weights summing to 100), same pattern as the `DeathBrackets` guard
+-Added `WillPair` to `Person` - a standalone pairing-willingness flag, independent of orientation and of `WillHaveChildren`; newborns roll it against `NeverPairProbability` in `AppSettings` (in %, default 1)
+-Initial people carry `Orientation` and `WillPair` explicitly in `InitialPeople.json` (no dice at init, same as `Gender`): Carys and Gethin homosexual, Bonnie and Jordi bisexual, Hedda never pairs
++`InitialPerson.WillPair` defaults to true so only the exceptions appear in the data file
+-Removed a redundant `IsAlive = true` reassignment in `DeathEngine` - the survivor branch only ever sees people already filtered alive (#39)
 
 ## [2.0.2]
 
