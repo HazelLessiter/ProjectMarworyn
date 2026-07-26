@@ -26,8 +26,6 @@ namespace ProjectMarworyn.UnitTests
             mockFileManager.ReadInitialPersonFile().Returns(new List<InitialPerson>());
 
             var mockGenerationManager = Substitute.For<IGenerationManager>();
-            mockGenerationManager.Initialise(Arg.Any<List<Person>>())
-                .Returns(new Generation { Iteration = 0, People = _people });
             mockGenerationManager.CheckForExtinction(Arg.Any<List<Person>>()).Returns(false);
 
             var mockSeedGenerator = Substitute.For<ISeedGenerator>();
@@ -43,9 +41,8 @@ namespace ProjectMarworyn.UnitTests
             _mockPersonGenerator.GenerateChildren(Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>(),
-                    Arg.Any<List<Person>>(),
                     Arg.Any<DateTime>())
-                .Returns(new ChildGenerationResult { Children = new List<Person>(), People = _people });
+                .Returns(new List<Person>());
 
             _mockAgeProcessor = Substitute.For<IAgeProcessor>();
             _mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(x => x.ArgAt<List<Person>>(0));
@@ -57,7 +54,7 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(x => new PairingResult { Pairs = new List<Pair>(), People = x.ArgAt<List<Person>>(0) });
+                .Returns(new List<Pair>());
 
             _simulationManager = new SimulationManager(mockFileManager,
                 mockGenerationManager,
@@ -77,10 +74,9 @@ namespace ProjectMarworyn.UnitTests
         public void ProgressDay_EveryoneDiesOnTheSameDay_DoesNotThrow()
         {
             _mockDeathEngine.ProcessDeaths(Arg.Any<List<Person>>(),
-                    Arg.Any<Generation>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(new Generation { People = new List<Person>() });
+                .Returns(new List<Person>());
             _simulationManager.Start();
 
             var exception = Record.Exception(() => _simulationManager.ProgressDay());
@@ -96,20 +92,14 @@ namespace ProjectMarworyn.UnitTests
         {
             var child = CreatePerson(99);
             _mockDeathEngine.ProcessDeaths(Arg.Any<List<Person>>(),
-                    Arg.Any<Generation>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(x => new Generation { People = x.ArgAt<List<Person>>(0) });
+                .Returns(x => x.ArgAt<List<Person>>(0));
             _mockPersonGenerator.GenerateChildren(Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>(),
-                    Arg.Any<List<Person>>(),
                     Arg.Any<DateTime>())
-                .Returns(x => new ChildGenerationResult
-                {
-                    Children = new List<Person> { child },
-                    People = x.ArgAt<List<Person>>(3)
-                });
+                .Returns(new List<Person> { child });
             _simulationManager.Start();
 
             _simulationManager.ProgressDay();
@@ -131,6 +121,7 @@ namespace ProjectMarworyn.UnitTests
                 DaysSinceLastChild = 0,
                 WillHaveChildren = true,
                 WillPair = true,
+                IsFertile = true,
                 HasPair = false
             };
     }

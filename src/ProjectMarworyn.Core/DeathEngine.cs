@@ -28,8 +28,7 @@ namespace ProjectMarworyn.Core
             }
         }
 
-        public Generation ProcessDeaths(List<Person> people,
-            Generation generation,
+        public List<Person> ProcessDeaths(List<Person> people,
             int worldSeed,
             DateTime currentTime)
         {
@@ -54,13 +53,7 @@ namespace ProjectMarworyn.Core
                 }
             }
 
-            var currentGeneration = new Generation()
-            {
-                Iteration = generation.Iteration,
-                People = survivors,
-            };
-
-            return currentGeneration;
+            return survivors;
         }
     }
 }

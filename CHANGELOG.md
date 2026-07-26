@@ -2,6 +2,20 @@
 
 ---
 
+## [2.2.0]
+
+-Pairing rewritten around mutual attraction (Issue #15 Stage 4): new `AttractionCalculator` (injected as `IAttractionCalculator`) decides attraction from orientation and the candidate's gender - heterosexual means any gender different from your own (so a heterosexual non-binary person is attracted to both binary genders), homosexual the same gender, bisexual the binary genders, pansexual everyone, asexual anyone; both sides must be attracted or no pair forms
++Aromantic and aroace people never pair; `WillPair` is respected as the orientation-independent opt-out
++Intersex people now enter the pairing pool - the old female/male biosex pools silently excluded them
+-`Pair` is now `PersonA`/`PersonB` instead of `FPerson`/`MPerson`; `GenerateChildren` derives mother/father from biosex, so reproduction needs the egg and sperm sides covered and same-sex pairs don't conceive
++Adoption (later) will redistribute children orphaned in the simulation instead - people never appear from nowhere
+-Asexual people pair romantically but never conceive - a child means sexual reproduction by definition until the adoption system exists
+-Added `IsFertile` to `Person` and `IntersexFertileProbability` to `AppSettings` (in %, default 50 - a modelling estimate, no citable fertile/infertile split exists): intersex newborns roll it at birth, binary biosex is always fertile, and a fertile intersex person reproduces in the direction of their gender with non-binary gender able to fill either role
++`IsFertile` defaults to true in `InitialPeople.json` - only infertile people carry it in the data file
+-`DeathEngine.ProcessDeaths` now returns the survivor list and the `Generation` model is removed - it was recreated every day just to carry `Iteration` plus the survivors (#41); `Iteration` now lives on `SimulationManager`
+-`SimulationManager` is now the sole owner of the population list (#34): `PairingResult` and `ChildGenerationResult` are removed entirely - `GeneratePairs` returns the pair list and `GenerateChildren` the children list directly, since each type's only remaining cargo was a single list - and membership changes in exactly two places, the death survivor list and appending newborns
++`GenerateChildren` no longer removes and re-adds parents to reset their fertility cooldown; the reset happens on the `Person` directly, so parents stop silently migrating to the back of the list (an accidental reorder that fed the seeded pairing order)
+
 ## [2.1.0]
 
 -`Person.TimeLived` is replaced by an explicit birthday (`BirthMonth`/`BirthDay`) and `Person.TimeFromLastChild` by a plain day counter (`DaysSinceLastChild`) - no more 1-based `DateTime` fields misused as durations
@@ -22,6 +36,12 @@
 -Fixed `NullReferenceException` in `SimulationManager.ProgressDay` when every remaining person dies on the same day - the extinction check runs at the start of the next day, so the rest of the day now guards against an empty population
 -Intersex children now roll for trans like everyone else - their randomly assigned binary gender is the starting point the trans roll can flip (not visible today, but will be once trans status is tracked)
 -Non-binary children now pick between three naming routes: traditional (either binary convention), prefix + prefix, or suffix + suffix, with either parent's part able to come first on the new routes - naming logic extracted into `PersonGenerator.CalculateName`
+-Added `Orientation` to `Person` (Issue #15 Stage 3): heterosexual, homosexual, bisexual, pansexual, asexual, aromantic and aroace. Newborns roll it against a new `OrientationWeights` table in `AppSettings` (in %, defaults from ONS census 2021; aromantic and aroace at 0.05 each are invented placeholders - no census records them)
++`PersonGenerator` validates the table at construction (one entry per orientation, weights summing to 100), same pattern as the `DeathBrackets` guard
+-Added `WillPair` to `Person` - a standalone pairing-willingness flag, independent of orientation and of `WillHaveChildren`; newborns roll it against `NeverPairProbability` in `AppSettings` (in %, default 1)
+-Initial people carry `Orientation` and `WillPair` explicitly in `InitialPeople.json` (no dice at init, same as `Gender`): Carys and Gethin homosexual, Bonnie and Jordi bisexual, Hedda never pairs
++`InitialPerson.WillPair` defaults to true so only the exceptions appear in the data file
+-Removed a redundant `IsAlive = true` reassignment in `DeathEngine` - the survivor branch only ever sees people already filtered alive (#39)
 
 ## [2.0.2]
 

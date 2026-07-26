@@ -15,7 +15,7 @@ namespace ProjectMarworyn.Core.Managers
         private readonly IPairingEngine _pairingEngine;
         private int _worldSeed;
         private List<Person> _people;
-        private Generation _currentGeneration;
+        private int _generationIteration;
         private GameState _gameState;
         private List<Pair> _pairs;
 
@@ -48,7 +48,7 @@ namespace ProjectMarworyn.Core.Managers
             _people = _personGenerator.Initialise(initialPeople,
                 _worldSeed);
 
-            _currentGeneration = _generationManager.Initialise(_people);
+            _generationIteration = 0;
             _heartbeat.Start();
             _pairs = new List<Pair>();
         }
@@ -80,8 +80,8 @@ namespace ProjectMarworyn.Core.Managers
 
                 if (currentTime.Year % 20 == 0)
                 {
-                    _currentGeneration.Iteration += 1;
-                    _gameState.Text.Add($"New Generation: {_currentGeneration.Iteration}");
+                    _generationIteration += 1;
+                    _gameState.Text.Add($"New Generation: {_generationIteration}");
                 }
             }
 
@@ -90,18 +90,15 @@ namespace ProjectMarworyn.Core.Managers
                 date);
 
             //Death
-            _currentGeneration = _deathEngine.ProcessDeaths(_people,
-                _currentGeneration,
+            _people = _deathEngine.ProcessDeaths(_people,
                 _worldSeed,
                 date);
 
             //Pair
-            var pairingResult = _pairingEngine.GeneratePairs(_currentGeneration.People,
+            _pairs = _pairingEngine.GeneratePairs(_people,
                 _pairs,
                 _worldSeed,
                 date);
-            _pairs = pairingResult.Pairs;
-            _people = pairingResult.People;
 
             //Everyone alive can die on the same day, and the extinction check only runs at the
             //start of the next day - so the rest of this day must handle an empty population
@@ -111,14 +108,12 @@ namespace ProjectMarworyn.Core.Managers
             }
 
             //Generate Children
-            var childGenerationResult = _personGenerator.GenerateChildren(_pairs,
+            var children = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
-                _people,
                 date);
 
-            _people = childGenerationResult.People.Concat(childGenerationResult.Children)
-                .ToList();
+            _people.AddRange(children);
         }
     }
 }

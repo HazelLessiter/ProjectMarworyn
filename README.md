@@ -15,6 +15,8 @@ This project utilises the unmodified Pixeloid font by GGBotNet. It can be found 
 - **Deterministic world seed** — three random words are selected from a seed-word list and hashed (SHA-256) into a single integer seed, making every run reproducible by seed.
 - **Name inheritance** — children receive blended names built from their parents' prefixes and suffixes; non-binary children draw from three naming routes (traditional, prefix + prefix, or suffix + suffix).
 - **Biosex and gender modelled separately** — biosex (female/male/intersex) and gender (female/male/non-binary) are independent fields, with intersex, trans, and non-binary representation driven by ONS census 2021 statistics through seeded, configurable probabilities.
+- **Orientation-driven pairing** — each person has an orientation (heterosexual, homosexual, bisexual, pansexual, asexual, aromantic, aroace) rolled at birth against a census-weighted table, and pairs only form on mutual attraction to each other's gender. A configurable slice of the population never pairs at all, regardless of orientation.
+- **Biological reproduction** — children need a pair covering both the egg and sperm sides, derived from biosex (with fertile intersex people reproducing in the direction of their gender). Same-sex and asexual pairs form households but don't conceive — a planned adoption system will let them raise children orphaned in the simulation; people never appear from nowhere.
 - **Day-based simulation** — the simulation ticks forward one real-time interval per in-world day, with pairing and births evaluated each new year and generations advancing every 20 years.
 - **Simulation clock** — a universal heartbeat system tracks simulation time independently from real-world time, with each tick advancing the simulation by one day.
 - **Graphical output** — simulation events are rendered in a MonoGame window using a pixel sprite font.
@@ -156,6 +158,7 @@ ProjectMarworyn/
 │       ├── Configuration/
 │       │   ├── AppSettings.cs        # Strongly-typed settings
 │       │   ├── DeathBracket.cs       # Age bracket + daily death chance (config shape)
+│       │   ├── OrientationWeight.cs  # Orientation + weight in % (config shape)
 │       │   ├── SimulationConstants.cs # Fixed simulation constants (days per year)
 │       │   ├── InitialPeople.json    # Initial population data (deserialises to InitialPerson)
 │       │   └── SeedWord.json         # Word pool for world seed generation
@@ -171,7 +174,7 @@ ProjectMarworyn/
 │       ├── Managers/
 │       │   ├── FileManager.cs        # Reads InitialPeople.json & SeedWord.json
 │       │   ├── IFileManager.cs
-│       │   ├── GenerationManager.cs  # Manages generation state and extinction checks
+│       │   ├── GenerationManager.cs  # Extinction checks
 │       │   ├── IGenerationManager.cs
 │       │   ├── SimulationManager.cs  # Orchestrates the day-by-day simulation loop
 │       │   └── ISimulationManager.cs
@@ -179,25 +182,25 @@ ProjectMarworyn/
 │       │   ├── Enums/
 │       │   │   ├── Biosex.cs         # Female / Male / Intersex enum
 │       │   │   ├── BiosexModifier.cs
-│       │   │   └── Gender.cs         # Female / Male / NonBinary enum
-│       │   ├── ChildGenerationResult.cs # Children + updated people from GenerateChildren
+│       │   │   ├── Gender.cs         # Female / Male / NonBinary enum
+│       │   │   └── Orientation.cs    # Heterosexual through Aroace enum
 │       │   ├── GameState.cs          # Shared state — text lines rendered each frame
-│       │   ├── Generation.cs         # Iteration + person list
-│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex, Gender — maps from InitialPeople.json
+│       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex, Gender, Orientation, WillPair, IsFertile — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
 │       │   ├── Pair.cs               # Matched pair of individuals
-│       │   ├── PairingResult.cs      # Pairs + updated people from GeneratePairs
 │       │   ├── Person.cs             # Individual with age, biosex, gender, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word
 │       ├── Appsettings.json          # Runtime settings (see Configuration below)
 │       ├── AgeProcessor.cs           # Advances person age each tick
 │       ├── IAgeProcessor.cs
+│       ├── AttractionCalculator.cs   # Orientation × gender attraction policy
+│       ├── IAttractionCalculator.cs
 │       ├── DeathEngine.cs            # Calculates and applies death outcomes
 │       ├── IDeathEngine.cs
 │       ├── Heartbeat.cs              # Drives the simulation clock
 │       ├── IHeartbeat.cs
-│       ├── PairingEngine.cs          # Pairs eligible individuals each generation
+│       ├── PairingEngine.cs          # Pairs mutually attracted individuals
 │       └── IPairingEngine.cs
 └── tests/
     ├── ProjectMarworyn.UnitTests/    # xUnit unit test project
@@ -239,6 +242,12 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
     "FertilityCooldownYears": 2,
     "TransgenderProbability": 0.2,
     "NonBinaryProbability": 0.06,
+    "OrientationWeights": [
+      { "Orientation": "Heterosexual", "Weight": 96.81 },
+      { "Orientation": "Aroace", "Weight": 0.05 }
+    ],
+    "NeverPairProbability": 1,
+    "IntersexFertileProbability": 50,
     "DeathBrackets": [
       { "MaxAge": 9, "DailyDeathChance": 0.1 },
       { "MaxAge": 99, "DailyDeathChance": 1.0 },
@@ -248,7 +257,7 @@ Settings are read from `src/ProjectMarworyn.Core/Appsettings.json` under the `Co
 }
 ```
 
-The `DeathBrackets` sample above is abridged — the real file has one bracket per decade of life.
+The `DeathBrackets` and `OrientationWeights` samples above are abridged — the real file has one bracket per decade of life and one weight per orientation.
 
 | Setting | Description |
 |---|---|
@@ -258,6 +267,9 @@ The `DeathBrackets` sample above is abridged — the real file has one bracket p
 | `FertilityCooldownYears` | Elapsed years before a parent can have another child (cooldown years are a fixed 365 days) |
 | `TransgenderProbability` | Chance in % that a child's gender is the binary opposite of their biosex-aligned gender (default 0.2, ONS census 2021: trans men 0.10% + trans women 0.10%) |
 | `NonBinaryProbability` | Chance in % that a child is non-binary, rolled independently of `TransgenderProbability` and taking precedence (default 0.06, ONS census 2021) |
+| `OrientationWeights` | One weighted entry per `Orientation` value, in %, summing to 100 — newborns roll their orientation against the cumulative bands (defaults from ONS census 2021; the aromantic/aroace weights are placeholders, no census records them) |
+| `NeverPairProbability` | Chance in % that a newborn never pairs regardless of orientation (`WillPair = false`, default 1) |
+| `IntersexFertileProbability` | Chance in % that an intersex newborn is fertile (default 50 — a modelling estimate, no citable figure exists); binary biosex is always fertile |
 | `DeathBrackets` | Ordered age brackets with a daily death chance in % — the first bracket whose `MaxAge` fits wins; omit `MaxAge` on the final bracket to make it the catch-all |
 
 ### Initial population file format (`InitialPeople.json`)
@@ -266,12 +278,16 @@ Deserialises into `InitialPerson`. Each entry defines one member of the starting
 
 ```json
 [
-  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0, "Gender": 0 }
+  { "FullName": "Alys", "Prefix": "A", "Suffix": "lys", "Biosex": 0, "Gender": 0 },
+  { "FullName": "Carys", "Prefix": "Ca", "Suffix": "rys", "Biosex": 0, "Gender": 0, "Orientation": 1 },
+  { "FullName": "Hedda", "Prefix": "Hed", "Suffix": "da", "Biosex": 0, "Gender": 0, "WillPair": false }
 ]
 ```
 
 `Biosex` values: `0` = Female, `1` = Male, `2` = Intersex.
 `Gender` values: `0` = Female, `1` = Male, `2` = NonBinary — explicit per person, not derived from biosex, so trans and non-binary people can be seeded directly.
+`Orientation` values: `0` = Heterosexual, `1` = Homosexual, `2` = Bisexual, `3` = Pansexual, `4` = Asexual, `5` = Aromantic, `6` = Aroace — defaults to Heterosexual when omitted.
+`WillPair` and `IsFertile` default to `true` — only the exceptions (never-pairing or infertile people) carry them in the data file.
 
 ### Seed-word file format (`SeedWord.json`)
 
@@ -290,7 +306,8 @@ Three words are chosen at random and combined (e.g. `ACORN-BIRCH-BROOK`) then SH
 3. **Loop** — the MonoGame update loop calls `SimulationManager.ProgressDay()` once per `DayDuration` interval:
    - The simulation clock ticks, advancing in-world time by one day.
    - Each person ages up when the calendar reaches their birthday (leap years included; leap-day babies age up on 1 March in non-leap years), and death is evaluated based on their age bracket.
-   - Each day, the simulation checks for eligible pairs and potential births. Newborns are assigned a biosex and, independently, a gender via seeded rolls against the configured probabilities, then receive a blended name built from both parents' prefixes and suffixes.
+   - Each day, single adults who are willing to pair look for a mutually attractive partner — attraction is decided by each side's orientation against the other's gender — and pair off via seeded rolls.
+   - Pairs covering both biological roles (one egg side, one sperm side, derived from biosex) can conceive. Newborns are assigned a biosex and, independently, a gender, orientation, pairing willingness, and (for intersex children) fertility via seeded rolls against the configured probabilities, then receive a blended name built from both parents' prefixes and suffixes.
    - On 1 January each year, population statistics are logged to the screen. Every 20 years the generation counter increments.
    - The current date, population count, and events are written to `GameState.Text` and rendered to the window each frame.
 4. **End** — when fewer than two individuals remain, extinction is declared and the clock stops.

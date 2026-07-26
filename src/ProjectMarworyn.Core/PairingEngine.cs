@@ -1,22 +1,24 @@
 using ProjectMarworyn.Core.Generators;
 using ProjectMarworyn.Core.Models;
-using ProjectMarworyn.Core.Models.Enums;
 
 namespace ProjectMarworyn.Core
 {
     internal class PairingEngine : IPairingEngine
     {
         private readonly IDiceGenerator _diceGenerator;
+        private readonly IAttractionCalculator _attractionCalculator;
         private GameState _gameState;
 
         public PairingEngine(IDiceGenerator diceGenerator,
+            IAttractionCalculator attractionCalculator,
             GameState gameState)
         {
             _diceGenerator = diceGenerator;
+            _attractionCalculator = attractionCalculator;
             _gameState = gameState;
         }
 
-        public PairingResult GeneratePairs(List<Person> people,
+        public List<Pair> GeneratePairs(List<Person> people,
             List<Pair> pairs,
             int worldSeed,
             DateTime currentTime)
@@ -24,59 +26,56 @@ namespace ProjectMarworyn.Core
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
-            //Deliberately not materialised: the deferred query re-evaluates HasPair as iteration
-            //advances, so anyone paired mid-loop is skipped automatically. A .ToList() snapshot
-            //would re-visit them - irrelevant while partners only come from the male pool, but a
-            //trap once pairing can touch upcoming females (e.g. same-sex pairing, issue #15 stage 4)
-            var singleFemaleAdults = people.Where(x => x.Biosex == Biosex.Female &&
-                x.Age >= 18 &&
-                x.HasPair == false);
-
-            //Filtered once up-front and reduced via RemoveAt below, rather than re-filtering `people` on every female -
-            //RemoveAt keeps the same relative order a fresh filter would produce, so pairing outcomes for a given world seed are unchanged
-            var singleMaleAdults = people.Where(x => x.Biosex == Biosex.Male &&
-                    x.Age >= 18 &&
-                    x.HasPair == false)
+            //Snapshot deliberately: pairing can claim anyone later in the list, so each
+            //iteration re-checks HasPair instead of relying on a deferred query
+            var singleAdults = people.Where(x => x.Age >= 18 &&
+                    x.HasPair == false &&
+                    x.WillPair &&
+                    _attractionCalculator.CanPair(x))
                 .ToList();
 
-            foreach (var fPerson in singleFemaleAdults)
+            foreach (var person in singleAdults)
             {
-                var mCount = singleMaleAdults.Count;
-
-                if (mCount <= 0)
+                if (person.HasPair)
                 {
-                    break;
+                    continue;
+                }
+
+                var candidates = singleAdults.Where(x => x.Id != person.Id &&
+                        x.HasPair == false &&
+                        _attractionCalculator.AreMutuallyAttracted(person,
+                            x))
+                    .ToList();
+
+                if (candidates.Count == 0)
+                {
+                    continue;
                 }
 
                 var position = _diceGenerator.Next(dice,
                     0,
-                    mCount);
+                    candidates.Count);
 
-                var mPerson = singleMaleAdults[position];
-                singleMaleAdults.RemoveAt(position);
+                var partner = candidates[position];
 
                 var pair = new Pair()
                 {
-                    FPerson = fPerson,
-                    MPerson = mPerson
+                    PersonA = person,
+                    PersonB = partner
                 };
                 pairs.Add(pair);
 
-                _gameState.Text.Add($"Pair: {fPerson.Name.FullName} + {mPerson.Name.FullName}");
+                _gameState.Text.Add($"Pair: {person.Name.FullName} + {partner.Name.FullName}");
 
-                fPerson.HasPair = true;
-                mPerson.HasPair = true;
+                person.HasPair = true;
+                partner.HasPair = true;
             }
 
-            var alivePairs = pairs.Where(x => x.FPerson.IsAlive &&
-                    x.MPerson.IsAlive)
+            var alivePairs = pairs.Where(x => x.PersonA.IsAlive &&
+                    x.PersonB.IsAlive)
                 .ToList();
 
-            return new PairingResult
-            {
-                Pairs = alivePairs,
-                People = people
-            };
+            return alivePairs;
         }
     }
 }

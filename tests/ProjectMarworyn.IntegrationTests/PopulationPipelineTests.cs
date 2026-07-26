@@ -12,6 +12,7 @@ public class PopulationPipelineTests
 {
     private readonly GameState _gameState;
     private readonly IDiceGenerator _diceGenerator;
+    private readonly IAttractionCalculator _attractionCalculator;
     private readonly AgeProcessor _ageProcessor;
     private readonly DeathEngine _deathEngine;
     private readonly PairingEngine _pairingEngine;
@@ -27,7 +28,10 @@ public class PopulationPipelineTests
         _deathEngine = new DeathEngine(_diceGenerator,
             _gameState,
             Options.Create(new AppSettings { DeathBrackets = CreateDefaultDeathBrackets() }));
-        _pairingEngine = new PairingEngine(_diceGenerator, _gameState);
+        _attractionCalculator = new AttractionCalculator();
+        _pairingEngine = new PairingEngine(_diceGenerator,
+            _attractionCalculator,
+            _gameState);
         _personGenerator = new PersonGenerator(_diceGenerator,
             _gameState,
             Options.Create(new AppSettings
@@ -83,18 +87,16 @@ public class PopulationPipelineTests
         var people = Enumerable.Range(0, 50)
             .Select(i => CreatePerson(i, age: 30))
             .ToList();
-        var generation = _generationManager.Initialise(people);
 
         var aged = _ageProcessor.Age(people,
             new DateTime(1, 1, 1));
 
-        var result = _deathEngine.ProcessDeaths(aged,
-            generation,
+        var survivors = _deathEngine.ProcessDeaths(aged,
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(result.People);
-        Assert.True(result.People.Count <= aged.Count);
+        Assert.NotNull(survivors);
+        Assert.True(survivors.Count <= aged.Count);
     }
 
     [Fact]
@@ -106,14 +108,12 @@ public class PopulationPipelineTests
         var people = Enumerable.Range(0, 1000)
             .Select(i => CreatePerson(i, age: 100))
             .ToList();
-        var generation = _generationManager.Initialise(people);
 
-        var result = _deathEngine.ProcessDeaths(people,
-            generation,
+        var survivors = _deathEngine.ProcessDeaths(people,
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.True(result.People.Count < people.Count);
+        Assert.True(survivors.Count < people.Count);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotEmpty(result.Pairs);
+        Assert.NotEmpty(result);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(result.Pairs);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(result.Pairs);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -188,24 +188,13 @@ public class PopulationPipelineTests
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
-        var childResult = _personGenerator.GenerateChildren(pairingResult.Pairs,
+        var childResult = _personGenerator.GenerateChildren(pairingResult,
             worldSeed,
             people.Max(p => p.Id),
-            pairingResult.People,
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(childResult.Children);
-        Assert.NotEmpty(childResult.Children);
-    }
-
-    [Fact]
-    public void GenerationManager_Initialise_SetsIterationToZero()
-    {
-        var people = new List<Person> { CreatePerson(1) };
-
-        var generation = _generationManager.Initialise(people);
-
-        Assert.Equal(0, generation.Iteration);
+        Assert.NotNull(childResult);
+        Assert.NotEmpty(childResult);
     }
 
     [Fact]
@@ -267,6 +256,7 @@ public class PopulationPipelineTests
             DaysSinceLastChild = 0,
             WillHaveChildren = true,
             WillPair = true,
+            IsFertile = true,
             HasPair = false
         };
 
@@ -284,6 +274,7 @@ public class PopulationPipelineTests
             DaysSinceLastChild = 730,
             WillHaveChildren = true,
             WillPair = true,
+            IsFertile = true,
             HasPair = false
         };
 }

@@ -18,43 +18,27 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
-        public void ProcessDeaths_WithEmptyPeopleList_ReturnsEmptyLists()
+        public void ProcessDeaths_WithEmptyPeopleList_ReturnsEmptyList()
         {
             var engine = CreateEngine(1.0);
 
-            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(new List<Person>(),
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(currentGeneration.People);
+            Assert.Empty(survivors);
         }
 
         [Fact]
-        public void ProcessDeaths_WithEmptyPeopleList_PreservesIteration()
+        public void ProcessDeaths_ReturnsNonNullList()
         {
             var engine = CreateEngine(1.0);
 
-            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
-                CreateGeneration(5),
+            var survivors = engine.ProcessDeaths(new List<Person>(),
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(5, currentGeneration.Iteration);
-        }
-
-        [Fact]
-        public void ProcessDeaths_ReturnsNonNullLists()
-        {
-            var engine = CreateEngine(1.0);
-
-            var currentGeneration = engine.ProcessDeaths(new List<Person>(),
-                CreateGeneration(),
-                0,
-                new DateTime(1, 1, 1));
-
-            Assert.NotNull(currentGeneration);
-            Assert.NotNull(currentGeneration.People);
+            Assert.NotNull(survivors);
         }
 
         [Fact]
@@ -65,12 +49,11 @@ namespace ProjectMarworyn.UnitTests
             var engine = CreateEngine(0.0);
             var people = new List<Person> { CreatePerson(50, isAlive: false) };
 
-            var result = engine.ProcessDeaths(people,
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(people,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.People);
+            Assert.Empty(survivors);
             Assert.Empty(_gameState.Text);
         }
 
@@ -82,13 +65,12 @@ namespace ProjectMarworyn.UnitTests
             var deadPerson = new Person { Id = 2, Name = new Name { FullName = "Dead" }, Age = 30, Biosex = Biosex.Female, IsAlive = false };
             var people = new List<Person> { alivePerson, deadPerson };
 
-            var result = engine.ProcessDeaths(people,
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(people,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.People);
-            Assert.Contains(alivePerson, result.People);
+            Assert.Single(survivors);
+            Assert.Contains(alivePerson, survivors);
         }
 
         [Fact]
@@ -98,7 +80,6 @@ namespace ProjectMarworyn.UnitTests
             var person = CreatePerson(50);
 
             engine.ProcessDeaths(new List<Person> { person },
-                CreateGeneration(),
                 0,
                 new DateTime(1, 1, 1));
 
@@ -112,7 +93,6 @@ namespace ProjectMarworyn.UnitTests
             var person = CreatePerson(30);
 
             engine.ProcessDeaths(new List<Person> { person },
-                CreateGeneration(),
                 0,
                 new DateTime(1, 1, 1));
 
@@ -125,45 +105,27 @@ namespace ProjectMarworyn.UnitTests
             var engine = CreateEngine(1.0);
             var people = new List<Person> { CreatePerson(10), CreatePerson(20), CreatePerson(30) };
 
-            var result = engine.ProcessDeaths(people,
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(people,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.All(result.People, person => Assert.True(person.IsAlive));
+            Assert.All(survivors, person => Assert.True(person.IsAlive));
         }
 
         [Fact]
-        public void ProcessDeaths_SurvivingPeopleStoredInGeneration()
+        public void ProcessDeaths_ReturnsAllSurvivors()
         {
             var engine = CreateEngine(1.0);
             var person1 = new Person { Id = 1, Name = new Name { FullName = "Survivor1" }, Age = 10, Biosex = Biosex.Female, IsAlive = true };
             var person2 = new Person { Id = 2, Name = new Name { FullName = "Survivor2" }, Age = 15, Biosex = Biosex.Male, IsAlive = true };
             var people = new List<Person> { person1, person2 };
 
-            var currentGeneration = engine.ProcessDeaths(people,
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(people,
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(2, currentGeneration.People.Count);
-            Assert.All(currentGeneration.People, person => Assert.True(person.IsAlive));
-        }
-
-        [Fact]
-        public void ProcessDeaths_PreservesGenerationIteration()
-        {
-            var engine = CreateEngine(1.0);
-
-            var currentGeneration = engine.ProcessDeaths(new List<Person>
-                {
-                    CreatePerson(20)
-                },
-                CreateGeneration(7),
-                0,
-                new DateTime(1, 1, 1));
-
-            Assert.Equal(7, currentGeneration.Iteration);
+            Assert.Equal(2, survivors.Count);
+            Assert.All(survivors, person => Assert.True(person.IsAlive));
         }
 
         [Fact]
@@ -172,7 +134,6 @@ namespace ProjectMarworyn.UnitTests
             var engine = CreateEngine(0.0);
 
             engine.ProcessDeaths(new List<Person> { CreatePerson(50) },
-                CreateGeneration(),
                 0,
                 new DateTime(1, 1, 1));
 
@@ -185,7 +146,6 @@ namespace ProjectMarworyn.UnitTests
             var engine = CreateEngine(1.0);
 
             engine.ProcessDeaths(new List<Person> { CreatePerson(30) },
-                CreateGeneration(),
                 0,
                 new DateTime(1, 1, 1));
 
@@ -206,7 +166,6 @@ namespace ProjectMarworyn.UnitTests
             };
 
             engine.ProcessDeaths(new List<Person> { person },
-                CreateGeneration(),
                 0,
                 new DateTime(1, 1, 1));
 
@@ -248,15 +207,14 @@ namespace ProjectMarworyn.UnitTests
         {
             var engine = CreateEngine(nextDoubleValue);
 
-            var result = engine.ProcessDeaths(new List<Person> { CreatePerson(age) },
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(new List<Person> { CreatePerson(age) },
                 0,
                 new DateTime(1, 1, 1));
 
             if (expectsDeath)
-                Assert.Empty(result.People);
+                Assert.Empty(survivors);
             else
-                Assert.Single(result.People);
+                Assert.Single(survivors);
         }
 
         // Verifies bracket selection at every age boundary of the default table.
@@ -281,16 +239,13 @@ namespace ProjectMarworyn.UnitTests
             bool upperDies)
         {
             var engine = CreateEngine(nextDoubleValue);
-            var generation = CreateGeneration();
 
             var lowerSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(lowerAge) },
-                generation,
                 0,
-                new DateTime(1, 1, 1)).People;
+                new DateTime(1, 1, 1));
             var upperSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(upperAge) },
-                generation,
                 0,
-                new DateTime(1, 1, 1)).People;
+                new DateTime(1, 1, 1));
 
             if (lowerDies)
                 Assert.Empty(lowerSurvivors);
@@ -312,12 +267,11 @@ namespace ProjectMarworyn.UnitTests
         {
             var engine = CreateEngine(0.04);
 
-            var result = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
-                CreateGeneration(),
+            var survivors = engine.ProcessDeaths(new List<Person> { CreatePerson(85) },
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.People);
+            Assert.Single(survivors);
         }
 
         // Custom brackets flip the default outcomes for both ages at the same dice roll,
@@ -333,17 +287,15 @@ namespace ProjectMarworyn.UnitTests
             var engine = CreateEngine(0.5,
                 customBrackets);
 
-            var childResult = engine.ProcessDeaths(new List<Person> { CreatePerson(5) },
-                CreateGeneration(),
+            var childSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(5) },
                 0,
                 new DateTime(1, 1, 1));
-            var adultResult = engine.ProcessDeaths(new List<Person> { CreatePerson(50) },
-                CreateGeneration(),
+            var adultSurvivors = engine.ProcessDeaths(new List<Person> { CreatePerson(50) },
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(childResult.People);
-            Assert.Empty(adultResult.People);
+            Assert.Single(childSurvivors);
+            Assert.Empty(adultSurvivors);
         }
 
         // A misconfigured table (hand-edited Appsettings.json) must fail at construction
@@ -394,11 +346,6 @@ namespace ProjectMarworyn.UnitTests
                 Biosex = Biosex.Male,
                 IsAlive = isAlive
             };
-        }
-
-        private static Generation CreateGeneration(int iteration = 1)
-        {
-            return new Generation { Iteration = iteration, People = new List<Person>() };
         }
 
         private DeathEngine CreateEngine(double nextDoubleValue,

@@ -75,6 +75,7 @@ namespace ProjectMarworyn.Core.Generators
                     BirthDay = birthDay,
                     WillHaveChildren = CalcWillHaveChildren(dice),
                     WillPair = initialPerson.WillPair,
+                    IsFertile = initialPerson.IsFertile,
                     DaysSinceLastChild = yearsFromLastChild * SimulationConstants.DaysPerYear + dayOffset,
                     HasPair = false
                 };
@@ -87,32 +88,61 @@ namespace ProjectMarworyn.Core.Generators
             return people;
         }
 
-        public ChildGenerationResult GenerateChildren(List<Pair> pairs,
+        public List<Person> GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
-            List<Person> people,
             DateTime currentTime)
         {
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
-            //For each pair
-            var aliveFertilePairs = pairs.Where(x => x.FPerson.IsAlive &&
-                    x.MPerson.IsAlive &&
-                    x.FPerson.Age >= 18 &&
-                    x.FPerson.Age <= 45 &&
-                    x.MPerson.Age >= 18 &&
-                    x.FPerson.WillHaveChildren &&
-                    x.MPerson.WillHaveChildren &&
-                    x.FPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear &&
-                    x.MPerson.DaysSinceLastChild >= _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
-                .ToList();
-
             var children = new List<Person>();
-            List<Person> peopleToUpdate = new List<Person>();
 
-            foreach (var pair in aliveFertilePairs)
+            foreach (var pair in pairs)
             {
+                //Reproduction is strictly biological (issue #15 stage 4): one partner must
+                //supply the egg side and one the sperm side, so same-sex pairs don't conceive.
+                //Adoption (later) will redistribute children orphaned in the simulation instead -
+                //people never appear from nowhere
+                //Asexual partners pair romantically, but a child here means sexual reproduction,
+                //so they wait for the adoption system too
+                if (pair.PersonA.Orientation == Orientation.Asexual ||
+                    pair.PersonB.Orientation == Orientation.Asexual)
+                {
+                    continue;
+                }
+
+                if (!pair.PersonA.IsFertile ||
+                    !pair.PersonB.IsFertile)
+                {
+                    continue;
+                }
+
+                var mother = SelectParent(pair,
+                    Biosex.Female);
+                var father = SelectParent(pair,
+                    Biosex.Male,
+                    mother);
+
+                if (mother == null ||
+                    father == null)
+                {
+                    continue;
+                }
+
+                if (!mother.IsAlive ||
+                    !father.IsAlive ||
+                    mother.Age < 18 ||
+                    mother.Age > 45 ||
+                    father.Age < 18 ||
+                    !mother.WillHaveChildren ||
+                    !father.WillHaveChildren ||
+                    mother.DaysSinceLastChild < _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear ||
+                    father.DaysSinceLastChild < _appSettings.FertilityCooldownYears * SimulationConstants.DaysPerYear)
+                {
+                    continue;
+                }
+
                 var childChance = dice.Next(1,
                     101);
 
@@ -124,7 +154,8 @@ namespace ProjectMarworyn.Core.Generators
 
                     var name = CalculateName(dice,
                         gender,
-                        pair);
+                        mother,
+                        father);
 
                     personId++;
                     var child = new Person()
@@ -141,36 +172,28 @@ namespace ProjectMarworyn.Core.Generators
                         BirthDay = currentTime.Day,
                         WillHaveChildren = CalcWillHaveChildren(dice),
                         Orientation = CalculateOrientation(dice),
-                        WillPair = CalcWillPair(dice)
+                        WillPair = CalcWillPair(dice),
+                        IsFertile = CalcIsFertile(dice,
+                            biosex)
                     };
 
                     children.Add(child);
-                    _gameState.Text.Add($"Child {child.Name.FullName} was born to {pair.FPerson.Name.FullName} and {pair.MPerson.Name.FullName}");
+                    _gameState.Text.Add($"Child {child.Name.FullName} was born to {mother.Name.FullName} and {father.Name.FullName}");
 
-                    peopleToUpdate.Add(pair.FPerson);
-                    peopleToUpdate.Add(pair.MPerson);
-
-                    people.Remove(pair.FPerson);
-                    people.Remove(pair.MPerson);
+                    mother.DaysSinceLastChild = 0;
+                    father.DaysSinceLastChild = 0;
                 }
             }
 
-            foreach (var person in peopleToUpdate)
-            {
-                person.DaysSinceLastChild = 0;
-                people.Add(person);
-            }
-
-            return new ChildGenerationResult
-            {
-                Children = children,
-                People = people
-            };
+            return children;
         }
 
+        //The pair's biosex roles never change mid-simulation, so the mother/father naming
+        //conventions survive the Pair model losing its FPerson/MPerson shape
         private Name CalculateName(Random dice,
             Gender gender,
-            Pair pair)
+            Person mother,
+            Person father)
         {
             var namingGender = gender;
 
@@ -185,47 +208,49 @@ namespace ProjectMarworyn.Core.Generators
                         break;
                     case 1:
                         return RandomOrderName(dice,
-                            pair.FPerson.Name.Prefix,
-                            pair.MPerson.Name.Prefix);
+                            mother.Name.Prefix,
+                            father.Name.Prefix);
                     case 2:
                         return RandomOrderName(dice,
-                            pair.FPerson.Name.Suffix,
-                            pair.MPerson.Name.Suffix);
+                            mother.Name.Suffix,
+                            father.Name.Suffix);
                     default:
                         throw new InvalidOperationException("Error randomising naming route");
                 }
             }
 
+            //The cross-parent conventions look reversed but are intentional and date from v1:
+            //male children take mother's prefix + father's suffix, female children the mirror
             if (namingGender == Gender.Male)
             {
                 return new Name
                 {
-                    FullName = pair.FPerson.Name.Prefix + pair.MPerson.Name.Suffix,
-                    Prefix = pair.FPerson.Name.Prefix,
-                    Suffix = pair.MPerson.Name.Suffix,
+                    FullName = mother.Name.Prefix + father.Name.Suffix,
+                    Prefix = mother.Name.Prefix,
+                    Suffix = father.Name.Suffix,
                 };
             }
 
             return new Name
             {
-                FullName = pair.MPerson.Name.Prefix + pair.FPerson.Name.Suffix,
-                Prefix = pair.MPerson.Name.Prefix,
-                Suffix = pair.FPerson.Name.Suffix,
+                FullName = father.Name.Prefix + mother.Name.Suffix,
+                Prefix = father.Name.Prefix,
+                Suffix = mother.Name.Suffix,
             };
         }
 
         private Name RandomOrderName(Random dice,
-            string fPersonPart,
-            string mPersonPart)
+            string motherPart,
+            string fatherPart)
         {
-            var mPersonFirst = _diceGenerator.Next(dice, 0, 2) == 1;
+            var fatherFirst = _diceGenerator.Next(dice, 0, 2) == 1;
 
-            var firstPart = mPersonFirst ?
-                mPersonPart :
-                fPersonPart;
-            var secondPart = mPersonFirst ?
-                fPersonPart :
-                mPersonPart;
+            var firstPart = fatherFirst ?
+                fatherPart :
+                motherPart;
+            var secondPart = fatherFirst ?
+                motherPart :
+                fatherPart;
 
             return new Name
             {
@@ -233,6 +258,80 @@ namespace ProjectMarworyn.Core.Generators
                 Prefix = firstPart,
                 Suffix = secondPart,
             };
+        }
+
+        private static Person SelectParent(Pair pair,
+            Biosex role,
+            Person exclude = null)
+        {
+            //The exact biosex match takes the role first, leaving a flexible intersex
+            //partner free to cover the other side
+            if (pair.PersonA != exclude &&
+                pair.PersonA.Biosex == role)
+            {
+                return pair.PersonA;
+            }
+
+            if (pair.PersonB != exclude &&
+                pair.PersonB.Biosex == role)
+            {
+                return pair.PersonB;
+            }
+
+            if (pair.PersonA != exclude &&
+                CanFillRole(pair.PersonA,
+                    role))
+            {
+                return pair.PersonA;
+            }
+
+            if (pair.PersonB != exclude &&
+                CanFillRole(pair.PersonB,
+                    role))
+            {
+                return pair.PersonB;
+            }
+
+            return null;
+        }
+
+        //A fertile intersex person reproduces in the direction of their gender -
+        //female-gendered supplies the egg side, male-gendered the sperm side, and
+        //non-binary leaves both directions open
+        private static bool CanFillRole(Person person,
+            Biosex role)
+        {
+            //Unreachable via SelectParent (its exact-biosex branches run first), but kept
+            //so the method answers truthfully if ever called on its own
+            if (person.Biosex == role)
+            {
+                return true;
+            }
+
+            if (person.Biosex != Biosex.Intersex)
+            {
+                return false;
+            }
+
+            var roleAlignedGender = role == Biosex.Female ?
+                Gender.Female :
+                Gender.Male;
+
+            return person.Gender == roleAlignedGender ||
+                person.Gender == Gender.NonBinary;
+        }
+
+        private bool CalcIsFertile(Random dice,
+            Biosex biosex)
+        {
+            if (biosex != Biosex.Intersex)
+            {
+                return true;
+            }
+
+            var fertileRoll = _diceGenerator.NextDouble(dice) * 100;
+
+            return fertileRoll < _appSettings.IntersexFertileProbability;
         }
 
         private Gender RandomGender(Random random)

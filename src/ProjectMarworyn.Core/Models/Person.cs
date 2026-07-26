@@ -12,6 +12,7 @@ namespace ProjectMarworyn.Core.Models
         public Orientation Orientation { get; set; }
         public bool WillHaveChildren { get; set; }
         public bool WillPair { get; set; }
+        public bool IsFertile { get; set; }
         public bool IsAlive { get; set; }
         public int BirthMonth { get; set; }
         public int BirthDay { get; set; }

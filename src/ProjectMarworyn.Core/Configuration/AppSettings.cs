@@ -13,6 +13,7 @@ namespace ProjectMarworyn.Core.Configuration
         //Gay/Lesbian 1.5%, Bisexual 1.3%, Pansexual 0.23% and Asexual 0.06% from the "Other" write-ins; Heterosexual takes the remainder (non-responses folded in, as with BiosexModifier)
         //Aromantic and Aroace are invented placeholders - no census records them; pending research into EU figures
         public double NeverPairProbability { get; set; }//In %. Chance a newborn never pairs regardless of orientation (WillPair = false). Balance placeholder - no census figure for this; initial people carry WillPair explicitly in InitialPeople.json instead of rolling
+        public double IntersexFertileProbability { get; set; }//In %. Chance an intersex newborn is fertile. Modelling estimate, not census-backed - fertility varies widely by condition (many DSDs cause infertility, some don't) and no clean published split exists; revisit if better figures surface
         public double NonBinaryProbability { get; set; }//In %. Default 0.06% who identified as non-binary (same census source). Rolled independently of TransgenderProbability, with non-binary taking precedence
     }
 }

@@ -215,6 +215,34 @@ namespace ProjectMarworyn.UnitTests
         }
 
         [Fact]
+        public void Initialise_IsFertileDefaultsToTrue()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Female }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.True(result[0].IsFertile);
+        }
+
+        [Fact]
+        public void Initialise_WithInfertilePerson_IsFertileIsFalse()
+        {
+            var initialPeople = new List<InitialPerson>
+            {
+                new InitialPerson { FullName = "Test", Biosex = Biosex.Intersex, IsFertile = false }
+            };
+
+            var result = _personGenerator.Initialise(initialPeople,
+                0);
+
+            Assert.False(result[0].IsFertile);
+        }
+
+        [Fact]
         public void Initialise_SetsIsAliveToTrue()
         {
             var initialPeople = new List<InitialPerson>
@@ -305,11 +333,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
+            Assert.Single(result);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
         }
 
         // Verifies the Female→Male and Male→Intersex boundary transitions.
@@ -325,12 +352,12 @@ namespace ProjectMarworyn.UnitTests
             var pair2 = CreateFertilePair();
 
             var lowerResult = CreateGeneratorWithNextDouble(lowerValue)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new DateTime(1, 1, 1));
             var upperResult = CreateGeneratorWithNextDouble(upperValue)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
-            Assert.Equal(lowerExpected, lowerResult.Children[0].Biosex);
-            Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
+            Assert.Equal(lowerExpected, lowerResult[0].Biosex);
+            Assert.Equal(upperExpected, upperResult[0].Biosex);
         }
 
         // The mocked NextDouble feeds both the biosex roll and the gender deviation roll,
@@ -349,11 +376,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // With TransgenderProbability at 100% every deviation roll hits,
@@ -372,11 +398,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // Intersex children are assigned a random binary gender and then roll for trans like
@@ -389,12 +414,12 @@ namespace ProjectMarworyn.UnitTests
             var pair2 = CreateFertilePair();
 
             var alignedResult = CreateGeneratorWithNextDouble(0.9900)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.FPerson, pair1.MPerson }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new DateTime(1, 1, 1));
             var flippedResult = CreateGeneratorWithNextDouble(0.9900, transgenderProbability: 100)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.FPerson, pair2.MPerson }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Intersex, alignedResult.Children[0].Biosex);
-            Assert.NotEqual(alignedResult.Children[0].Gender, flippedResult.Children[0].Gender);
+            Assert.Equal(Biosex.Intersex, alignedResult[0].Biosex);
+            Assert.NotEqual(alignedResult[0].Gender, flippedResult[0].Gender);
         }
 
         [Fact]
@@ -406,11 +431,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
-            Assert.True(result.Children[0].Gender == Gender.Female || result.Children[0].Gender == Gender.Male);
+            Assert.Equal(Biosex.Intersex, result[0].Biosex);
+            Assert.True(result[0].Gender == Gender.Female || result[0].Gender == Gender.Male);
         }
 
         // With NonBinaryProbability at 100% every roll lands in the non-binary band,
@@ -429,11 +453,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(Gender.NonBinary, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(Gender.NonBinary, result[0].Gender);
         }
 
         // The non-binary and transgender probabilities are independent rolls, with the
@@ -454,10 +477,9 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // Route 0: the traditional route, either binary convention at random.
@@ -472,10 +494,9 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            var fullName = result.Children[0].Name.FullName;
+            var fullName = result[0].Name.FullName;
             Assert.True(fullName == "JaneSmith" || fullName == "JohnDoe",
                 $"Expected one of the two binary name conventions but got '{fullName}'");
         }
@@ -484,10 +505,10 @@ namespace ProjectMarworyn.UnitTests
         // part able to come first. The child's own Prefix/Suffix must decompose the
         // FullName so their children can inherit parts.
         [Theory]
-        [InlineData(1, 0, "JaneJohn", "Jane", "John")]  // prefix + prefix, FPerson first
-        [InlineData(1, 1, "JohnJane", "John", "Jane")]  // prefix + prefix, MPerson first
-        [InlineData(2, 0, "DoeSmith", "Doe", "Smith")]  // suffix + suffix, FPerson first
-        [InlineData(2, 1, "SmithDoe", "Smith", "Doe")]  // suffix + suffix, MPerson first
+        [InlineData(1, 0, "JaneJohn", "Jane", "John")]  // prefix + prefix, mother first
+        [InlineData(1, 1, "JohnJane", "John", "Jane")]  // prefix + prefix, father first
+        [InlineData(2, 0, "DoeSmith", "Doe", "Smith")]  // suffix + suffix, mother first
+        [InlineData(2, 1, "SmithDoe", "Smith", "Doe")]  // suffix + suffix, father first
         public void GenerateChildren_NonBinaryChildOnDedicatedRoute_CombinesParentNameParts(int namingRoute,
             int partOrder,
             string expectedFullName,
@@ -503,12 +524,11 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedFullName, result.Children[0].Name.FullName);
-            Assert.Equal(expectedPrefix, result.Children[0].Name.Prefix);
-            Assert.Equal(expectedSuffix, result.Children[0].Name.Suffix);
+            Assert.Equal(expectedFullName, result[0].Name.FullName);
+            Assert.Equal(expectedPrefix, result[0].Name.Prefix);
+            Assert.Equal(expectedSuffix, result[0].Name.Suffix);
         }
 
         [Fact]
@@ -520,11 +540,10 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(2, 6, 15));
 
-            Assert.Equal(6, result.Children[0].BirthMonth);
-            Assert.Equal(15, result.Children[0].BirthDay);
+            Assert.Equal(6, result[0].BirthMonth);
+            Assert.Equal(15, result[0].BirthDay);
         }
 
         [Fact]
@@ -540,10 +559,9 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Empty(result);
         }
 
         // Verifies the cumulative-band walk in CalculateOrientation against the default census
@@ -566,10 +584,9 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedOrientation, result.Children[0].Orientation);
+            Assert.Equal(expectedOrientation, result[0].Orientation);
         }
 
         // A rigged table (everything on Aroace) proves the child's orientation comes from
@@ -587,10 +604,9 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Orientation.Aroace, result.Children[0].Orientation);
+            Assert.Equal(Orientation.Aroace, result[0].Orientation);
         }
 
         // The never-pair roll is independent of orientation. The mocked NextDouble feeds it
@@ -611,10 +627,199 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.FPerson, pair.MPerson },
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedWillPair, result.Children[0].WillPair);
+            Assert.Equal(expectedWillPair, result[0].WillPair);
+        }
+
+        // The cooldown reset happens on the Person objects directly - GenerateChildren
+        // no longer owns or reorders the population list (issue #34).
+        [Fact]
+        public void GenerateChildren_OnBirth_ResetsBothParentsCooldown()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result);
+            Assert.Equal(0, pair.PersonA.DaysSinceLastChild);
+            Assert.Equal(0, pair.PersonB.DaysSinceLastChild);
+        }
+
+        // Reproduction requires exactly one female and one male biosex parent (issue #15
+        // stage 4): a same-sex pair passes every other fertility check and still produces
+        // no children.
+        [Fact]
+        public void GenerateChildren_SameSexPair_ProducesNoChildren()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonB.Biosex = Biosex.Female;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result);
+        }
+
+        // Parental roles derive from biosex, not from position in the pair: swapping
+        // PersonA/PersonB changes nothing, including the child naming conventions.
+        [Fact]
+        public void GenerateChildren_PairOrderReversed_StillReproduces()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            var swap = pair.PersonA;
+            pair.PersonA = pair.PersonB;
+            pair.PersonB = swap;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            // 0.4514 rolls a female child, so the female convention applies:
+            // father's prefix + mother's suffix
+            Assert.Single(result);
+            Assert.Equal("JohnDoe", result[0].Name.FullName);
+        }
+
+        // A child here means sexual reproduction, so asexual partners wait for the
+        // adoption system regardless of which side of the pair they are on.
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void GenerateChildren_AsexualPartner_ProducesNoChildren(bool asexualIsPersonA)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            if (asexualIsPersonA)
+                pair.PersonA.Orientation = Orientation.Asexual;
+            else
+                pair.PersonB.Orientation = Orientation.Asexual;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void GenerateChildren_InfertileIntersexPartner_ProducesNoChildren()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonB.Biosex = Biosex.Intersex;
+            pair.PersonB.IsFertile = false;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Empty(result);
+        }
+
+        // A fertile intersex person reproduces in the direction of their gender:
+        // male-gendered John supplies the sperm side opposite female-biosex Jane.
+        [Fact]
+        public void GenerateChildren_FertileIntersexPartner_TakesRoleFromGender()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonB.Biosex = Biosex.Intersex;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result);
+        }
+
+        // A non-binary-gendered fertile intersex person can fill whichever role the
+        // partner leaves open - here the exact biosex match takes their own side first.
+        [Theory]
+        [InlineData(true)]  // intersex partner covers the sperm side opposite female Jane
+        [InlineData(false)] // intersex partner covers the egg side opposite male John
+        public void GenerateChildren_NonBinaryGenderedFertileIntersex_FillsMissingRole(bool intersexIsPersonB)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            var intersexPartner = intersexIsPersonB ?
+                pair.PersonB :
+                pair.PersonA;
+            intersexPartner.Biosex = Biosex.Intersex;
+            intersexPartner.Gender = Gender.NonBinary;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result);
+        }
+
+        // Both roles filled by intersex partners: entirely gender-derived reproduction.
+        [Fact]
+        public void GenerateChildren_TwoFertileIntersexPartnersWithOppositeGenders_Reproduce()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+            pair.PersonA.Biosex = Biosex.Intersex;
+            pair.PersonB.Biosex = Biosex.Intersex;
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result);
+        }
+
+        // The fertility roll only applies to intersex newborns and reads the configured
+        // probability - the mocked 0.9900 roll (99.00) sits under 100 and over 0.
+        [Theory]
+        [InlineData(100, true)]
+        [InlineData(0, false)]
+        public void GenerateChildren_IntersexChild_FertileRollAgainstConfig(double intersexFertileProbability,
+            bool expectedIsFertile)
+        {
+            var generator = CreateGeneratorWithNextDouble(0.9900,
+                intersexFertileProbability: intersexFertileProbability);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Intersex, result[0].Biosex);
+            Assert.Equal(expectedIsFertile, result[0].IsFertile);
+        }
+
+        [Fact]
+        public void GenerateChildren_BinaryBiosexChild_IsAlwaysFertile()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514,
+                intersexFertileProbability: 0);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Equal(Biosex.Female, result[0].Biosex);
+            Assert.True(result[0].IsFertile);
         }
 
         // A misconfigured weight table (hand-edited Appsettings.json) must fail at construction
@@ -676,6 +881,7 @@ namespace ProjectMarworyn.UnitTests
             double transgenderProbability = 0,
             double nonBinaryProbability = 0,
             double neverPairProbability = 0,
+            double intersexFertileProbability = 0,
             List<OrientationWeight> orientationWeights = null,
             int namingRoute = 0,
             int partOrder = 0)
@@ -694,6 +900,7 @@ namespace ProjectMarworyn.UnitTests
                     TransgenderProbability = transgenderProbability,
                     NonBinaryProbability = nonBinaryProbability,
                     NeverPairProbability = neverPairProbability,
+                    IntersexFertileProbability = intersexFertileProbability,
                     OrientationWeights = orientationWeights ?? CreateDefaultOrientationWeights()
                 }));
         }
@@ -723,26 +930,30 @@ namespace ProjectMarworyn.UnitTests
         {
             return new Pair
             {
-                FPerson = new Person
+                PersonA = new Person
                 {
                     Id = 1,
                     Name = new Name { FullName = "JaneDoe", Prefix = "Jane", Suffix = "Doe" },
                     Age = 25,
                     Biosex = Biosex.Female,
+                    Gender = Gender.Female,
                     IsAlive = true,
                     WillHaveChildren = true,
                     WillPair = true,
+                    IsFertile = true,
                     DaysSinceLastChild = 730
                 },
-                MPerson = new Person
+                PersonB = new Person
                 {
                     Id = 2,
                     Name = new Name { FullName = "JohnSmith", Prefix = "John", Suffix = "Smith" },
                     Age = 30,
                     Biosex = Biosex.Male,
+                    Gender = Gender.Male,
                     IsAlive = true,
                     WillHaveChildren = true,
                     WillPair = true,
+                    IsFertile = true,
                     DaysSinceLastChild = 730
                 }
             };
