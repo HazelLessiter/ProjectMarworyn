@@ -13,7 +13,7 @@
 -Added `IsFertile` to `Person` and `IntersexFertileProbability` to `AppSettings` (in %, default 50 - a modelling estimate, no citable fertile/infertile split exists): intersex newborns roll it at birth, binary biosex is always fertile, and a fertile intersex person reproduces in the direction of their gender with non-binary gender able to fill either role
 +`IsFertile` defaults to true in `InitialPeople.json` - only infertile people carry it in the data file
 -`DeathEngine.ProcessDeaths` now returns the survivor list and the `Generation` model is removed - it was recreated every day just to carry `Iteration` plus the survivors (#41); `Iteration` now lives on `SimulationManager`
--`SimulationManager` is now the sole owner of the population list (#34): `PairingResult` and `ChildGenerationResult` lose their `People` properties, and membership changes in exactly two places - the death survivor list and appending newborns
+-`SimulationManager` is now the sole owner of the population list (#34): `PairingResult` loses its `People` property, `ChildGenerationResult` is removed entirely (`GenerateChildren` returns the children list directly, its only remaining cargo), and membership changes in exactly two places - the death survivor list and appending newborns
 +`GenerateChildren` no longer removes and re-adds parents to reset their fertility cooldown; the reset happens on the `Person` directly, so parents stop silently migrating to the back of the list (an accidental reorder that fed the seeded pairing order)
 
 ## [2.1.0]

@@ -193,8 +193,8 @@ public class PopulationPipelineTests
             people.Max(p => p.Id),
             new DateTime(1, 1, 1));
 
-        Assert.NotNull(childResult.Children);
-        Assert.NotEmpty(childResult.Children);
+        Assert.NotNull(childResult);
+        Assert.NotEmpty(childResult);
     }
 
     [Fact]

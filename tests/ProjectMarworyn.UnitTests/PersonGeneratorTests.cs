@@ -335,8 +335,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
+            Assert.Single(result);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
         }
 
         // Verifies the Female→Male and Male→Intersex boundary transitions.
@@ -356,8 +356,8 @@ namespace ProjectMarworyn.UnitTests
             var upperResult = CreateGeneratorWithNextDouble(upperValue)
                 .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
-            Assert.Equal(lowerExpected, lowerResult.Children[0].Biosex);
-            Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
+            Assert.Equal(lowerExpected, lowerResult[0].Biosex);
+            Assert.Equal(upperExpected, upperResult[0].Biosex);
         }
 
         // The mocked NextDouble feeds both the biosex roll and the gender deviation roll,
@@ -378,8 +378,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // With TransgenderProbability at 100% every deviation roll hits,
@@ -400,8 +400,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // Intersex children are assigned a random binary gender and then roll for trans like
@@ -418,8 +418,8 @@ namespace ProjectMarworyn.UnitTests
             var flippedResult = CreateGeneratorWithNextDouble(0.9900, transgenderProbability: 100)
                 .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Intersex, alignedResult.Children[0].Biosex);
-            Assert.NotEqual(alignedResult.Children[0].Gender, flippedResult.Children[0].Gender);
+            Assert.Equal(Biosex.Intersex, alignedResult[0].Biosex);
+            Assert.NotEqual(alignedResult[0].Gender, flippedResult[0].Gender);
         }
 
         [Fact]
@@ -433,8 +433,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
-            Assert.True(result.Children[0].Gender == Gender.Female || result.Children[0].Gender == Gender.Male);
+            Assert.Equal(Biosex.Intersex, result[0].Biosex);
+            Assert.True(result[0].Gender == Gender.Female || result[0].Gender == Gender.Male);
         }
 
         // With NonBinaryProbability at 100% every roll lands in the non-binary band,
@@ -455,8 +455,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedBiosex, result.Children[0].Biosex);
-            Assert.Equal(Gender.NonBinary, result.Children[0].Gender);
+            Assert.Equal(expectedBiosex, result[0].Biosex);
+            Assert.Equal(Gender.NonBinary, result[0].Gender);
         }
 
         // The non-binary and transgender probabilities are independent rolls, with the
@@ -479,7 +479,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedGender, result.Children[0].Gender);
+            Assert.Equal(expectedGender, result[0].Gender);
         }
 
         // Route 0: the traditional route, either binary convention at random.
@@ -496,7 +496,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            var fullName = result.Children[0].Name.FullName;
+            var fullName = result[0].Name.FullName;
             Assert.True(fullName == "JaneSmith" || fullName == "JohnDoe",
                 $"Expected one of the two binary name conventions but got '{fullName}'");
         }
@@ -526,9 +526,9 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedFullName, result.Children[0].Name.FullName);
-            Assert.Equal(expectedPrefix, result.Children[0].Name.Prefix);
-            Assert.Equal(expectedSuffix, result.Children[0].Name.Suffix);
+            Assert.Equal(expectedFullName, result[0].Name.FullName);
+            Assert.Equal(expectedPrefix, result[0].Name.Prefix);
+            Assert.Equal(expectedSuffix, result[0].Name.Suffix);
         }
 
         [Fact]
@@ -542,8 +542,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(2, 6, 15));
 
-            Assert.Equal(6, result.Children[0].BirthMonth);
-            Assert.Equal(15, result.Children[0].BirthDay);
+            Assert.Equal(6, result[0].BirthMonth);
+            Assert.Equal(15, result[0].BirthDay);
         }
 
         [Fact]
@@ -561,7 +561,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Empty(result);
         }
 
         // Verifies the cumulative-band walk in CalculateOrientation against the default census
@@ -586,7 +586,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedOrientation, result.Children[0].Orientation);
+            Assert.Equal(expectedOrientation, result[0].Orientation);
         }
 
         // A rigged table (everything on Aroace) proves the child's orientation comes from
@@ -606,7 +606,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Orientation.Aroace, result.Children[0].Orientation);
+            Assert.Equal(Orientation.Aroace, result[0].Orientation);
         }
 
         // The never-pair roll is independent of orientation. The mocked NextDouble feeds it
@@ -629,7 +629,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(expectedWillPair, result.Children[0].WillPair);
+            Assert.Equal(expectedWillPair, result[0].WillPair);
         }
 
         // The cooldown reset happens on the Person objects directly - GenerateChildren
@@ -645,7 +645,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
+            Assert.Single(result);
             Assert.Equal(0, pair.PersonA.DaysSinceLastChild);
             Assert.Equal(0, pair.PersonB.DaysSinceLastChild);
         }
@@ -665,7 +665,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Empty(result);
         }
 
         // Parental roles derive from biosex, not from position in the pair: swapping
@@ -686,8 +686,8 @@ namespace ProjectMarworyn.UnitTests
 
             // 0.4514 rolls a female child, so the female convention applies:
             // father's prefix + mother's suffix
-            Assert.Single(result.Children);
-            Assert.Equal("JohnDoe", result.Children[0].Name.FullName);
+            Assert.Single(result);
+            Assert.Equal("JohnDoe", result[0].Name.FullName);
         }
 
         // A child here means sexual reproduction, so asexual partners wait for the
@@ -709,7 +709,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -725,7 +725,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Children);
+            Assert.Empty(result);
         }
 
         // A fertile intersex person reproduces in the direction of their gender:
@@ -742,7 +742,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
+            Assert.Single(result);
         }
 
         // A non-binary-gendered fertile intersex person can fill whichever role the
@@ -765,7 +765,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
+            Assert.Single(result);
         }
 
         // Both roles filled by intersex partners: entirely gender-derived reproduction.
@@ -782,7 +782,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Children);
+            Assert.Single(result);
         }
 
         // The fertility roll only applies to intersex newborns and reads the configured
@@ -802,8 +802,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
-            Assert.Equal(expectedIsFertile, result.Children[0].IsFertile);
+            Assert.Equal(Biosex.Intersex, result[0].Biosex);
+            Assert.Equal(expectedIsFertile, result[0].IsFertile);
         }
 
         [Fact]
@@ -818,8 +818,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(Biosex.Female, result.Children[0].Biosex);
-            Assert.True(result.Children[0].IsFertile);
+            Assert.Equal(Biosex.Female, result[0].Biosex);
+            Assert.True(result[0].IsFertile);
         }
 
         // A misconfigured weight table (hand-edited Appsettings.json) must fail at construction

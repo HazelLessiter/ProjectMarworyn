@@ -109,12 +109,12 @@ namespace ProjectMarworyn.Core.Managers
             }
 
             //Generate Children
-            var childGenerationResult = _personGenerator.GenerateChildren(_pairs,
+            var children = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
                 date);
 
-            _people.AddRange(childGenerationResult.Children);
+            _people.AddRange(children);
         }
     }
 }

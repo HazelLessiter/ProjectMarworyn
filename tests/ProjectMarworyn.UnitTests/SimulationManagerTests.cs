@@ -42,7 +42,7 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<int>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(new ChildGenerationResult { Children = new List<Person>() });
+                .Returns(new List<Person>());
 
             _mockAgeProcessor = Substitute.For<IAgeProcessor>();
             _mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(x => x.ArgAt<List<Person>>(0));
@@ -99,10 +99,7 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<int>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(new ChildGenerationResult
-                {
-                    Children = new List<Person> { child }
-                });
+                .Returns(new List<Person> { child });
             _simulationManager.Start();
 
             _simulationManager.ProgressDay();

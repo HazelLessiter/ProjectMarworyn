@@ -88,7 +88,7 @@ namespace ProjectMarworyn.Core.Generators
             return people;
         }
 
-        public ChildGenerationResult GenerateChildren(List<Pair> pairs,
+        public List<Person> GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
             DateTime currentTime)
@@ -185,10 +185,7 @@ namespace ProjectMarworyn.Core.Generators
                 }
             }
 
-            return new ChildGenerationResult
-            {
-                Children = children
-            };
+            return children;
         }
 
         //The pair's biosex roles never change mid-simulation, so the mother/father naming
