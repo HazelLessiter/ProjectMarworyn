@@ -77,8 +77,7 @@ namespace ProjectMarworyn.Core
 
             return new PairingResult
             {
-                Pairs = alivePairs,
-                People = people
+                Pairs = alivePairs
             };
         }
     }

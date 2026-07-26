@@ -100,7 +100,6 @@ namespace ProjectMarworyn.Core.Managers
                 _worldSeed,
                 date);
             _pairs = pairingResult.Pairs;
-            _people = pairingResult.People;
 
             //Everyone alive can die on the same day, and the extinction check only runs at the
             //start of the next day - so the rest of this day must handle an empty population
@@ -113,11 +112,9 @@ namespace ProjectMarworyn.Core.Managers
             var childGenerationResult = _personGenerator.GenerateChildren(_pairs,
                 _worldSeed,
                 _people.MaxBy(x => x.Id ).Id,
-                _people,
                 date);
 
-            _people = childGenerationResult.People.Concat(childGenerationResult.Children)
-                .ToList();
+            _people.AddRange(childGenerationResult.Children);
         }
     }
 }

@@ -333,7 +333,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Single(result.Children);
@@ -353,9 +352,9 @@ namespace ProjectMarworyn.UnitTests
             var pair2 = CreateFertilePair();
 
             var lowerResult = CreateGeneratorWithNextDouble(lowerValue)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.PersonA, pair1.PersonB }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new DateTime(1, 1, 1));
             var upperResult = CreateGeneratorWithNextDouble(upperValue)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.PersonA, pair2.PersonB }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
             Assert.Equal(lowerExpected, lowerResult.Children[0].Biosex);
             Assert.Equal(upperExpected, upperResult.Children[0].Biosex);
@@ -377,7 +376,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedBiosex, result.Children[0].Biosex);
@@ -400,7 +398,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedBiosex, result.Children[0].Biosex);
@@ -417,9 +414,9 @@ namespace ProjectMarworyn.UnitTests
             var pair2 = CreateFertilePair();
 
             var alignedResult = CreateGeneratorWithNextDouble(0.9900)
-                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new List<Person> { pair1.PersonA, pair1.PersonB }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair1 }, 0, 0, new DateTime(1, 1, 1));
             var flippedResult = CreateGeneratorWithNextDouble(0.9900, transgenderProbability: 100)
-                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new List<Person> { pair2.PersonA, pair2.PersonB }, new DateTime(1, 1, 1));
+                .GenerateChildren(new List<Pair> { pair2 }, 0, 0, new DateTime(1, 1, 1));
 
             Assert.Equal(Biosex.Intersex, alignedResult.Children[0].Biosex);
             Assert.NotEqual(alignedResult.Children[0].Gender, flippedResult.Children[0].Gender);
@@ -434,7 +431,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
@@ -457,7 +453,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedBiosex, result.Children[0].Biosex);
@@ -482,7 +477,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedGender, result.Children[0].Gender);
@@ -500,7 +494,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             var fullName = result.Children[0].Name.FullName;
@@ -531,7 +524,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedFullName, result.Children[0].Name.FullName);
@@ -548,7 +540,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(2, 6, 15));
 
             Assert.Equal(6, result.Children[0].BirthMonth);
@@ -568,7 +559,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Empty(result.Children);
@@ -594,7 +584,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedOrientation, result.Children[0].Orientation);
@@ -615,7 +604,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(Orientation.Aroace, result.Children[0].Orientation);
@@ -639,10 +627,27 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(expectedWillPair, result.Children[0].WillPair);
+        }
+
+        // The cooldown reset happens on the Person objects directly - GenerateChildren
+        // no longer owns or reorders the population list (issue #34).
+        [Fact]
+        public void GenerateChildren_OnBirth_ResetsBothParentsCooldown()
+        {
+            var generator = CreateGeneratorWithNextDouble(0.4514);
+            var pair = CreateFertilePair();
+
+            var result = generator.GenerateChildren(new List<Pair> { pair },
+                0,
+                0,
+                new DateTime(1, 1, 1));
+
+            Assert.Single(result.Children);
+            Assert.Equal(0, pair.PersonA.DaysSinceLastChild);
+            Assert.Equal(0, pair.PersonB.DaysSinceLastChild);
         }
 
         // Reproduction requires exactly one female and one male biosex parent (issue #15
@@ -658,7 +663,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Empty(result.Children);
@@ -678,7 +682,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             // 0.4514 rolls a female child, so the female convention applies:
@@ -704,7 +707,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Empty(result.Children);
@@ -721,7 +723,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Empty(result.Children);
@@ -739,7 +740,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Single(result.Children);
@@ -763,7 +763,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Single(result.Children);
@@ -781,7 +780,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Single(result.Children);
@@ -802,7 +800,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(Biosex.Intersex, result.Children[0].Biosex);
@@ -819,7 +816,6 @@ namespace ProjectMarworyn.UnitTests
             var result = generator.GenerateChildren(new List<Pair> { pair },
                 0,
                 0,
-                new List<Person> { pair.PersonA, pair.PersonB },
                 new DateTime(1, 1, 1));
 
             Assert.Equal(Biosex.Female, result.Children[0].Biosex);

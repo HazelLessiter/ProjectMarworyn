@@ -91,14 +91,12 @@ namespace ProjectMarworyn.Core.Generators
         public ChildGenerationResult GenerateChildren(List<Pair> pairs,
             int worldSeed,
             int personId,
-            List<Person> people,
             DateTime currentTime)
         {
             var dice = _diceGenerator.Create(worldSeed,
                 currentTime);
 
             var children = new List<Person>();
-            List<Person> peopleToUpdate = new List<Person>();
 
             foreach (var pair in pairs)
             {
@@ -182,24 +180,14 @@ namespace ProjectMarworyn.Core.Generators
                     children.Add(child);
                     _gameState.Text.Add($"Child {child.Name.FullName} was born to {mother.Name.FullName} and {father.Name.FullName}");
 
-                    peopleToUpdate.Add(mother);
-                    peopleToUpdate.Add(father);
-
-                    people.Remove(mother);
-                    people.Remove(father);
+                    mother.DaysSinceLastChild = 0;
+                    father.DaysSinceLastChild = 0;
                 }
-            }
-
-            foreach (var person in peopleToUpdate)
-            {
-                person.DaysSinceLastChild = 0;
-                people.Add(person);
             }
 
             return new ChildGenerationResult
             {
-                Children = children,
-                People = people
+                Children = children
             };
         }
 

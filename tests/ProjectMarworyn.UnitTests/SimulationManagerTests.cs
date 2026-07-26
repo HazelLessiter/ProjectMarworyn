@@ -41,9 +41,8 @@ namespace ProjectMarworyn.UnitTests
             _mockPersonGenerator.GenerateChildren(Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>(),
-                    Arg.Any<List<Person>>(),
                     Arg.Any<DateTime>())
-                .Returns(new ChildGenerationResult { Children = new List<Person>(), People = _people });
+                .Returns(new ChildGenerationResult { Children = new List<Person>() });
 
             _mockAgeProcessor = Substitute.For<IAgeProcessor>();
             _mockAgeProcessor.Age(Arg.Any<List<Person>>(), Arg.Any<DateTime>()).Returns(x => x.ArgAt<List<Person>>(0));
@@ -55,7 +54,7 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(x => new PairingResult { Pairs = new List<Pair>(), People = x.ArgAt<List<Person>>(0) });
+                .Returns(new PairingResult { Pairs = new List<Pair>() });
 
             _simulationManager = new SimulationManager(mockFileManager,
                 mockGenerationManager,
@@ -99,12 +98,10 @@ namespace ProjectMarworyn.UnitTests
             _mockPersonGenerator.GenerateChildren(Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>(),
-                    Arg.Any<List<Person>>(),
                     Arg.Any<DateTime>())
-                .Returns(x => new ChildGenerationResult
+                .Returns(new ChildGenerationResult
                 {
-                    Children = new List<Person> { child },
-                    People = x.ArgAt<List<Person>>(3)
+                    Children = new List<Person> { child }
                 });
             _simulationManager.Start();
 

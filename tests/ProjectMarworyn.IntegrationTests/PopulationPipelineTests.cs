@@ -191,7 +191,6 @@ public class PopulationPipelineTests
         var childResult = _personGenerator.GenerateChildren(pairingResult.Pairs,
             worldSeed,
             people.Max(p => p.Id),
-            pairingResult.People,
             new DateTime(1, 1, 1));
 
         Assert.NotNull(childResult.Children);

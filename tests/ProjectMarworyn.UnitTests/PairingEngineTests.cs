@@ -52,7 +52,6 @@ namespace ProjectMarworyn.UnitTests
                 new DateTime(1, 1, 1));
 
             Assert.NotNull(result.Pairs);
-            Assert.NotNull(result.People);
         }
 
         [Fact]
@@ -280,25 +279,6 @@ namespace ProjectMarworyn.UnitTests
 
             Assert.True(femalePerson.HasPair);
             Assert.True(malePerson.HasPair);
-        }
-
-        [Fact]
-        public void GeneratePairs_ReturnsPeopleList()
-        {
-            var people = new List<Person>
-            {
-                CreateAdult(1, "Jane", Biosex.Female, Gender.Female),
-                CreateAdult(2, "John", Biosex.Male, Gender.Male, age: 28)
-            };
-            var pairs = new List<Pair>();
-
-            var result = _pairingEngine.GeneratePairs(people,
-                pairs,
-                0,
-                new DateTime(1, 1, 1));
-
-            Assert.NotNull(result.People);
-            Assert.Equal(people, result.People);
         }
 
         [Theory]
