@@ -54,7 +54,7 @@ namespace ProjectMarworyn.UnitTests
                     Arg.Any<List<Pair>>(),
                     Arg.Any<int>(),
                     Arg.Any<DateTime>())
-                .Returns(new PairingResult { Pairs = new List<Pair>() });
+                .Returns(new List<Pair>());
 
             _simulationManager = new SimulationManager(mockFileManager,
                 mockGenerationManager,

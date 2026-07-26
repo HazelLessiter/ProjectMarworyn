@@ -184,12 +184,10 @@ ProjectMarworyn/
 │       │   │   ├── BiosexModifier.cs
 │       │   │   ├── Gender.cs         # Female / Male / NonBinary enum
 │       │   │   └── Orientation.cs    # Heterosexual through Aroace enum
-│       │   ├── ChildGenerationResult.cs # Children + updated people from GenerateChildren
 │       │   ├── GameState.cs          # Shared state — text lines rendered each frame
 │       │   ├── InitialPerson.cs      # FullName, Prefix, Suffix, Biosex, Gender, Orientation, WillPair, IsFertile — maps from InitialPeople.json
 │       │   ├── Name.cs               # FullName, Prefix, Suffix
 │       │   ├── Pair.cs               # Matched pair of individuals
-│       │   ├── PairingResult.cs      # Pairs + updated people from GeneratePairs
 │       │   ├── Person.cs             # Individual with age, biosex, gender, name, and simulation state
 │       │   ├── SimulationClock.cs    # In-world time state
 │       │   └── SeedWord.cs           # Id + Word

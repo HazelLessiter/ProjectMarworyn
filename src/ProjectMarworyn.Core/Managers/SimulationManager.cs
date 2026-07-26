@@ -95,11 +95,10 @@ namespace ProjectMarworyn.Core.Managers
                 date);
 
             //Pair
-            var pairingResult = _pairingEngine.GeneratePairs(_people,
+            _pairs = _pairingEngine.GeneratePairs(_people,
                 _pairs,
                 _worldSeed,
                 date);
-            _pairs = pairingResult.Pairs;
 
             //Everyone alive can die on the same day, and the extinction check only runs at the
             //start of the next day - so the rest of this day must handle an empty population

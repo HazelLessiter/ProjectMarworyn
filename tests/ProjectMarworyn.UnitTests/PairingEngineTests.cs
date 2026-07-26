@@ -37,7 +37,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.NotNull(result.Pairs);
+            Assert.NotNull(result);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         [Fact]
@@ -105,8 +105,8 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal("Jane", result.Pairs[0].PersonA.Name.FullName);
-            Assert.Equal("John", result.Pairs[0].PersonB.Name.FullName);
+            Assert.Equal("Jane", result[0].PersonA.Name.FullName);
+            Assert.Equal("John", result[0].PersonB.Name.FullName);
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         // Two heterosexual people of the same gender have no mutual attraction,
@@ -144,7 +144,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -162,7 +162,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -180,7 +180,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         [Fact]
@@ -198,7 +198,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         [Fact]
@@ -241,7 +241,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(2, result.Pairs.Count);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
@@ -301,7 +301,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         // Attraction must be mutual: she is attracted to him, he is not attracted to her.
@@ -320,7 +320,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -338,7 +338,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         // The pansexual person reaches the non-binary gender; the heterosexual non-binary
@@ -358,7 +358,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         // WillPair is the orientation-independent opt-out: a compatible partner is available,
@@ -378,7 +378,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
             Assert.False(people[0].HasPair);
         }
 
@@ -399,7 +399,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Empty(result.Pairs);
+            Assert.Empty(result);
         }
 
         // Intersex people were silently excluded from the old biosex-pool pairing;
@@ -419,7 +419,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Single(result.Pairs);
+            Assert.Single(result);
         }
 
         // Someone claimed as a partner mid-loop must be skipped when their own turn comes:
@@ -441,7 +441,7 @@ namespace ProjectMarworyn.UnitTests
                 0,
                 new DateTime(1, 1, 1));
 
-            Assert.Equal(2, result.Pairs.Count);
+            Assert.Equal(2, result.Count);
             Assert.All(people, person => Assert.True(person.HasPair));
         }
 

@@ -18,7 +18,7 @@ namespace ProjectMarworyn.Core
             _gameState = gameState;
         }
 
-        public PairingResult GeneratePairs(List<Person> people,
+        public List<Pair> GeneratePairs(List<Person> people,
             List<Pair> pairs,
             int worldSeed,
             DateTime currentTime)
@@ -75,10 +75,7 @@ namespace ProjectMarworyn.Core
                     x.PersonB.IsAlive)
                 .ToList();
 
-            return new PairingResult
-            {
-                Pairs = alivePairs
-            };
+            return alivePairs;
         }
     }
 }

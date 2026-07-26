@@ -4,6 +4,6 @@ namespace ProjectMarworyn.Core
 {
     internal interface IPairingEngine
     {
-        PairingResult GeneratePairs(List<Person> people, List<Pair> pairs, int worldSeed, DateTime currentTime);
+        List<Pair> GeneratePairs(List<Person> people, List<Pair> pairs, int worldSeed, DateTime currentTime);
     }
 }

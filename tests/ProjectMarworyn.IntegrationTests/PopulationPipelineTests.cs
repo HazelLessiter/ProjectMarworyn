@@ -133,7 +133,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.NotEmpty(result.Pairs);
+        Assert.NotEmpty(result);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(result.Pairs);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class PopulationPipelineTests
             worldSeed,
             new DateTime(1, 1, 1));
 
-        Assert.Empty(result.Pairs);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class PopulationPipelineTests
             new List<Pair>(),
             worldSeed,
             new DateTime(1, 1, 1));
-        var childResult = _personGenerator.GenerateChildren(pairingResult.Pairs,
+        var childResult = _personGenerator.GenerateChildren(pairingResult,
             worldSeed,
             people.Max(p => p.Id),
             new DateTime(1, 1, 1));
